@@ -68,15 +68,22 @@ def select_primary_group():
 
 class UserForm(FlaskForm):
     username = StringField(_("Username"), validators=[
-        DataRequired(message=_("A valid username is required.")),
+        Optional(),
         is_username])
 
+    display_name = StringField(_("Display name"), validators=[
+        DataRequired(message="Invalid displayed name."),
+        Length(max=50)])
+
     email = StringField(_("Email address"), validators=[
-        DataRequired(message=_("A valid email address is required.")),
+        Optional(),
         Email(message=_("Invalid email address."))])
 
+    discord = StringField(_("Discord id"), validators=[
+        Optional()])
+
     password = PasswordField("Password", validators=[
-        DataRequired()])
+        Optional()])
 
     birthday = BirthdayField(_("Birthday"), format="%d %m %Y", validators=[
         Optional()])
@@ -156,6 +163,10 @@ class UserForm(FlaskForm):
 
     def save(self):
         data = self.data
+        if not data["username"]:
+            data["username"] = None
+        if not data["email"]:
+            data["email"] = None
         data.pop('submit', None)
         data.pop('csrf_token', None)
         user = User(**data)

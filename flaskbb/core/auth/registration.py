@@ -23,11 +23,13 @@ class UserRegistrationInfo(object):
     User registration object, contains all relevant information for validating
     and creating a new user.
     """
-    username = attr.ib()
-    password = attr.ib(repr=False)
-    email = attr.ib()
-    language = attr.ib()
-    group = attr.ib()
+    display_name = attr.ib()
+    username = attr.ib(default=None)
+    password = attr.ib(default=None, repr=False)
+    email = attr.ib(default=None)
+    discord = attr.ib(default=None)
+    language = attr.ib(default=None)
+    group = attr.ib(default=None)
 
 
 class UserValidator(ABC):
@@ -105,4 +107,8 @@ class UserRegistrationService(ABC):
         :param user_info: The provided user registration information.
         :type user_info: :class:`~flaskbb.core.auth.registration.UserRegistrationInfo`
         """  # noqa
+        pass
+
+    @abstractmethod
+    def register_via_discord(self, user_discord_info):
         pass

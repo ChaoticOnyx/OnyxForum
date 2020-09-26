@@ -177,24 +177,24 @@ class ChangeUserDetails(MethodView):
 
 
 class AllUserTopics(MethodView):  # pragma: no cover
-    def get(self, username):
+    def get(self, userid):
         page = request.args.get("page", 1, type=int)
-        user = User.query.filter_by(username=username).first_or_404()
+        user = User.query.filter_by(id=userid).first_or_404()
         topics = user.all_topics(page, current_user)
         return render_template("user/all_topics.html", user=user, topics=topics)
 
 
 class AllUserPosts(MethodView):  # pragma: no cover
-    def get(self, username):
+    def get(self, userid):
         page = request.args.get("page", 1, type=int)
-        user = User.query.filter_by(username=username).first_or_404()
+        user = User.query.filter_by(id=userid).first_or_404()
         posts = user.all_posts(page, current_user)
         return render_template("user/all_posts.html", user=user, posts=posts)
 
 
 class UserProfile(MethodView):  # pragma: no cover
-    def get(self, username):
-        user = User.query.filter_by(username=username).first_or_404()
+    def get(self, userid):
+        user = User.query.filter_by(id=userid).first_or_404()
         return render_template("user/profile.html", user=user)
 
 
@@ -219,17 +219,17 @@ def flaskbb_load_blueprints(app):
     )
     register_view(
         user,
-        routes=["/<username>/posts"],
+        routes=["/user<userid>/posts"],
         view_func=AllUserPosts.as_view("view_all_posts"),
     )
     register_view(
         user,
-        routes=["/<username>/topics"],
+        routes=["/user<userid>/topics"],
         view_func=AllUserTopics.as_view("view_all_topics"),
     )
 
     register_view(
-        user, routes=["/<username>"], view_func=UserProfile.as_view("profile")
+        user, routes=["/user<userid>"], view_func=UserProfile.as_view("profile")
     )
 
     app.register_blueprint(user, url_prefix=app.config["USER_URL_PREFIX"])

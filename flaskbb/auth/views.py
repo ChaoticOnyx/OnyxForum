@@ -10,9 +10,10 @@
     :license: BSD, see LICENSE for more details.
 """
 import logging
+import traceback
 from datetime import datetime
 
-from flask import Blueprint, current_app, flash, g, redirect, request, url_for
+from flask import Blueprint, current_app, flash, g, redirect, request, url_for, session
 from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import (
@@ -23,6 +24,7 @@ from flask_login import (
     login_user,
     logout_user,
 )
+from flask_discord.models import User as DiscordUser
 
 from flaskbb.auth.forms import (
     AccountActivationForm,
@@ -62,6 +64,60 @@ from .services import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+class DiscordAuthorize(MethodView):
+    def get(self):
+        # if current_app.discord.authorized:
+        #     current_app.discord.revoke()
+        #    return
+        return current_app.discord.create_session()
+
+
+class DiscordAuthorizeCallback(MethodView):
+    def __init__(self, authentication_manager_factory, registration_service_factory):
+        self.authentication_manager_factory = authentication_manager_factory
+        self.registration_service_factory = registration_service_factory
+
+    def get(self):
+        s = session
+        current_app.discord.callback()
+        discord_user: DiscordUser = current_app.discord.fetch_user()
+        print(discord_user)
+
+        auth_manager = self.authentication_manager_factory()
+        try:
+            user = auth_manager.authenticate_via_discord(
+                discord=str(discord_user.id)
+            )
+        finally:
+            pass
+
+        if not user:
+            registration_info = UserRegistrationInfo(
+                discord=str(discord_user.id),
+                display_name=discord_user.username,
+                group=4
+            )
+
+            service = self.registration_service_factory()
+            try:
+                service.register_via_discord(registration_info)
+                user = auth_manager.authenticate_via_discord(
+                    discord=str(discord_user.id)
+                )
+            except Exception as e:
+                print(traceback.format_exc())
+                flash("Failed authorize with Discord", "danger")
+
+        if user:
+            login_user(user, remember=True)
+
+            current_app.pluggy.hook.flaskbb_event_user_registered(
+                username=user.username
+            )
+
+        return redirect(url_for("forum.index"))
 
 
 class Logout(MethodView):
@@ -114,6 +170,10 @@ class Reauth(MethodView):
 
     def get(self):
         if not login_fresh():
+            if current_user.password is None:
+                if current_app.discord.authorized:
+                    confirm_login()
+                return current_app.discord.create_session()
             return render_template("auth/reauth.html", form=self.form())
         return redirect_or_next(current_user.url)
 
@@ -161,6 +221,7 @@ class Register(MethodView):
         if form.validate_on_submit():
             registration_info = UserRegistrationInfo(
                 username=form.username.data,
+                display_name=form.username.data,
                 password=form.password.data,
                 group=4,
                 email=form.email.data,
@@ -434,6 +495,16 @@ def flaskbb_load_blueprints(app):
     limiter.limit(
         login_rate_limit, error_message=login_rate_limit_message
     )(auth)
+
+    register_view(auth, routes=['/discord'], view_func=DiscordAuthorize.as_view('discord'))
+    register_view(
+        auth,
+        routes=['/discord-callback'],
+        view_func=DiscordAuthorizeCallback.as_view(
+            'discord-callback',
+            authentication_manager_factory=authentication_manager_factory,
+            registration_service_factory=registration_service_factory)
+    )
 
     register_view(auth, routes=['/logout'], view_func=Logout.as_view('logout'))
     register_view(

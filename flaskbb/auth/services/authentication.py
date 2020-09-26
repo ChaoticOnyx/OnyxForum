@@ -98,6 +98,13 @@ class DefaultFlaskBBAuthProvider(AuthenticationProvider):
         check_password_hash("dummy password", secret)
         return None
 
+    def authenticate_via_discord(self, discord):
+        user = User.query.filter(
+            db.or_(User.discord == discord)
+        ).first()
+
+        return user
+
 
 class MarkFailedLogin(AuthenticationFailureHandler):
     """
@@ -164,6 +171,28 @@ class PluginAuthenticationManager(AuthenticationManager):
         except StopAuthentication:
             self.plugin_manager.hook.flaskbb_authentication_failed(
                 identifier=identifier
+            )
+            raise
+        finally:
+            try:
+                self.session.commit()
+            except Exception:
+                logger.exception("Exception while processing login")
+                self.session.rollback()
+                raise
+
+    def authenticate_via_discord(self, discord):
+        try:
+            user = self.plugin_manager.hook.flaskbb_authenticate_via_discord(
+                discord=discord
+            )
+            if user is None:
+                raise StopAuthentication(_("Wrong discord id."))
+            self.plugin_manager.hook.flaskbb_post_authenticate(user=user)
+            return user
+        except StopAuthentication:
+            self.plugin_manager.hook.flaskbb_authentication_failed(
+                identifier=discord
             )
             raise
         finally:

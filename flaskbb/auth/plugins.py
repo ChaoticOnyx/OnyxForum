@@ -43,6 +43,11 @@ def flaskbb_authenticate(identifier, secret):
     return DefaultFlaskBBAuthProvider().authenticate(identifier, secret)
 
 
+@impl(trylast=True)
+def flaskbb_authenticate_via_discord(discord):
+    return DefaultFlaskBBAuthProvider().authenticate_via_discord(discord)
+
+
 @impl(tryfirst=True)
 def flaskbb_post_authenticate(user):
     handlers = [ClearFailedLogins()]

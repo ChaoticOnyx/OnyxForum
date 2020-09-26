@@ -28,6 +28,7 @@ class UserDetailsChange(object):
     Object representing a change user details.
     """
 
+    display_name = attr.ib(default=empty)
     birthday = attr.ib(default=empty)
     gender = attr.ib(default=empty)
     location = attr.ib(default=empty)

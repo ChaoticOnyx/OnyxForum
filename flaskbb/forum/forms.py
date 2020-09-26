@@ -60,6 +60,7 @@ class ReplyForm(PostForm):
         else:
             self.post.date_modified = time_utcnow()
             self.post.modified_by = user.username
+            self.post.modified_by_user_id = user.id
 
         if self.track_topic.data:
             user.track_topic(topic)
@@ -140,6 +141,7 @@ class EditTopicForm(TopicForm):
 
         self.topic.first_post.date_modified = time_utcnow()
         self.topic.first_post.modified_by = user.username
+        self.topic.first_post.modified_by_user_id = user.id
 
         current_app.pluggy.hook.flaskbb_form_topic_save(
             form=self, topic=self.topic

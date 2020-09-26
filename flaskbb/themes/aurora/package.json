@@ -41,6 +41,8 @@
     "uglify-js": "^3.3.16"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.14.0",
+    "@fortawesome/free-brands-svg-icons": "^5.14.0",
     "bootstrap-markdown": "^2.10.0",
     "bootstrap-sass": "^3.3.7",
     "font-awesome": "^4.7.0",

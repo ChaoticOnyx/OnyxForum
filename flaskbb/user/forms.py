@@ -99,6 +99,9 @@ class ChangePasswordForm(FlaskBBForm):
 
 
 class ChangeUserDetailsForm(FlaskBBForm):
+    display_name = StringField(_("Display name"), validators=[
+        DataRequired(message="Invalid displayed name."),
+        Length(max=50)])
     birthday = BirthdayField(_("Birthday"), format="%d %m %Y", validators=[Optional()])
     gender = StringField(_("Gender"), validators=[Optional()])
     location = StringField(_("Location"), validators=[Optional()])
@@ -114,6 +117,7 @@ class ChangeUserDetailsForm(FlaskBBForm):
 
     def as_change(self):
         return UserDetailsChange(
+            display_name=self.display_name.data,
             birthday=self.birthday.data,
             gender=self.gender.data,
             location=self.location.data,

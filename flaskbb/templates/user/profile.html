@@ -3,7 +3,7 @@
 {% block breadcrumb %}
 <ul class="breadcrumb flaskbb-breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li class="active">{{ user.username }}</li>
+    <li class="active">{{ user.display_name }}</li>
 </ul>
 {% endblock %}
 

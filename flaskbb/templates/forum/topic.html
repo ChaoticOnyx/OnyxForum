@@ -17,7 +17,7 @@
     {% if topic.hidden %}
     <div class="alert alert-warning">
         <span class="fa fa-user-secret"></span>
-        {{ gettext("This topic is hidden (%(when)s by %(who)s)", who=topic.hidden_by.username, when=format_date(topic.hidden_at)) }}
+        {{ gettext("This topic is hidden (%(when)s by %(who)s)", who=topic.hidden_by.display_name, when=format_date(topic.hidden_at)) }}
     </div>
     {% endif %}
 
@@ -33,7 +33,7 @@
                 <div class="author col-md-2 col-sm-3 col-xs-12">
                     <!-- Registered User -->
                     {% if post.user_id %}
-                    <div class="author-name"><h4><a href="{{ user.url }}">{{ user.username }}</a></h4></div>
+                    <div class="author-name"><h4><a href="{{ user.url }}">{{ user.display_name }}</a></h4></div>
 
                     <!-- check if user is online or not -->
                     {% if user|is_online %}
@@ -56,7 +56,7 @@
 
                     {% else %}
                     <!-- user deleted or guest -->
-                    <div class="author-name"><h4>{{ post.username }}</h4></div>
+                    <div class="author-name"><h4>{{ post.display_name }}</h4></div>
                     <div class="author-title"><h5>{% trans %}Guest{% endtrans %}</h5></div>
                     {% endif %}
 
@@ -72,7 +72,7 @@
                             </a>
                             {% if post.user_id and post.date_modified %}
                             <small>
-                                ({% trans date=post.date_modified|format_datetime, user_url=url_for('user.profile', username=post.modified_by), user=post.modified_by %}Last modified: {{ date }} by <a href="{{ user_url }}">{{ user }}</a>{% endtrans %})
+                                ({% trans date=post.date_modified|format_datetime, user_url=url_for('user.profile', userid=post.modified_by_user_id), user=post.modified_by %}Last modified: {{ date }} by <a href="{{ user_url }}">{{ user }}</a>{% endtrans %})
                             </small>
                             {% endif %}
                         </div>
@@ -87,7 +87,7 @@
                             {% if post.hidden %}
                             <div class="alert alert-warning">
                                 <span class="fa fa-user-secret"></span>
-                                {{ gettext("This post is hidden (%(when)s by %(who)s)", who=post.hidden_by.username, when=format_date(post.hidden_at)) }}
+                                {{ gettext("This post is hidden (%(when)s by %(who)s)", who=post.hidden_by.display_name, when=format_date(post.hidden_at)) }}
                             </div>
                             {% endif %}
 

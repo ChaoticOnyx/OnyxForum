@@ -19,5 +19,5 @@ indent_style = tab
 [*.{json,yaml,yml}]
 indent_size = 2
 
-[*.{ini,html}]
+[*.{ini,html,scss}]
 indent_size = 4

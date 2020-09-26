@@ -86,15 +86,15 @@
                             <div class="topic-author">
                                 {% trans %}by{% endtrans %}
                                 {% if topic.user_id %}
-                                 <a href="{{ topic.user.url }}">{{ topic.user.username }}</a>
+                                 <a href="{{ topic.user.url }}">{{ topic.user.display_name }}</a>
                                 {% else %}
-                                {{ topic.username }}
+                                {{ topic.display_name }}
                                 {% endif %}
                             </div>
 
                             {% if topic.hidden %}
                             <div class="topic-author">
-                                {{ gettext("Hidden on %(when)s  by %(who)s", who=topic.hidden_by.username, when=format_date(topic.hidden_at)) }}
+                                {{ gettext("Hidden on %(when)s  by %(who)s", who=topic.hidden_by.display_name, when=format_date(topic.hidden_at)) }}
                             </div>
                             {% endif %}
                         </div>
@@ -114,9 +114,9 @@
                     <div class="topic-author">
                         {% trans %}by{% endtrans %}
                         {% if last_post.user_id %}
-                        <a href="{{ last_post.user.url }}">{{ last_post.user.username }}</a>
+                        <a href="{{ last_post.user.url }}">{{ last_post.user.display_name }}</a>
                         {% else %}
-                        {{ last_post.username }}
+                        {{ last_post.display_name }}
                         {% endif %}
                     </div>
                 </div>

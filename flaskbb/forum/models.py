@@ -157,6 +157,7 @@ class Post(HideableCRUDMixin, db.Model):
                              nullable=False)
     date_modified = db.Column(UTCDateTime(timezone=True), nullable=True)
     modified_by = db.Column(db.String(200), nullable=True)
+    modified_by_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
 
     # Properties
     @property

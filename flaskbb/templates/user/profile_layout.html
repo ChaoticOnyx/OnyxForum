@@ -1,6 +1,6 @@
 {%- from theme("macros.html") import sidebar with context -%}
 {% extends theme("layout.html") %}
-{% set page_title = _("%(user)s - User", user=user.username) %}
+{% set page_title = _("%(user)s - User", user=user.display_name) %}
 
 {% block content %}
 
@@ -12,7 +12,7 @@
         <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="panel page-panel">
                 <div class="panel-heading page-head">
-                    <a href="{{ user.url }}">{{ user.username }}</a>
+                    <a href="{{ user.url }}">{{ user.display_name }}</a>
                     {% if current_user|can_edit_user %}
                     <a class="btn btn-xs btn-default pull-right" href="{{ url_for('management.edit_user', user_id=user.id)}}"><i class="fa fa-pencil"></i> {% trans %}Edit{% endtrans %}</a>
                     {% endif %}
@@ -22,7 +22,7 @@
                     <div class="col-md-3 col-sm-3 col-xs-12 profile-sidebar">
                         <div class="profile-picture">
                             {% if user.avatar %}
-                            <img src="{{ user.avatar }}" alt="{{ user.username }}'s Avatar">
+                            <img src="{{ user.avatar }}" alt="{{ user.display_name }}'s Avatar">
                             {% endif %}
                         </div>
 

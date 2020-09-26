@@ -4,7 +4,7 @@
 {% block breadcrumb %}
 <ul class="breadcrumb flaskbb-breadcrumb">
     <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li><a href="{{ user.url }}">{{ user.username }}</a></li>
+    <li><a href="{{ user.url }}">{{ user.display_name }}</a></li>
     <li class="active">{% trans %}Posts{% endtrans %}</li>
 </ul>
 {% endblock %}
@@ -42,7 +42,7 @@
     {% if posts.items %}
     <div class="col-md-12 col-sm-12 col-xs-12 controls-col">
         <div class="pull-left">
-            {{ render_pagination(posts, url_for('user.view_all_posts', username=user.username)) }}
+            {{ render_pagination(posts, url_for('user.view_all_posts', userid=user.id)) }}
         </div>
     </div>
     {% endif %}

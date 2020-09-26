@@ -11,6 +11,7 @@
         <form class="form-horizontal" role="form" method="POST">
             {{ form.hidden_tag() }}
             {{ run_hook('flaskbb_tpl_form_user_details_before', form=form) }}
+            {{ horizontal_field(form.display_name) }}
             {{ horizontal_select_field(form.birthday, select_class="form-control", surrounded_div="col-sm-4") }}
             {{ horizontal_field(form.gender) }}
             {{ horizontal_field(form.location) }}

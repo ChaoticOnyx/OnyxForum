@@ -37,7 +37,9 @@
                 <form class="form-horizontal settings-form" role="form" method="post">
                     {{ form.hidden_tag() }}
                     {{ horizontal_field(form.username) }}
+                    {{ horizontal_field(form.display_name) }}
                     {{ horizontal_field(form.email) }}
+                    {{ horizontal_field(form.discord) }}
                     {{ horizontal_field(form.password) }}
                     {{ horizontal_select_field(form.birthday, surrounded_div="col-sm-4") }}
                     {{ horizontal_field(form.gender) }}

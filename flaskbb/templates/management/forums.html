@@ -135,7 +135,7 @@
                                         <div class="forum-moderators">
                                             {% trans %}Moderators{% endtrans %}:
                                             {% for moderator in forum.moderators %}
-                                            <a href="{{ url_for('user.profile', username=moderator.username) }}">{{ moderator.username }}</a>{% if not loop.last %}, {% endif %}
+                                            <a href="{{ moderator.url }}">{{ moderator.display_name }}</a>{% if not loop.last %}, {% endif %}
                                             {% endfor %}
                                         </div>
                                         {% endif %}

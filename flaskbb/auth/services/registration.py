@@ -210,6 +210,12 @@ class RegistrationService(UserRegistrationService):
         self._post_process(user)
         return user
 
+    def register_via_discord(self, user_info):
+        user = self._store_user(user_info)
+        user.activated = True
+        self._post_process(user)
+        return user
+
     def _validate_registration(self, user_info):
         failures = []
         validators = self.plugins.hook.flaskbb_gather_registration_validators()
@@ -231,7 +237,9 @@ class RegistrationService(UserRegistrationService):
         try:
             user = User(
                 username=user_info.username,
+                display_name=user_info.display_name,
                 email=user_info.email,
+                discord=user_info.discord,
                 password=user_info.password,
                 language=user_info.language,
                 primary_group_id=user_info.group,

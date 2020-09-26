@@ -62,10 +62,10 @@
             {% for report in reports.items %}
                 <div class="row settings-row hover clearfix">
                     <div class="col-md-1 col-sm-1 col-xs-1"><input type="checkbox" name="rowid" class="action-checkbox" value="{{ report.id }}" title="Select Report"/></div>
-                    <div class="col-md-1 col-sm-2 col-xs-2"><a href="{{ report.post.user.url }}">{{ report.post.user.username }}</a></div>
+                    <div class="col-md-1 col-sm-2 col-xs-2"><a href="{{ report.post.user.url }}">{{ report.post.user.display_name }}</a></div>
                     <div class="col-md-2 col-sm-3 col-xs-3"><a href="{{ report.post.url }}" target="_blank">{{ report.post.topic.title }}</a></div>
                     <div class="col-md-2 col-sm-4 col-xs-3">{{ report.reason }}</div>
-                    <div class="col-md-2 hidden-sm hidden-xs">{{ report.reporter.username }}</div>
+                    <div class="col-md-2 hidden-sm hidden-xs">{{ report.reporter.display_name }}</div>
                     <div class="col-md-2 hidden-sm hidden-xs">{{ report.reported|time_since }}</div>
                     <div class="col-md-2 col-sm-2 col-xs-2">
                         {% if not report.zapped %}

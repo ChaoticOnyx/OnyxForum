@@ -355,6 +355,12 @@ def flaskbb_authenticate(identifier, secret):
     """
 
 
+@spec(firstresult=True)
+def flaskbb_authenticate_via_discord(discord):
+    """
+    """
+
+
 @spec
 def flaskbb_post_authenticate(user):
     """Hook for handling actions that occur after a user is
@@ -705,6 +711,13 @@ def flaskbb_settings_updated(user, settings_update):
 
 
 # Template Hooks
+@spec
+def flaskbb_tpl_navigation_first():
+    """Hook for registering additional navigation items.
+
+    in :file:`templates/layout.html`.
+    """
+
 @spec
 def flaskbb_tpl_navigation_before():
     """Hook for registering additional navigation items.

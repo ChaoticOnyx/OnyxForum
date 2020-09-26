@@ -94,9 +94,11 @@ class User(db.Model, UserMixin, CRUDMixin):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(200), unique=True, nullable=False)
-    email = db.Column(db.String(200), unique=True, nullable=False)
-    _password = db.Column('password', db.String(120), nullable=False)
+    username = db.Column(db.String(200), unique=True, nullable=True)
+    display_name = db.Column(db.String(200), nullable=False)
+    email = db.Column(db.String(200), unique=True, nullable=True)
+    discord = db.Column(db.String(200), unique=True, nullable=True)
+    _password = db.Column('password', db.String(120), nullable=True)
     date_joined = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
                             nullable=False)
     lastseen = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
@@ -184,7 +186,7 @@ class User(db.Model, UserMixin, CRUDMixin):
     @property
     def url(self):
         """Returns the url for the user."""
-        return url_for("user.profile", username=self.username)
+        return url_for("user.profile", userid=self.id)
 
     @property
     def permissions(self):
@@ -457,6 +459,15 @@ class User(db.Model, UserMixin, CRUDMixin):
                 self.add_to_group(group)
 
             self.invalidate_cache()
+
+        if not self.username:
+            self.username = None
+        if not self.password:
+            self.password = None
+        if not self.email:
+            self.email = None
+        if not self.discord:
+            self.discord = None
 
         db.session.add(self)
         db.session.commit()

@@ -23,7 +23,7 @@
         <!-- syntax highlighting -->
         <link rel="stylesheet" href="{{ url_for('static', filename='css/pygments.css') }}">
         <!-- bootstrap & aurora theme -->
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+        <link rel="stylesheet" href="{{ theme_static('css/styles.css') }}">
         <!-- lato font -->
         <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
         <!-- emoji -->
@@ -73,6 +73,7 @@
                         <ul class="nav navbar-nav forum-nav">
                             {%- from theme("macros.html") import is_active, topnav with context -%}
 
+                            {{ run_hook("flaskbb_tpl_navigation_first") }}
                             {{ run_hook("flaskbb_tpl_navigation_before") }}
                             {{ topnav(endpoint='forum.index', name=_('Forum'), icon='fa fa-comment', active=active_forum_nav) }}
                             {{ topnav(endpoint='forum.memberlist', name=_('Memberlist'), icon='fa fa-user') }}
@@ -89,8 +90,8 @@
                             <!-- User Menu -->
                             <li>
                                 <div class="btn-group navbar-btn user-btn">
-                                    <a class="btn btn-primary" href="{{ url_for('user.profile', username=current_user.username) }}">
-                                        <span class="fa fa-user fa-fw"></span> {{ current_user.username }}
+                                    <a class="btn btn-primary" href="{{ url_for('user.profile', userid=current_user.id) }}">
+                                        <span class="fa fa-user fa-fw"></span> {{ current_user.display_name }}
                                     </a>
                                     <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
                                     <ul class="dropdown-menu" role="menu">
@@ -114,20 +115,9 @@
                             <!-- Not logged in - Login/Register -->
                             <li>
                                 <div class="btn-group navbar-btn user-btn">
-                                    <a class="btn btn-primary" href="{{ url_for('auth.login') }}">
-                                        <span class="fa fa-user fa-fw"></span> {% trans %}Login{% endtrans %}
+                                    <a class="btn discord" href="{{ url_for('auth.discord') }}">
+                                        <img src="static/img/discord.png" width="20"> {% trans %}Login with Discord{% endtrans %}
                                     </a>
-                                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
-                                    <ul class="dropdown-menu" role="menu">
-                                        {# MAYBE(anr): Move this into a hook?? #}
-                                        {% if flaskbb_config["REGISTRATION_ENABLED"] %}
-                                        <li><a href="{{ url_for('auth.register') }}"><span class="fa fa-user-plus fa-fw"></span> {% trans %}Register{% endtrans %}</a></li>
-                                        {% endif %}
-                                        <li><a href="{{ url_for('auth.forgot_password') }}"><span class="fa fa-undo fa-fw"></span> {% trans %}Reset Password{% endtrans %}</a></li>
-                                        {% if flaskbb_config["ACTIVATE_ACCOUNT"] %}
-                                        <li><a href="{{ url_for('auth.request_activation_token') }}"><span class="fa fa-fw fa-ticket"></span> {% trans %}Activate Account{% endtrans %}</a></li>
-                                        {% endif %}
-                                    </ul>
                                 </div>
                             </li>
                             {% endif %}

@@ -21,6 +21,7 @@ from flask_login import current_user
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError, ProgrammingError
+from flask_discord import DiscordOAuth2Session
 
 from flaskbb._compat import iteritems, string_types
 # extensions
@@ -53,6 +54,8 @@ from flaskbb.utils.search import (ForumWhoosheer, PostWhoosheer,
 # app specific configurations
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.translations import FlaskBBDomain
+
+import modules.portal
 
 from . import markup  # noqa
 from .auth import views as auth_views  # noqa
@@ -210,7 +213,7 @@ def configure_extensions(app):
     debugtoolbar.init_app(app)
 
     # Flask-Themes
-    themes.init_themes(app, app_identifier="flaskbb")
+    themes.init_themes(app, app_identifier="flaskbb", theme_url_prefix="/themes")
 
     # Flask-And-Redis
     redis_store.init_app(app)
@@ -246,6 +249,8 @@ def configure_extensions(app):
             return None
 
     login_manager.init_app(app)
+
+    app.discord = DiscordOAuth2Session(app)
 
 
 def configure_template_filters(app):
@@ -322,7 +327,7 @@ def configure_before_handlers(app):
         @app.before_request
         def mark_current_user_online():
             if current_user.is_authenticated:
-                mark_online(current_user.username)
+                mark_online(current_user.id)
             else:
                 mark_online(request.remote_addr, guest=True)
 

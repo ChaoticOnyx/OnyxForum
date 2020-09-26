@@ -60,6 +60,10 @@ class AuthenticationManager(ABC):
         """
         pass
 
+    @abstractmethod
+    def authenticate_via_discord(self, discord):
+        pass
+
 
 class AuthenticationProvider(ABC):
     """
