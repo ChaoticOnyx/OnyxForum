@@ -1,0 +1,39 @@
+{% extends theme("hub/index.html") %}
+
+{% block hub_content %}
+    <div class="main">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Member</th>
+                <th>Pedalique Forum Group</th>
+                <th>Pedalique Discord Role</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for member in members %}
+            <tr>
+                <td>
+                    {% if member.url %}
+                        <a href={{member.url}}>{{ member.username }}</a>
+                    {% else %}
+                        {{ member.username }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if member.group %}
+                        {{ member.group }}
+                        {% if member.remove_group_url %}
+                            <a href={{member.remove_group_url}}>[X]</a>
+                        {% endif %}
+                    {% else %}
+                        <a href={{url_for('hub.team', server=server.id, user_to_add=member.id)}}>[Add Pedalique Group]</a>
+                    {% endif %}
+                </td>
+                <td>{{ member.discord_role }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+{% endblock %}

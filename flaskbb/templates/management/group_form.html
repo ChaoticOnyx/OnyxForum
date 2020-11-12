@@ -54,6 +54,22 @@
                         {{ render_boolean_field(form.makehidden) }}
                         {{ render_boolean_field(form.viewhidden) }}
 
+                        <div class="panel settings-panel">
+                            <div class="panel-heading settings-head">
+                                Servers hub permissions
+                            </div>
+                            <div class="panel-body settings-body">
+                                {{ render_boolean_field(form.onyx_base) }}
+                                {{ render_boolean_field(form.onyx_additional) }}
+                                {{ render_boolean_field(form.onyx_management) }}
+                                {{ render_boolean_field(form.dragon_base) }}
+                                {{ render_boolean_field(form.dragon_additional) }}
+                                {{ render_boolean_field(form.dragon_management) }}
+                                {{ render_boolean_field(form.eos_base) }}
+                                {{ render_boolean_field(form.eos_additional) }}
+                                {{ render_boolean_field(form.eos_management) }}
+                            </div>
+                        </div>
 
                         {{ render_submit_field(form.submit, div_class="form-group col-sm-5") }}
                     </div>

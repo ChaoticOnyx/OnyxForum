@@ -51,6 +51,17 @@ class Group(db.Model, CRUDMixin):
     guest = db.Column(db.Boolean, default=False, nullable=False)
     banned = db.Column(db.Boolean, default=False, nullable=False)
 
+    # Hub permissions
+    onyx_base = db.Column(db.Boolean, default=False, nullable=False)
+    onyx_additional = db.Column(db.Boolean, default=False, nullable=False)
+    onyx_management = db.Column(db.Boolean, default=False, nullable=False)
+    dragon_base = db.Column(db.Boolean, default=False, nullable=False)
+    dragon_additional = db.Column(db.Boolean, default=False, nullable=False)
+    dragon_management = db.Column(db.Boolean, default=False, nullable=False)
+    eos_base = db.Column(db.Boolean, default=False, nullable=False)
+    eos_additional = db.Column(db.Boolean, default=False, nullable=False)
+    eos_management = db.Column(db.Boolean, default=False, nullable=False)
+
     # Moderator permissions (only available when the user a moderator)
     mod_edituser = db.Column(db.Boolean, default=False, nullable=False)
     mod_banuser = db.Column(db.Boolean, default=False, nullable=False)
@@ -85,9 +96,11 @@ class Group(db.Model, CRUDMixin):
     def get_member_group(cls):
         """Returns the first member group."""
         # This feels ugly..
-        return cls.query.filter(cls.admin == False, cls.super_mod == False,
-                                cls.mod == False, cls.guest == False,
-                                cls.banned == False).first()
+        return cls.query.filter(cls.id == 4).first()
+
+    def save(self):
+        User.invalidate_cache_for_all()  # for a case if we changed permissions
+        super().save()
 
 
 class User(db.Model, UserMixin, CRUDMixin):
@@ -228,7 +241,10 @@ class User(db.Model, UserMixin, CRUDMixin):
         """Set to a unique key specific to the object in the database.
         Required for cache.memoize() to work across requests.
         """
-        return "<{} {}>".format(self.__class__.__name__, self.username)
+        if self.username:
+            return "<{} {}>".format(self.__class__.__name__, self.username)
+        else:
+            return "<{} {} ({})>".format(self.__class__.__name__, self.display_name, self.discord)
 
     def _get_password(self):
         """Returns the hashed password."""
@@ -408,6 +424,11 @@ class User(db.Model, UserMixin, CRUDMixin):
         cache.delete_memoized(self.get_permissions, self)
         cache.delete_memoized(self.get_groups, self)
 
+    @classmethod
+    def invalidate_cache_for_all(cls):
+        cache.delete_memoized(cls.get_permissions)
+        cache.delete_memoized(cls.get_groups)
+
     def ban(self):
         """Bans the user. Returns True upon success."""
         if not self.get_permissions()['banned']:
@@ -458,7 +479,7 @@ class User(db.Model, UserMixin, CRUDMixin):
                     continue
                 self.add_to_group(group)
 
-            self.invalidate_cache()
+        self.invalidate_cache()
 
         if not self.username:
             self.username = None

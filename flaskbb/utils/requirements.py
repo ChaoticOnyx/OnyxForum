@@ -239,14 +239,8 @@ def permission_with_identity(requirement, name=None):
 
 # Template Requirements
 
-
-def has_permission(permission):
-
-    def _(user):
-        return Permission(Has(permission), identity=user)
-
-    _.__name__ = "Has_{}".format(permission)
-    return _
+def has_permission(user, permission):
+    return Permission(Has(permission), identity=user)
 
 
 def can_moderate(user, forum):

@@ -1,0 +1,50 @@
+{% extends theme("layout.html") %}
+{%- from theme("macros.html") import sidebar with context -%}
+{% set active_hub_nav=True %}
+
+{% block content %}
+<div class="page-view">
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="panel page-panel">
+                <div class="panel-heading page-head">
+                    {{ server.name }}
+                </div>
+                <div class="panel-body page-body profile-body">
+                    {% block server_sidebar %}
+                    <div class="col-md-3 col-sm-3 col-xs-12 server-sidebar">
+{#                        <div class="profile-picture">#}
+{#                            {% if user.avatar %}#}
+{#                            <img src="{{ user.avatar }}" alt="{{ user.display_name }}'s Avatar">#}
+{#                            {% endif %}#}
+{#                        </div>#}
+
+                        <div class="server-name">
+                            {{ server.name }}
+                        </div>
+
+                        <div class="server-online">
+                            {%- if server_status == "online" %}
+                            <span class="label label-success">{% trans %}online{% endtrans %}</span>
+                            {%- else %}
+                            <span class="label label-default">{% trans %}offline{% endtrans %}</span>
+                            {%- endif %}
+                        </div>
+
+                        {{ sidebar(actions, extra_class="profile-sidebar") }}
+                    </div>
+                    {% endblock %}
+
+
+
+                    <div class="col-md-9 col-sm-9 col-xs-12 server-content">
+                        {% block hub_content %}
+                        {% endblock %}
+                    </div> <!-- end col -->
+
+                </div> <!-- end profile widget -->
+            </div> <!-- end page-panel -->
+        </div> <!-- end col -->
+    </div> <!-- end row -->
+</div> <!-- end page-view -->
+{% endblock %}

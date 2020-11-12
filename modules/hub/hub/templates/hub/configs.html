@@ -1,0 +1,12 @@
+
+{% extends theme("hub/index.html") %}
+
+{% block hub_content %}
+<div class="panel page-panel">
+    <div class="panel-body">
+        {% for config in configs %}
+            <a href="{{ url_for('hub.config_edit', server=server.id, config_name=config)}}">{{ config }}</a><br>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

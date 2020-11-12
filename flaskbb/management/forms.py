@@ -262,6 +262,51 @@ class GroupForm(FlaskForm):
         description=_("Allows a user to hide posts and topics"),
     )
 
+    onyx_base = BooleanField(
+        _("Onyx base permissions"),
+        description=_("Readonly access to server logs"),
+    )
+
+    onyx_additional = BooleanField(
+        _("Onyx additional permissions (dangerous)"),
+        description=_("Access to server controls and configs"),
+    )
+
+    onyx_management = BooleanField(
+        _("Onyx management permissions"),
+        description=_("Management access for server's head"),
+    )
+
+    dragon_base = BooleanField(
+        _("Dragon base permissions"),
+        description=_("Readonly access to server logs"),
+    )
+
+    dragon_additional = BooleanField(
+        _("Dragon additional permissions (dangerous)"),
+        description=_("Access to server controls and configs"),
+    )
+
+    dragon_management = BooleanField(
+        _("Dragon management permissions"),
+        description=_("Management access for server's head"),
+    )
+
+    eos_base = BooleanField(
+        _("EOS base permissions"),
+        description=_("Readonly access to server logs"),
+    )
+
+    eos_additional = BooleanField(
+        _("EOS additional permissions (dangerous)"),
+        description=_("Access to server controls and configs"),
+    )
+
+    eos_management = BooleanField(
+        _("EOS management permissions"),
+        description=_("Management access for server's head"),
+    )
+
     submit = SubmitField(_("Save"))
 
     def validate_name(self, field):

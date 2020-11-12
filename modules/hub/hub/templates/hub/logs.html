@@ -1,0 +1,24 @@
+
+{% extends theme("hub/index.html") %}
+
+{% block hub_content %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page"></li>
+        {%- for folder in title_parent_folders %}
+            {%- if folder.url %}
+                <li class="breadcrumb-item"><a href="{{ folder.url }}">{{ folder.name }}</a></li>
+            {%- else %}
+                <li class="breadcrumb-item active" aria-current="page">{{ folder.name }}</li>
+            {%- endif -%}
+        {%- endfor -%}
+    </ol>
+
+    <div class="panel page-panel">
+        <div class="panel-body">
+            {% for entry, url in entries %}
+                <a href="{{ url }}">{{ entry }}</a><br>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+

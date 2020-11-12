@@ -1,0 +1,17 @@
+{% if current_user|can_access_hub %}
+
+<li {% if 'hub' == request.blueprint %}class="active"{% endif %}>
+    <a href={{url_for('hub.index')}} class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        <i class="fa fa-sitemap"></i> Hub
+        <span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+        {% for server in servers %}
+            {% if current_user|has_permission(server.base_permission) %}
+                <li><a href={{url_for('hub.index', server=server.id)}}>{{server.name}}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</li>
+
+{% endif %}

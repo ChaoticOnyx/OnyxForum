@@ -55,6 +55,8 @@ from flaskbb.utils.search import (ForumWhoosheer, PostWhoosheer,
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.translations import FlaskBBDomain
 
+from hub.servers_config import servers_config
+
 import modules.portal
 
 from . import markup  # noqa
@@ -167,6 +169,8 @@ def configure_app(app, config):
         debug_panels.append("flask_debugtoolbar_warnings.WarningsPanel")
 
     app.pluggy = FlaskBBPluginManager("flaskbb")
+
+    app.config["BYOND_SERVERS"] = servers_config
 
 
 def configure_celery_app(app, celery):
@@ -308,6 +312,10 @@ def configure_context_processors(app):
     def inject_now():
         """Injects the current time."""
         return dict(now=datetime.utcnow())
+
+    @app.context_processor
+    def inject_servers():
+        return dict(servers=app.config["BYOND_SERVERS"])
 
 
 def configure_before_handlers(app):
