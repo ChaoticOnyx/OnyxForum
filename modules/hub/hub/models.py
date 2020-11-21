@@ -1,4 +1,6 @@
 from flaskbb.extensions import db
+from flaskbb.utils.database import UTCDateTime
+from flaskbb.utils.helpers import time_utcnow
 from sqlalchemy import Column, ForeignKey, String
 from sqlalchemy.dialects.mysql import VARCHAR
 from sqlalchemy.orm import relationship
@@ -35,3 +37,23 @@ class DiscordUserRole(db.Model):
 
     discord_role = relationship('DiscordRole')
     discord_user = relationship('DiscordUser')
+
+
+class HubLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    datetime = db.Column(
+        UTCDateTime(timezone=True), default=time_utcnow, nullable=False
+    )
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    message = db.Column(db.Text, nullable=False)
+
+    user = db.relationship("User", lazy="joined", foreign_keys=[user_id])
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        return self

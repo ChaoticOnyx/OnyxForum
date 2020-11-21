@@ -85,12 +85,14 @@ class DiscordAuthorizeCallback(MethodView):
         discord_user: DiscordUser = current_app.discord.fetch_user()
         print(discord_user)
 
+        user = None
+
         auth_manager = self.authentication_manager_factory()
         try:
             user = auth_manager.authenticate_via_discord(
                 discord=str(discord_user.id)
             )
-        finally:
+        except:
             pass
 
         if not user:

@@ -430,21 +430,16 @@ def _format_html_time_tag(datetime, what_to_display):
         content = babel_format_date(datetime, locale=_get_user_locale())
     elif what_to_display == "date-and-time":
         content = babel_format_datetime(
-            datetime, tzinfo=UTC, locale=_get_user_locale()
+            datetime, format="dd.MM.yyyy HH:mm:ss", tzinfo=UTC, locale=_get_user_locale()
         )
-        # While this could be done with a format string, that would
-        # hinder internationalization and honestly why bother.
-        content += " UTC"
     else:
         raise ValueError("what_to_display argument invalid")
 
     isoformat = datetime.isoformat()
 
-    return Markup(
-        '<time datetime="{}" data-what_to_display="{}">{}</time>'.format(
-            isoformat, what_to_display, content
-        )
-    )
+    return Markup('<time datetime="{}">{}</time>'.format(
+            isoformat, content
+        ))
 
 
 def format_datetime(datetime):

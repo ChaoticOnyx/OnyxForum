@@ -7,6 +7,7 @@ from collections import OrderedDict
 from flask import Blueprint, redirect, request, url_for, current_app, abort, flash, send_file
 from flask_babelplus import gettext as _
 from flask_allows import Permission
+from flask_login import current_user
 from flask.views import MethodView
 from flaskbb.utils.helpers import FlashAndRedirect
 from flaskbb.display.navigation import NavigationLink
@@ -15,7 +16,7 @@ from flaskbb.user.models import User, Group
 
 from hub.forms import ConfigEditForm
 from hub.permissions import CanAccessServerHub, CanAccessServerHubAdditional, CanAccessServerHubManagement
-from hub.models import DiscordUser, DiscordUserRole, DiscordRole
+from hub.models import DiscordUser, DiscordUserRole, DiscordRole, HubLog
 from hub.utils import hub_current_server
 
 from flaskbb.utils.helpers import (
@@ -39,6 +40,13 @@ class FlashAndRedirectToHub(object):
         return redirect(url_for("hub.index", server=hub_current_server.id))
 
 
+def LogAction(user, message):
+    log_entry = HubLog()
+    log_entry.user = user
+    log_entry.message = message
+    log_entry.save()
+
+
 class ServerControl(MethodView):
     decorators = [
         allows.requires(
@@ -49,35 +57,48 @@ class ServerControl(MethodView):
             )
         )
     ]
+    _action = "made unknown action with"
+
+    def _report(self, user):
+        LogAction(user, self._action + " server")
 
 
 class StartServer(ServerControl):
+    _action = "started"
+
     def get(self):
         if not hub_current_server:
             abort(404)
 
         command = "sudo systemctl start " + hub_current_server.service_name
         os.system(command)
+        self._report(current_user)
         return redirect(url_for("hub.index", server=hub_current_server.id))
 
 
 class StopServer(ServerControl):
+    _action = "stopped"
+
     def get(self):
         if not hub_current_server:
             abort(404)
 
         command = "sudo systemctl stop " + hub_current_server.service_name
         os.system(command)
+        self._report(current_user)
         return redirect(url_for("hub.index", server=hub_current_server.id))
 
 
 class RestartServer(ServerControl):
+    _action = "restarted"
+
     def get(self):
         if not hub_current_server:
             abort(404)
 
         command = "sudo systemctl restart " + hub_current_server.service_name
         os.system(command)
+        self._report(current_user)
         return redirect(url_for("hub.index", server=hub_current_server.id))
 
 
@@ -95,6 +116,14 @@ class Hub(MethodView):
 
     def __get_actions(self, server_status):
         actions = []
+
+        actions.append(
+            NavigationLink(
+                endpoint="hub.hublogs",
+                name=_("Logs"),
+                icon="fa fa-clock-o",
+                urlforkwargs={"server": hub_current_server.id},
+            ))
 
         if Permission(CanAccessServerHubAdditional()):
             if server_status == "online":
@@ -134,8 +163,8 @@ class Hub(MethodView):
 
         actions.append(
             NavigationLink(
-                endpoint="hub.logs",
-                name=_("Logs"),
+                endpoint="hub.gamelogs",
+                name=_("Game Logs"),
                 icon="fa fa-file",
                 urlforkwargs={"server": hub_current_server.id},
             ))
@@ -166,7 +195,13 @@ class Hub(MethodView):
         }
 
     def get(self):
-        return render_template("hub/index.html", **self.get_args())
+        return redirect(url_for("hub.hublogs", server=hub_current_server.id))
+
+
+class HubLogView(Hub):
+    def get(self):
+        logs = db.session.query(HubLog).order_by(HubLog.id.desc()).limit(100).all()
+        return render_template("hub/hublogs.html", **self.get_args(), logs=logs)
 
 
 class ConfigsView(Hub):
@@ -250,6 +285,7 @@ class ConfigEditView(Hub):
         if form.validate_on_submit():
             with open(os.path.join(server.configs_path, config_name), "w") as f:
                 f.write(form.content.data)
+                LogAction(current_user, 'updated server\'s config file "{}"'.format(config_name))
                 flash("Configuration file was saved!")
 
         return render_template("hub/config_edit.html", **self.get_args(), config_name=config_name, form=form)
@@ -267,12 +303,12 @@ class LogsView(Hub):
         path = current_path
         while root_path != path:
             name = os.path.split(path)[1]
-            url = url_for("hub.logs", server=server_id, path=os.path.relpath(path, root_path))
+            url = url_for("hub.gamelogs", server=server_id, path=os.path.relpath(path, root_path))
             folders.insert(0, {"name": name, "url": url})
             path = os.path.dirname(path)
 
         name = "logs"
-        url = url_for("hub.logs", server=server_id)
+        url = url_for("hub.gamelogs", server=server_id)
         folders.insert(0, {"name": name, "url": url})
 
         if len(folders):
@@ -311,13 +347,13 @@ class LogsView(Hub):
         for entry in logs_folder_entries:
             entry_pure = os.path.split(entry)[1]
             if os.path.isfile(entry):
-                entries[entry_pure] = url_for("hub.download_log", server=server_id, path=os.path.relpath(entry, server.logs_path))
+                entries[entry_pure] = url_for("hub.download_gamelog", server=server_id, path=os.path.relpath(entry, server.logs_path))
             else:
                 lll = os.path.relpath(entry, server.logs_path)
-                entries[entry_pure] = url_for("hub.logs", server=server_id, path=os.path.relpath(entry, server.logs_path))
+                entries[entry_pure] = url_for("hub.gamelogs", server=server_id, path=os.path.relpath(entry, server.logs_path))
 
         return render_template(
-            "hub/logs.html",
+            "hub/gamelogs.html",
             **self.get_args(),
             entries=sorted(entries.items()),
             title_parent_folders=title_parent_folders
@@ -465,6 +501,12 @@ register_view(
 
 register_view(
     hub,
+    routes=["/hublogs"],
+    view_func=HubLogView.as_view("hublogs")
+)
+
+register_view(
+    hub,
     routes=["/start"],
     view_func=StartServer.as_view("start"),
 )
@@ -495,14 +537,14 @@ register_view(
 
 register_view(
     hub,
-    routes=["/logs"],
-    view_func=LogsView.as_view("logs")
+    routes=["/gamelogs"],
+    view_func=LogsView.as_view("gamelogs")
 )
 
 register_view(
     hub,
-    routes=["/download_log"],
-    view_func=LogDownload.as_view("download_log")
+    routes=["/download_gamelog"],
+    view_func=LogDownload.as_view("download_gamelog")
 )
 
 register_view(

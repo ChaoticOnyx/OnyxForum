@@ -114,7 +114,7 @@ def flaskbb_gather_registration_validators():
 def flaskbb_registration_post_processor(user):
     handlers = []
 
-    if flaskbb_config["ACTIVATE_ACCOUNT"]:
+    if flaskbb_config["ACTIVATE_ACCOUNT"] and not user.activated:
         handlers.append(
             SendActivationPostProcessor(account_activator_factory())
         )

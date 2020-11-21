@@ -1,0 +1,12 @@
+
+{% extends theme("hub/index.html") %}
+
+{% block hub_content %}
+    <div class="panel page-panel">
+        <div class="panel-body">
+            {% for log in logs %}
+                <b>{{ log.date|format_datetime() }}:</b> <a href={{log.user.url}}>{{ log.user.display_name }}</a> {{ log.message }}<br>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
