@@ -41,6 +41,7 @@ class DiscordUserRole(db.Model):
 
 class HubLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    server_id = db.Column(String(50), nullable=False)
     datetime = db.Column(
         UTCDateTime(timezone=True), default=time_utcnow, nullable=False
     )

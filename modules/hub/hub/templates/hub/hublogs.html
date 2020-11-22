@@ -5,7 +5,7 @@
     <div class="panel page-panel">
         <div class="panel-body">
             {% for log in logs %}
-                <b>{{ log.date|format_datetime() }}:</b> <a href={{log.user.url}}>{{ log.user.display_name }}</a> {{ log.message }}<br>
+                <b>{{ log.datetime|format_datetime() }}:</b> <a href={{log.user.url}}>{{ log.user.display_name }}</a> {{ log.message }}<br>
             {% endfor %}
         </div>
     </div>

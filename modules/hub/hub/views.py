@@ -44,6 +44,7 @@ def LogAction(user, message):
     log_entry = HubLog()
     log_entry.user = user
     log_entry.message = message
+    log_entry.server_id = hub_current_server.id
     log_entry.save()
 
 
@@ -200,7 +201,11 @@ class Hub(MethodView):
 
 class HubLogView(Hub):
     def get(self):
-        logs = db.session.query(HubLog).order_by(HubLog.id.desc()).limit(100).all()
+        logs = db.session.query(HubLog)\
+            .filter(HubLog.server_id == hub_current_server.id)\
+            .order_by(HubLog.id.desc())\
+            .limit(100)\
+            .all()
         return render_template("hub/hublogs.html", **self.get_args(), logs=logs)
 
 
@@ -417,6 +422,11 @@ class TeamView(Hub):
                     user.add_to_group(last_group)
 
                 user.save()
+                LogAction(current_user, "added user {name} (discord: {discord_id}) to group {group}".format(
+                    name=user.display_name,
+                    discord_id=user_discord_id,
+                    group=group.name
+                ))
                 flash("Group {} was added for user {}".format(group.name, user.display_name))
                 return True
 
