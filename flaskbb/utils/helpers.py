@@ -24,7 +24,7 @@ import pkg_resources
 import requests
 import unidecode
 from babel.core import get_locale_identifier
-from babel.dates import format_date as babel_format_date
+from babel.dates import format_date as babel_format_date, get_timezone
 from babel.dates import format_datetime as babel_format_datetime
 from babel.dates import format_timedelta as babel_format_timedelta
 from flask import flash, g, redirect, request, session, url_for
@@ -430,7 +430,7 @@ def _format_html_time_tag(datetime, what_to_display):
         content = babel_format_date(datetime, locale=_get_user_locale())
     elif what_to_display == "date-and-time":
         content = babel_format_datetime(
-            datetime, format="dd.MM.yyyy HH:mm:ss", tzinfo=UTC, locale=_get_user_locale()
+            datetime, format="dd.MM.yyyy HH:mm:ss", tzinfo=get_timezone("Europe/Moscow"), locale=_get_user_locale()
         )
     else:
         raise ValueError("what_to_display argument invalid")

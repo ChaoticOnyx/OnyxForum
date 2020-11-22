@@ -427,7 +427,7 @@ class TeamView(Hub):
                     discord_id=user_discord_id,
                     group=group.name
                 ))
-                flash("Group {} was added for user {}".format(group.name, user.display_name))
+                flash("User {} was added to group {}".format(user.display_name, group.name))
                 return True
 
         flash("Failed to find appropriate group for user {}".format(user.display_name), "danger")
@@ -437,12 +437,20 @@ class TeamView(Hub):
         user = User.query.filter(User.discord == user_discord_id).first()
         assert user.primary_group.id in hub_current_server.discord_role_to_group.values()
 
+        removed_group = user.primary_group
+
         secondary_groups = user.secondary_groups.all()
         if len(secondary_groups):
             user.primary_group = secondary_groups[0]
         else:
             user.primary_group = Group.get_member_group()
         user.save()
+        LogAction(current_user, "removed user {name} (discord: {discord_id}) from group {group}".format(
+            name=user.display_name,
+            discord_id=user_discord_id,
+            group=removed_group.name
+        ))
+        flash("User {} was removed from group {}".format(user.display_name, removed_group.name))
 
     def get(self):
         if "user_to_add" in request.args:

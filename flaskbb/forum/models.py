@@ -219,7 +219,7 @@ class Post(HideableCRUDMixin, db.Model):
         if user and topic:
             created = time_utcnow()
             self.user = user
-            self.username = user.username
+            self.username = user.display_name
             self.topic = topic
             self.date_created = created
 

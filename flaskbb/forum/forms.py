@@ -59,7 +59,7 @@ class ReplyForm(PostForm):
             self.post = Post(content=self.content.data)
         else:
             self.post.date_modified = time_utcnow()
-            self.post.modified_by = user.username
+            self.post.modified_by = user.display_name
             self.post.modified_by_user_id = user.id
 
         if self.track_topic.data:
