@@ -1,6 +1,6 @@
 import requests
 
-from flask import Blueprint, Response, request, url_for
+from flask import Flask, Blueprint, Response, request, url_for
 from flask.views import MethodView
 from flaskbb.utils.helpers import register_view
 from pluggy import HookimplMarker
@@ -46,7 +46,7 @@ def register_webhooks_service(app):
 
 
 @impl(tryfirst=True)
-def flaskbb_load_blueprints(app):
+def flaskbb_load_blueprints(app: Flask):
     donations = Blueprint("donations", __name__)
 
     register_view(
@@ -56,8 +56,4 @@ def flaskbb_load_blueprints(app):
     )
 
     app.register_blueprint(donations)
-
-
-@impl
-def flaskbb_additional_setup(app):
-    register_webhooks_service(app)
+    app.before_first_request(lambda: register_webhooks_service(app))
