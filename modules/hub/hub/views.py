@@ -1,23 +1,26 @@
 import enum
 import os
 import attr
+import re
 from collections import OrderedDict
-
+from typing import List
 
 from flask import Blueprint, redirect, request, url_for, current_app, abort, flash, send_file
 from flask_babelplus import gettext as _
 from flask_allows import Permission
 from flask_login import current_user
+from flask_sqlalchemy import Pagination
 from flask.views import MethodView
 from flaskbb.utils.helpers import FlashAndRedirect
 from flaskbb.display.navigation import NavigationLink
 from flaskbb.extensions import allows, db
 from flaskbb.user.models import User, Group
 
-from hub.forms import ConfigEditForm
+from hub.forms import ConfigEditForm, BanSearchForm
 from hub.permissions import CanAccessServerHub, CanAccessServerHubAdditional, CanAccessServerHubManagement
 from hub.models import DiscordUser, DiscordUserRole, DiscordRole, HubLog
 from hub.utils import hub_current_server
+from hub.gameserver_models import game_models, ErroBan
 
 from flaskbb.utils.helpers import (
     format_quote,
@@ -169,6 +172,15 @@ class Hub(MethodView):
                 icon="fa fa-file",
                 urlforkwargs={"server": hub_current_server.id},
             ))
+
+        actions.append(
+            NavigationLink(
+                endpoint="hub.bans",
+                name=_("Bans"),
+                icon="fa fa-wheelchair-alt",
+                urlforkwargs={"server": hub_current_server.id},
+            )
+        )
 
         if Permission(CanAccessServerHubManagement()):
             actions.append(
@@ -511,6 +523,64 @@ class TeamView(Hub):
         )
 
 
+def bans_records_from_db_records(bans_records: List[ErroBan]):
+    bans = list()
+    for ban in bans_records:
+        ban_record = ban.get_ban_record()
+
+        description = ban_record.bantype
+        if ban_record.bantype == "tempban" or ban_record.bantype == "job_tempban":
+            description = str(int((ban_record.expiration_time - ban_record.bantime).total_seconds() / 60)) + "m"
+        elif ban_record.bantype == "permaban" or ban_record.bantype == "job_permaban":
+            description = "Permaban"
+
+        if ban_record.bantype == "job_tempban" or ban_record.bantype == "job_permaban":
+            description += ", Job: " + ban_record.role
+
+        ban_record.desc = description
+
+        bans.append(ban_record)
+
+    return bans
+
+
+class BansView(Hub):
+    def get(self):
+        page = request.args.get('page', 1, type=int)
+        server_ban = game_models[hub_current_server.id]["ErroBan"]
+
+        bans_records_page: Pagination = server_ban.query \
+            .order_by(server_ban.id.desc()) \
+            .paginate(page, 50)
+
+        bans = bans_records_from_db_records(bans_records_page.items)
+
+        form = BanSearchForm()
+        return render_template("hub/bans.html", **self.get_args(), bans=bans, page=bans_records_page, form=form)
+
+    def post(self):
+        page = request.args.get('page', 1, type=int)
+        form = BanSearchForm()
+
+        server_ban = game_models[hub_current_server.id]["ErroBan"]
+        query = server_ban.query \
+            .order_by(server_ban.id.desc())
+
+        if form.validate_on_submit() and form.searchText.data:
+            if form.searchType.data == "Ckey":
+                ckey = re.sub(r'[^\w\d]', '', form.searchText.data)
+                query = query.filter(server_ban.ckey == ckey)
+            elif form.searchType.data == "Admin":
+                ckey = re.sub(r'[^\w\d]', '', form.searchText.data)
+                query = query.filter(server_ban.a_ckey == ckey)
+            elif form.searchType.data == "Reason":
+                query = query.filter(server_ban.reason.contains(form.searchText.data))
+
+        bans_records_page: Pagination = query.paginate(page, 50)
+        bans = bans_records_from_db_records(bans_records_page.items)
+        return render_template("hub/bans.html", **self.get_args(), bans=bans, page=bans_records_page, form=form)
+
+
 register_view(
     hub,
     routes=["/"],
@@ -569,4 +639,10 @@ register_view(
     hub,
     routes=["/team"],
     view_func=TeamView.as_view("team")
+)
+
+register_view(
+    hub,
+    routes=["/bans"],
+    view_func=BansView.as_view("bans")
 )

@@ -1,0 +1,105 @@
+{% extends theme("hub/index_stripped.html") %}
+{% from theme('macros.html') import render_pagination %}
+
+{% block hub_content %}
+    <div class="panel page-panel">
+
+    <div class="panel-body">
+    <div class="row controls-row">
+        <div class="col-md-6 col-sm-6 col-xs-6 controls-col">
+            <form class="form-inline" role="form" method="post">
+                {{ form.hidden_tag() }}
+
+                {{ form.searchText(class="form-control") }}
+                {{ form.searchType(class="form-control") }}
+                {{ form.searchButton(class="btn btn-default") }}
+            </form>
+        </div>
+        <div class="col-md-6 col-sm-6 col-xs-6 controls-col">
+            <div class="pull-right">
+                {{ render_pagination(page, url_for('hub.bans', server=server.id), with_args=True) }}
+            </div>
+        </div>
+    </div>
+    </div>
+    <table class="table table-striped table-condensed">
+        {% for ban in bans %}
+        <tr>
+            <td>
+                <table width="100%">
+                    <tr>
+                        <td width="15%" class="ban-label-container">
+                            <table>
+                                <tr>
+                                    <td class="ban-label-header"><strong>Ckey: </strong></td>
+                                    <td class="ban-label">{{ ban.ckey }}</td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td width="25%" class="ban-label-container">
+                            <table>
+                                <tr>
+                                    <td class="ban-label-header"><strong>Duration: </strong></td>
+                                    <td class="ban-label">
+                                        {{ ban.bantime|format_datetime() }}
+
+                                        {% if ban.unbanned %}
+                                            <strike>
+                                        {% endif %}
+
+                                        {% if ban.bantype == "permaban" or ban.bantype == "job_permaban" %}
+                                            <br>Until the end of times
+                                        {% else %}
+                                            <br>{{ ban.expiration_time|format_datetime() }}
+                                        {% endif %}
+
+                                        {% if ban.unbanned %}
+                                            </strike>
+                                        {% endif %}
+
+                                        {% if ban.unbanned %}
+                                            <span class="text-success"><strong>
+                                                <br>{{ ban.unbanned_ckey }} unbaned on:
+                                                <br>{{ ban.unbanned_datetime|format_datetime() }}
+                                            </strong></span>
+                                        {% elif ban.expired %}
+                                            <span class="text-success"><strong>
+                                                <br>Expired
+                                            </strong></span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td width="15%" class="ban-label-container">
+                            <table>
+                                <tr>
+                                    <td class="ban-label-header"><strong>Admin: </strong></td>
+                                    <td class="ban-label">{{ ban.a_ckey }}</td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td width="100%" class="ban-label-container">
+                            <table>
+                                <tr>
+                                    <td class="ban-label-header"><strong>Description: </strong></td>
+                                    <td class="ban-label">{{ ban.desc }}</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr><td colspan="5">{{ ban.reason }}</td></tr>
+                </table>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div class="panel-footer">
+    <div class="row controls-row">
+        <div class="pull-right">
+            {{ render_pagination(page, url_for('hub.bans', server=server.id), with_args=True) }}
+        </div>
+    </div>
+    </div>
+    </div>
+{% endblock %}

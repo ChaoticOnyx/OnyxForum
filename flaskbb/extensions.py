@@ -28,6 +28,8 @@ from flask_wtf.csrf import CSRFProtect
 
 from flaskbb.exceptions import AuthorizationRequired
 
+import copy
+
 
 # Permissions Manager
 allows = Allows(throws=AuthorizationRequired)
@@ -42,6 +44,15 @@ metadata = MetaData(
     }
 )
 db = SQLAlchemy(metadata=metadata)
+
+metadata_onyx = copy.deepcopy(metadata)
+db_onyx = SQLAlchemy(metadata=metadata_onyx)
+
+metadata_eos = copy.deepcopy(metadata)
+db_eos = SQLAlchemy(metadata=metadata_eos)
+
+metadata_dragon = copy.deepcopy(metadata)
+db_dragon = SQLAlchemy(metadata=metadata_dragon)
 
 # Whooshee (Full Text Search)
 whooshee = Whooshee()

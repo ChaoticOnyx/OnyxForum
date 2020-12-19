@@ -16,19 +16,8 @@
                     <a href={{url_for('hub.index', server=server.id)}}>{{server.name}}</a>
                 </div>
                 <div class="panel-body page-body profile-body">
-                    {% block server_sidebar %}
-                    <div class="col-md-3 col-sm-3 col-xs-12 server-sidebar">
-                        {{ sidebar(actions, extra_class="profile-sidebar") }}
-                    </div>
+                    {% block hub_content %}
                     {% endblock %}
-
-
-
-                    <div class="col-md-9 col-sm-9 col-xs-12 server-content">
-                        {% block hub_content %}
-                        {% endblock %}
-                    </div> <!-- end col -->
-
                 </div> <!-- end profile widget -->
             </div> <!-- end page-panel -->
         </div> <!-- end col -->
