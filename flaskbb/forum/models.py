@@ -940,7 +940,7 @@ class Forum(db.Model, CRUDMixin):
                 self.last_post = last_post
                 self.last_post_title = last_post.topic.title
                 self.last_post_user_id = last_post.user_id
-                self.last_post_user_display_name = last_post.last_post_user_display_name
+                self.last_post_user_display_name = last_post.user_display_name
                 self.last_post_created = last_post.date_created
 
         # No post found..

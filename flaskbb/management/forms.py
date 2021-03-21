@@ -486,12 +486,12 @@ class ForumForm(FlaskForm):
 
         if field.data:
             moderators = [mod.strip() for mod in field.data.split(',')]
-            users = User.query.filter(User.username.in_(moderators))
+            users = User.query.filter(User.display_name.in_(moderators))
             for user in users:
                 if not Permission(IsAtleastModerator, identity=user):
                     raise ValidationError(
                         _("%(user)s is not in a moderators group.",
-                            user=user.username)
+                            user=user.display_name)
                     )
                 else:
                     approved_moderators.append(user)
