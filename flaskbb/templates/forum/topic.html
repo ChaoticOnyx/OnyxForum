@@ -13,6 +13,8 @@
         <li class="active">{{ topic.title }}</li>
     </ol>
 
+    <h2 class="forum-title">{{ topic.title }}</h2>
+
     {% include theme('forum/topic_controls.html') %}
     {% if topic.hidden %}
     <div class="alert alert-warning">
@@ -24,7 +26,7 @@
 
     <div class="panel topic-panel">
         <div class="panel-heading topic-head">
-            <a href="{{ topic.url }}">{{ topic.title }}</a>
+            Posts count: {{ topic.post_count }}
         </div>
         <div class="panel-body topic-body">
             {% for post, user in posts.items %}

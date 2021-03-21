@@ -427,7 +427,7 @@ def _get_user_locale():
 
 def _format_html_time_tag(datetime, what_to_display):
     if what_to_display == "date-only":
-        content = babel_format_date(datetime, locale=_get_user_locale())
+        content = babel_format_date(datetime, format="dd MMM yyyy", locale=_get_user_locale())
     elif what_to_display == "date-and-time":
         content = babel_format_datetime(
             datetime, format="dd.MM.yyyy HH:mm:ss", tzinfo=get_timezone("Europe/Moscow"), locale=_get_user_locale()

@@ -12,6 +12,8 @@
         <li class="active">{{ forum.title }}</li>
     </ol>
 
+    <h2 class="forum-title">{{ forum.title }}</h2>
+
     <div class="row controls-row">
         <div class="pull-left">
             {{ render_pagination(topics, forum.url) }}
@@ -84,12 +86,14 @@
                             </div>
 
                             <div class="topic-author">
+                                <span>
                                 {% trans %}by{% endtrans %}
                                 {% if topic.user_id %}
                                  <a href="{{ topic.user.url }}">{{ topic.user.display_name }}</a>
-                                {% else %}
+                                {%- else -%}
                                 {{ topic.display_name }}
-                                {% endif %}
+                                {%- endif -%}, {{ topic.date_created|format_date }}
+                                </span>
                             </div>
 
                             {% if topic.hidden %}
