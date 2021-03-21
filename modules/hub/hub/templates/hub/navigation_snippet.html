@@ -7,9 +7,7 @@
     </a>
     <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
         {% for server in servers %}
-            {% if current_user|has_permission(server.base_permission) %}
-                <li><a href={{url_for('hub.index', server=server.id)}}>{{server.name}}</a></li>
-            {% endif %}
+            <li><a href={{url_for('hub.index', server=server.id)}}>{{server.name}}</a></li>
         {% endfor %}
     </ul>
 </li>

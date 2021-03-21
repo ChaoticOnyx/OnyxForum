@@ -107,27 +107,17 @@ class RestartServer(ServerControl):
 
 
 class Hub(MethodView):
-    decorators = [
-        allows.requires(
-            CanAccessServerHub(),
-            on_fail=FlashAndRedirect(
-                message=_("You are not allowed to access the hub"),
-                level="danger",
-                endpoint="forum.index"
-            )
-        )
-    ]
-
     def __get_actions(self, server_status):
         actions = []
 
-        actions.append(
-            NavigationLink(
-                endpoint="hub.hublogs",
-                name=_("Logs"),
-                icon="fa fa-clock-o",
-                urlforkwargs={"server": hub_current_server.id},
-            ))
+        if Permission(CanAccessServerHub()):
+            actions.append(
+                NavigationLink(
+                    endpoint="hub.hublogs",
+                    name=_("Logs"),
+                    icon="fa fa-clock-o",
+                    urlforkwargs={"server": hub_current_server.id},
+                ))
 
         if Permission(CanAccessServerHubAdditional()):
             if server_status == "online":
@@ -165,13 +155,14 @@ class Hub(MethodView):
                     urlforkwargs={"server": hub_current_server.id},
                 ))
 
-        actions.append(
-            NavigationLink(
-                endpoint="hub.gamelogs",
-                name=_("Game Logs"),
-                icon="fa fa-file",
-                urlforkwargs={"server": hub_current_server.id},
-            ))
+        if Permission(CanAccessServerHub()):
+            actions.append(
+                NavigationLink(
+                    endpoint="hub.gamelogs",
+                    name=_("Game Logs"),
+                    icon="fa fa-file",
+                    urlforkwargs={"server": hub_current_server.id},
+                ))
 
         actions.append(
             NavigationLink(
@@ -208,10 +199,23 @@ class Hub(MethodView):
         }
 
     def get(self):
-        return redirect(url_for("hub.hublogs", server=hub_current_server.id))
+        if Permission(CanAccessServerHub()):
+            return redirect(url_for("hub.hublogs", server=hub_current_server.id))
+        return redirect(url_for("hub.bans", server=hub_current_server.id))
 
 
 class HubLogView(Hub):
+    decorators = [
+        allows.requires(
+            CanAccessServerHub(),
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to access the hub"),
+                level="danger",
+                endpoint="forum.index"
+            )
+        )
+    ]
+
     def get(self):
         logs = db.session.query(HubLog)\
             .filter(HubLog.server_id == hub_current_server.id)\
@@ -312,6 +316,17 @@ class ConfigEditView(Hub):
 
 
 class LogsView(Hub):
+    decorators = [
+        allows.requires(
+            CanAccessServerHub(),
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to access the hub"),
+                level="danger",
+                endpoint="forum.index"
+            )
+        )
+    ]
+
     # returns list [{"name": name, "url": url)]
     @staticmethod
     def get_title_parent_folders(server_id, root_path, current_path):
@@ -378,6 +393,17 @@ class LogsView(Hub):
 
 
 class LogDownload(Hub):
+    decorators = [
+        allows.requires(
+            CanAccessServerHub(),
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to access the hub"),
+                level="danger",
+                endpoint="forum.index"
+            )
+        )
+    ]
+
     def get(self):
         server_id = request.args["server"]
         path = request.args["path"]

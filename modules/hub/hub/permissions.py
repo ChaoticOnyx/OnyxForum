@@ -34,8 +34,4 @@ class CanAccessServerHubManagement(Requirement):
 # Template filters
 
 def can_access_hub(user):
-    servers = current_app.config["BYOND_SERVERS"]
-    for server in servers:
-        if Permission(Has(server.base_permission), identity=user):
-            return True
-    return False
+    return True
