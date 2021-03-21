@@ -151,7 +151,7 @@ class Post(HideableCRUDMixin, db.Model):
                                        use_alter=True),
                          nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
-    username = db.Column(db.String(200), nullable=False)
+    user_display_name = db.Column(db.String(200), nullable=True)
     content = db.Column(db.Text, nullable=False)
     date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
                              nullable=False)
@@ -180,7 +180,7 @@ class Post(HideableCRUDMixin, db.Model):
             # setting user here -- even with setting the user id explicitly
             # breaks the bulk insert for some reason
             self.user_id = user.id
-            self.username = user.username
+            self.user_display_name = user.display_name
 
         if topic:
             self.topic_id = topic if isinstance(topic, int) else topic.id
@@ -219,7 +219,7 @@ class Post(HideableCRUDMixin, db.Model):
         if user and topic:
             created = time_utcnow()
             self.user = user
-            self.username = user.display_name
+            self.user_display_name = user.display_name
             self.topic = topic
             self.date_created = created
 
@@ -231,7 +231,7 @@ class Post(HideableCRUDMixin, db.Model):
                 topic.forum.last_post = self
                 topic.forum.last_post_user = self.user
                 topic.forum.last_post_title = topic.title
-                topic.forum.last_post_username = user.username
+                topic.forum.last_post_user_display_name = user.display_name
                 topic.forum.last_post_created = created
 
                 # Update the post counts
@@ -310,13 +310,13 @@ class Post(HideableCRUDMixin, db.Model):
                     self.topic.forum.last_post = second_last_post
                     self.topic.forum.last_post_title = second_last_post.topic.title  # noqa
                     self.topic.forum.last_post_user = second_last_post.user
-                    self.topic.forum.last_post_username = second_last_post.username  # noqa
+                    self.topic.forum.last_post_user_display_name = second_last_post.user_display_name  # noqa
                     self.topic.forum.last_post_created = second_last_post.date_created  # noqa
                 else:
                     self.topic.forum.last_post = None
                     self.topic.forum.last_post_title = None
                     self.topic.forum.last_post_user = None
-                    self.topic.forum.last_post_username = None
+                    self.topic.forum.last_post_user_display_name = None
                     self.topic.forum.last_post_created = None
 
             # check if there is a second last post in this topic
@@ -393,7 +393,7 @@ class Post(HideableCRUDMixin, db.Model):
                 self.topic.forum.last_post = self
                 self.topic.forum.last_post_title = self.topic.title
                 self.topic.forum.last_post_user = self.user
-                self.topic.forum.last_post_username = self.username
+                self.topic.forum.last_post_user_display_name = self.user_display_name
                 self.topic.forum.last_post_created = self.date_created
 
 
@@ -407,7 +407,7 @@ class Topic(HideableCRUDMixin, db.Model):
                          nullable=False)
     title = db.Column(db.String(255), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
-    username = db.Column(db.String(200), nullable=False)
+    user_display_name = db.Column(db.String(200), nullable=True)
     date_created = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
                              nullable=False)
     last_updated = db.Column(UTCDateTime(timezone=True), default=time_utcnow,
@@ -469,7 +469,7 @@ class Topic(HideableCRUDMixin, db.Model):
             # insert stuff as they use the session.bulk_save_objects which does
             # not trigger relationships
             self.user_id = user.id
-            self.username = user.username
+            self.user_display_name = user.display_name
 
         if content:
             self._post = Post(content=content)
@@ -671,7 +671,7 @@ class Topic(HideableCRUDMixin, db.Model):
         # Set the forum and user id
         self.forum = forum
         self.user = user
-        self.username = user.username
+        self.user_display_name = user.display_name
 
         # Set the last_updated time. Needed for the readstracker
         self.date_created = self.last_updated = time_utcnow()
@@ -763,13 +763,13 @@ class Topic(HideableCRUDMixin, db.Model):
                 self.forum.last_post = topics[1].last_post
                 self.forum.last_post_title = topics[1].title
                 self.forum.last_post_user = topics[1].user
-                self.forum.last_post_username = topics[1].username
+                self.forum.last_post_user_display_name = topics[1].user_display_name
                 self.forum.last_post_created = topics[1].last_updated
         else:
             self.forum.last_post = None
             self.forum.last_post_title = None
             self.forum.last_post_user = None
-            self.forum.last_post_username = None
+            self.forum.last_post_user_display_name = None
             self.forum.last_post_created = None
 
     def _fix_user_post_counts(self, users=None):
@@ -818,7 +818,7 @@ class Topic(HideableCRUDMixin, db.Model):
             self.forum.last_post = self.last_post
             self.forum.last_post_title = self.title
             self.forum.last_post_user = self.user
-            self.forum.last_post_username = self.username
+            self.forum.last_post_user_display_name = self.user_display_name
             self.forum.last_post_created = self.last_updated
 
     def _handle_first_post(self):
@@ -874,7 +874,7 @@ class Forum(db.Model, CRUDMixin):
     # Not nice, but needed to improve the performance; can be set to NULL
     # if the forum has no posts
     last_post_title = db.Column(db.String(255), nullable=True)
-    last_post_username = db.Column(db.String(255), nullable=True)
+    last_post_user_display_name = db.Column(db.String(255), nullable=True)
     last_post_created = db.Column(UTCDateTime(timezone=True),
                                   default=time_utcnow, nullable=True)
 
@@ -940,7 +940,7 @@ class Forum(db.Model, CRUDMixin):
                 self.last_post = last_post
                 self.last_post_title = last_post.topic.title
                 self.last_post_user_id = last_post.user_id
-                self.last_post_username = last_post.username
+                self.last_post_user_display_name = last_post.last_post_user_display_name
                 self.last_post_created = last_post.date_created
 
         # No post found..
@@ -948,7 +948,7 @@ class Forum(db.Model, CRUDMixin):
             self.last_post = None
             self.last_post_title = None
             self.last_post_user = None
-            self.last_post_username = None
+            self.last_post_user_display_name = None
             self.last_post_created = None
 
         if commit:

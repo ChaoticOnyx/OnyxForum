@@ -26,7 +26,7 @@ class PostWhoosheer(AbstractWhoosheer):
 
     schema = whoosh.fields.Schema(
         post_id=whoosh.fields.NUMERIC(stored=True, unique=True),
-        username=whoosh.fields.TEXT(),
+        user_display_name=whoosh.fields.TEXT(),
         modified_by=whoosh.fields.TEXT(),
         content=whoosh.fields.TEXT()
     )
@@ -35,7 +35,7 @@ class PostWhoosheer(AbstractWhoosheer):
     def update_post(cls, writer, post):
         writer.update_document(
             post_id=post.id,
-            username=text_type(post.username),
+            user_display_name=text_type(post.user_display_name),
             modified_by=text_type(post.modified_by),
             content=text_type(post.content)
         )
@@ -44,7 +44,7 @@ class PostWhoosheer(AbstractWhoosheer):
     def insert_post(cls, writer, post):
         writer.add_document(
             post_id=post.id,
-            username=text_type(post.username),
+            user_display_name=text_type(post.user_display_name),
             modified_by=text_type(post.modified_by),
             content=text_type(post.content)
         )
@@ -60,7 +60,7 @@ class TopicWhoosheer(AbstractWhoosheer):
     schema = whoosh.fields.Schema(
         topic_id=whoosh.fields.NUMERIC(stored=True, unique=True),
         title=whoosh.fields.TEXT(),
-        username=whoosh.fields.TEXT(),
+        user_display_name=whoosh.fields.TEXT(),
         content=whoosh.fields.TEXT()
     )
 
@@ -69,7 +69,7 @@ class TopicWhoosheer(AbstractWhoosheer):
         writer.update_document(
             topic_id=topic.id,
             title=text_type(topic.title),
-            username=text_type(topic.username),
+            user_display_name=text_type(topic.user_display_name),
             content=text_type(getattr(topic.first_post, 'content', None))
         )
 
@@ -78,7 +78,7 @@ class TopicWhoosheer(AbstractWhoosheer):
         writer.add_document(
             topic_id=topic.id,
             title=text_type(topic.title),
-            username=text_type(topic.username),
+            user_display_name=text_type(topic.user_display_name),
             content=text_type(getattr(topic.first_post, 'content', None))
         )
 
@@ -122,7 +122,7 @@ class UserWhoosheer(AbstractWhoosheer):
 
     schema = whoosh.fields.Schema(
         user_id=whoosh.fields.NUMERIC(stored=True, unique=True),
-        username=whoosh.fields.TEXT(),
+        display_name=whoosh.fields.TEXT(),
         email=whoosh.fields.TEXT()
     )
 
@@ -130,7 +130,7 @@ class UserWhoosheer(AbstractWhoosheer):
     def update_user(cls, writer, user):
         writer.update_document(
             user_id=user.id,
-            username=text_type(user.username),
+            display_name=text_type(user.display_name),
             email=text_type(user.email)
         )
 
@@ -138,7 +138,7 @@ class UserWhoosheer(AbstractWhoosheer):
     def insert_user(cls, writer, user):
         writer.add_document(
             user_id=user.id,
-            username=text_type(user.username),
+            display_name=text_type(user.display_name),
             email=text_type(user.email)
         )
 

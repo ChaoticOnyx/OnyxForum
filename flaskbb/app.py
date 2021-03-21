@@ -228,8 +228,9 @@ def configure_extensions(app):
 
     # Flask-Whooshee
     whooshee.init_app(app)
+    whooshee.reindex()
     # not needed for unittests - and it will speed up testing A LOT
-    if not app.testing:
+    if True:#not app.testing:
         whooshee.register_whoosheer(PostWhoosheer)
         whooshee.register_whoosheer(TopicWhoosheer)
         whooshee.register_whoosheer(ForumWhoosheer)

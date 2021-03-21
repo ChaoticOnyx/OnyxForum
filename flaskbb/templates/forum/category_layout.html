@@ -113,9 +113,9 @@
                 <div class="last-post-author">
                     {% trans %}by{% endtrans %}
                     {% if forum.last_post_user_id %}
-                    <a href="{{ url_for('user.profile', userid=forum.last_post_user_id) }}">{{ forum.last_post_username }}</a>
+                    <a href="{{ url_for('user.profile', userid=forum.last_post_user_id) }}">{{ forum.last_post_user_display_name }}</a>
                     {% else %}
-                    {{ forum.last_post_username }}
+                    {{ forum.last_post_user_display_name }}
                     {% endif %}
                 </div>
 
