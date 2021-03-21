@@ -727,7 +727,7 @@ class EditForum(MethodView):
 
         if forum.moderators:
             form.moderators.data = ','.join(
-                [user.username for user in forum.moderators]
+                [user.display_name for user in forum.moderators]
             )
         else:
             form.moderators.data = None
@@ -748,7 +748,7 @@ class EditForum(MethodView):
         else:
             if forum.moderators:
                 form.moderators.data = ','.join(
-                    [user.username for user in forum.moderators]
+                    [user.display_name for user in forum.moderators]
                 )
             else:
                 form.moderators.data = None
