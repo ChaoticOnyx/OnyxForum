@@ -33,7 +33,7 @@ from flask_babelplus import lazy_gettext as _
 from flask_login import current_user
 from flask_themes2 import get_themes_list, render_theme_template
 from jinja2 import Markup
-from PIL import ImageFile
+from pil import ImageFile
 from pytz import UTC
 from werkzeug.local import LocalProxy
 from werkzeug.utils import ImportStringError, import_string
