@@ -2,6 +2,7 @@ import enum
 import os
 import attr
 import re
+import ast
 from collections import OrderedDict
 from typing import List
 
@@ -573,38 +574,52 @@ def bans_records_from_db_records(bans_records: List[ErroBan]):
 class BansView(Hub):
     def get(self):
         page = request.args.get('page', 1, type=int)
-        server_ban = game_models[hub_current_server.id]["ErroBan"]
-
-        bans_records_page: Pagination = server_ban.query \
-            .order_by(server_ban.id.desc()) \
-            .paginate(page, 50)
-
-        bans = bans_records_from_db_records(bans_records_page.items)
-
-        form = BanSearchForm()
-        return render_template("hub/bans.html", **self.get_args(), bans=bans, page=bans_records_page, form=form)
-
-    def post(self):
-        page = request.args.get('page', 1, type=int)
-        form = BanSearchForm()
+        search = request.args.get('search')
 
         server_ban = game_models[hub_current_server.id]["ErroBan"]
         query = server_ban.query \
             .order_by(server_ban.id.desc())
 
-        if form.validate_on_submit() and form.searchText.data:
-            if form.searchType.data == "Ckey":
-                ckey = re.sub(r'[^\w\d]', '', form.searchText.data)
-                query = query.filter(server_ban.ckey == ckey)
-            elif form.searchType.data == "Admin":
-                ckey = re.sub(r'[^\w\d]', '', form.searchText.data)
-                query = query.filter(server_ban.a_ckey == ckey)
-            elif form.searchType.data == "Reason":
-                query = query.filter(server_ban.reason.contains(form.searchText.data))
+        form = BanSearchForm()
+
+        if search is not None:
+            search = ast.literal_eval(search)
+            if not search["text"]:
+                abort(404)
+
+            form.searchText.data = search["text"]
+
+            if search["type"] == "ckey":
+                query = query.filter(server_ban.ckey == search["text"])
+                form.searchType.data = "Ckey"
+            elif search["type"] == "admin":
+                query = query.filter(server_ban.a_ckey == search["text"])
+                form.searchType.data = "Admin"
+            elif search["type"] == "reason":
+                query = query.filter(server_ban.reason.contains(search["text"]))
+                form.searchType.data = "Reason"
+            else:
+                abort(404)
 
         bans_records_page: Pagination = query.paginate(page, 50)
         bans = bans_records_from_db_records(bans_records_page.items)
-        return render_template("hub/bans.html", **self.get_args(), bans=bans, page=bans_records_page, form=form)
+        return render_template("hub/bans.html", **self.get_args(), bans=bans, page=bans_records_page, form=form, search=search)
+
+    def post(self):
+        form = BanSearchForm()
+
+        search = None
+        if form.validate_on_submit() and form.searchText.data:
+            if form.searchType.data == "Ckey":
+                ckey = re.sub(r'[^\w\d]', '', form.searchText.data)
+                search = {"type": "ckey", "text": ckey}
+            elif form.searchType.data == "Admin":
+                ckey = re.sub(r'[^\w\d]', '', form.searchText.data)
+                search = {"type": "admin", "text": ckey}
+            elif form.searchType.data == "Reason":
+                search = {"type": "reason", "text": form.searchText.data}
+
+        return redirect(url_for("hub.bans", server=hub_current_server.id, search=search))
 
 
 register_view(
