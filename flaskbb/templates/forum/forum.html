@@ -19,7 +19,6 @@
             {{ render_pagination(topics, forum.url) }}
         </div> <!-- end span pagination -->
 
-        {% if current_user|post_topic(forum) %}
         <div class="pull-right">
             <form class="inline-form" method="post" action="{{ url_for('forum.markread', forum_id=forum.id, slug=forum.slug) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
@@ -32,13 +31,13 @@
             <span class="btn btn-primary">
                 <span class="fa fa-lock fa-fw"></span> {% trans %}Locked{% endtrans %}
             </span>
-            {% else %}
+            {% endif %}
+            {% if current_user|post_topic(forum) %}
             <a href="{{ url_for('forum.new_topic', forum_id=forum.id, slug=forum.slug) }}" class="btn btn-primary">
                 <span class="fa fa-pencil fa-fw"></span> {% trans %}New Topic{% endtrans %}
             </a>
             {% endif %}
         </div>
-        {% endif %}
     </div>
 
     <div class="panel forum-panel">
