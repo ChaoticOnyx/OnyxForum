@@ -486,16 +486,16 @@ def time_since(time):  # pragma: no cover
     return format_timedelta(delta, add_direction=True)
 
 
-def format_quote(username, content):
+def format_quote(user, content):
     """Returns a formatted quote depending on the markup language.
 
-    :param username: The username of a user.
+    :param user: The user.
     :param content: The content of the quote
     """
-    profile_url = url_for("user.profile", username=username)
+    profile_url = user.url
     content = "\n> ".join(content.strip().split("\n"))
-    quote = u"**[{username}]({profile_url}) wrote:**\n> {content}\n".format(
-        username=username, profile_url=profile_url, content=content
+    quote = u"**[{display_name}]({profile_url}) wrote:**\n> {content}\n".format(
+        display_name=user.display_name, profile_url=profile_url, content=content
     )
 
     return quote

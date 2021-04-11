@@ -328,7 +328,7 @@ class RawMessage(MethodView):
             abort(404)
 
         return format_quote(
-            username=message.user.username, content=message.message
+            user=message.user, content=message.message
         )
 
 
