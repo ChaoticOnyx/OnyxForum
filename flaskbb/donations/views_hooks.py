@@ -41,6 +41,10 @@ class QiwiHook(MethodView):
 
 
 def register_webhooks_service(app):
+    if "QIWI_TOKEN" not in app.config:
+        print("Error: QIWI_TOKEN isn't specified")
+        return
+
     headers = {
         "Authorization": "Bearer " + app.config["QIWI_TOKEN"],
         "Accept": "application/json"
