@@ -123,7 +123,8 @@ class UserWhoosheer(AbstractWhoosheer):
     schema = whoosh.fields.Schema(
         user_id=whoosh.fields.NUMERIC(stored=True, unique=True),
         display_name=whoosh.fields.TEXT(),
-        email=whoosh.fields.TEXT()
+        email=whoosh.fields.TEXT(),
+        discord=whoosh.fields.TEXT()
     )
 
     @classmethod
@@ -131,7 +132,8 @@ class UserWhoosheer(AbstractWhoosheer):
         writer.update_document(
             user_id=user.id,
             display_name=text_type(user.display_name),
-            email=text_type(user.email)
+            email=text_type(user.email),
+            discord=text_type(user.discord)
         )
 
     @classmethod
@@ -139,7 +141,8 @@ class UserWhoosheer(AbstractWhoosheer):
         writer.add_document(
             user_id=user.id,
             display_name=text_type(user.display_name),
-            email=text_type(user.email)
+            email=text_type(user.email),
+            discord=text_type(user.discord)
         )
 
     @classmethod
