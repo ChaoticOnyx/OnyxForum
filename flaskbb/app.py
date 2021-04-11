@@ -55,7 +55,10 @@ from flaskbb.utils.search import (ForumWhoosheer, PostWhoosheer,
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.translations import FlaskBBDomain
 
-from hub.servers_config import servers_config
+try:
+    from hub.servers_config import servers_config
+except ImportError:
+    servers_config = []
 
 import modules.portal
 
@@ -94,17 +97,19 @@ def create_app(config=None, instance_path=None):
     if not os.path.exists(app.instance_path):
         os.makedirs(app.instance_path)
 
-    configure_app(app, config)
-    configure_celery_app(app, celery)
-    configure_extensions(app)
-    load_plugins(app)
-    configure_blueprints(app)
-    configure_template_filters(app)
-    configure_context_processors(app)
-    configure_before_handlers(app)
-    configure_errorhandlers(app)
-    configure_migrations(app)
-    configure_translations(app)
+    with app.app_context():
+        configure_app(app, config)
+        configure_celery_app(app, celery)
+        configure_extensions(app)
+        load_plugins(app)
+        configure_blueprints(app)
+        configure_template_filters(app)
+        configure_context_processors(app)
+        configure_before_handlers(app)
+        configure_errorhandlers(app)
+        configure_migrations(app)
+        configure_translations(app)
+
     app.pluggy.hook.flaskbb_additional_setup(app=app, pluggy=app.pluggy)
 
     return app
@@ -256,7 +261,8 @@ def configure_extensions(app):
 
     login_manager.init_app(app)
 
-    app.discord = DiscordOAuth2Session(app)
+    if "DISCORD_CLIENT_ID" in app.config:
+        app.discord = DiscordOAuth2Session(app)
 
 
 def configure_template_filters(app):
