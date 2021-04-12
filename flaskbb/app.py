@@ -262,7 +262,7 @@ def configure_extensions(app):
     login_manager.init_app(app)
 
     if "DISCORD_CLIENT_ID" in app.config:
-        app.discord = DiscordOAuth2Session(app)
+        app.discordAuth = DiscordOAuth2Session(app)
 
 
 def configure_template_filters(app):

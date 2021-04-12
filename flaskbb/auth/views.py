@@ -68,10 +68,7 @@ logger = logging.getLogger(__name__)
 
 class DiscordAuthorize(MethodView):
     def get(self):
-        # if current_app.discord.authorized:
-        #     current_app.discord.revoke()
-        #    return
-        return current_app.discord.create_session()
+        return current_app.discordAuth.create_session()
 
 
 class DiscordAuthorizeCallback(MethodView):
@@ -81,8 +78,8 @@ class DiscordAuthorizeCallback(MethodView):
 
     def get(self):
         s = session
-        current_app.discord.callback()
-        discord_user: DiscordUser = current_app.discord.fetch_user()
+        current_app.discordAuth.callback()
+        discord_user: DiscordUser = current_app.discordAuth.fetch_user()
         print(discord_user)
 
         user = None
@@ -173,9 +170,9 @@ class Reauth(MethodView):
     def get(self):
         if not login_fresh():
             if current_user.password is None:
-                if current_app.discord.authorized:
+                if current_app.discordAuth.authorized:
                     confirm_login()
-                return current_app.discord.create_session()
+                return current_app.discordAuth.create_session()
             return render_template("auth/reauth.html", form=self.form())
         return redirect_or_next(current_user.url)
 
