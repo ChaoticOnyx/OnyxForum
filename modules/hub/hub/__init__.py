@@ -67,3 +67,27 @@ def flaskbb_event_topic_save_after(topic, is_new):
             webhook.send(embed=embed)
         except Exception:
             print(traceback.format_exc())
+
+@hookimpl
+def flaskbb_event_post_save_after(post, is_new):
+    if "SENAT_FORUM_ID" not in current_app.config or "SENAT_JOURNAL_WEBHOOK" not in current_app.config:
+        print("SENAT_JOURNAL isn't configured")
+        return
+
+    if not is_new or not post.topic.first_post_id:
+        return
+
+    if post.topic.forum_id == current_app.config["SENAT_FORUM_ID"]:
+        try:
+            webhook = discord.Webhook.from_url(current_app.config["SENAT_JOURNAL_WEBHOOK"], adapter=discord.RequestsWebhookAdapter())
+
+            desc = post.content
+            desc = (desc[:2000] + "\n...") if len(desc) > 2000 else desc
+
+            url = url_for("forum.view_post", post_id=post.id,  _external=True)
+            title = post.user.display_name + " answered to \"" + post.topic.title + "\""
+            embed = discord.Embed(title=title, description=desc, url=url)
+
+            webhook.send(embed=embed)
+        except Exception:
+            print(traceback.format_exc())
