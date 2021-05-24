@@ -426,19 +426,36 @@ def _get_user_locale():
 
 
 def _format_html_time_tag(datetime, what_to_display):
+    now = time_utcnow()
+
+    date = None
+    if datetime.date() == now.date():
+        date = "Today"
+    elif datetime.date() == (now - timedelta(days=1)).date():
+        date = "Yesterday"
+
     if what_to_display == "date-only":
-        content = babel_format_date(datetime, format="dd MMM yyyy", locale=_get_user_locale())
+        exact = babel_format_date(datetime, format="dd MMM yyyy", locale=_get_user_locale())
+        content = date if date else exact
     elif what_to_display == "date-and-time":
-        content = babel_format_datetime(
-            datetime, format="dd.MM.yyyy HH:mm:ss", tzinfo=get_timezone("Europe/Moscow"), locale=_get_user_locale()
-        )
+        exact = babel_format_datetime(
+                    datetime, format="dd.MM.yyyy HH:mm:ss", tzinfo=get_timezone(), locale=_get_user_locale()
+                )
+
+        if date:
+            content = date + ", " + \
+                babel_format_datetime(
+                    datetime, format="HH:mm:ss", tzinfo=get_timezone(), locale=_get_user_locale()
+                )
+        else:
+            content = exact
     else:
         raise ValueError("what_to_display argument invalid")
 
     isoformat = datetime.isoformat()
 
-    return Markup('<time datetime="{}">{}</time>'.format(
-            isoformat, content
+    return Markup('<time datetime="{isoformat}" data-toggle="tooltip" data-placement="top" title="{exact}">{content}</time>'.format(
+            isoformat=isoformat, exact=exact, content=content
         ))
 
 
