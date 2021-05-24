@@ -1,0 +1,63 @@
+{% extends theme("hub/index.html") %}
+
+{% block hub_content %}
+<div class="panel panel-default">
+    <div class="panel-body">
+        {% if server_status == "offline" %}
+            <form class="inline-form" method="post" action="{{ url_for('hub.start', server=server.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button class="btn btn-success">{% trans %}Start{% endtrans %}</button>
+            </form>
+        {% else %}
+            <form class="inline-form" method="post" action="{{ url_for('hub.stop', server=server.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button class="btn btn-danger" name="confirmDialog">{% trans %}Stop{% endtrans %}</button>
+            </form>
+            <form class="inline-form" method="post" action="{{ url_for('hub.restart', server=server.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button class="btn btn-danger" name="confirmDialog">{% trans %}Restart{% endtrans %}</button>
+            </form>
+        {% endif %}
+
+        <form class="inline-form" method="post" action="{{ url_for('hub.update', server=server.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <button class="btn btn-primary" name="confirmDialog">{% trans %}Update{% endtrans %}</button>
+        </form>
+        <div class="well well-sm" style="margin-top: 1em; width: 75%;">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            <b>You don't need to stop or restart server for update.</b>
+            Just update server and changes will be applied automatically with next regular restart.
+        </div>
+
+        <ul class="nav nav-tabs">
+            <li role="presentation" {% if view == "HubLogs" %}class="active"{% endif %}>
+                <a href="{{ url_for('hub.control', server=server.id, view="HubLogs") }}">Hub Journal</a>
+            </li>
+            <li role="presentation" {% if view == "ServerLogs" %}class="active"{% endif %}>
+                <a href="{{ url_for('hub.control', server=server.id, view="ServerLogs") }}">Server Output</a>
+            </li>
+            <li role="presentation" {% if view == "UpdateLogs" %}class="active"{% endif %}>
+                <a href="{{ url_for('hub.control', server=server.id, view="UpdateLogs") }}">Update Logs</a>
+            </li>
+        </ul>
+
+        <div class="panel panel-default">
+            <div class="panel-body">
+                {% if view == "HubLogs" %}
+                    {% for log in logs %}
+                        <b>{{ log.datetime|format_datetime() }}:</b> <a href={{log.user.url}}>{{ log.user.display_name }}</a> {{ log.message }}<br>
+                    {% endfor %}
+                {% endif %}
+                {% if view == "UpdateLogs" or view == "ServerLogs" %}
+                    <div style="height: 300px; overflow: auto; display: flex; flex-direction: column-reverse;">
+                        {% for log in logs %}
+                            {{ log }}<br>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% include theme('confirm_dialog.html') %}
+{% endblock %}

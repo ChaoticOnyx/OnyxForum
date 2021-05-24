@@ -3,6 +3,9 @@ import os
 import attr
 import re
 import ast
+import errno
+import datetime
+import subprocess
 from collections import OrderedDict
 from typing import List
 
@@ -14,7 +17,7 @@ from flask_sqlalchemy import Pagination
 from flask.views import MethodView
 from flaskbb.utils.helpers import FlashAndRedirect
 from flaskbb.display.navigation import NavigationLink
-from flaskbb.extensions import allows, db
+from flaskbb.extensions import allows, db, celery
 from flaskbb.user.models import User, Group
 
 from hub.forms import ConfigEditForm, BanSearchForm
@@ -52,6 +55,32 @@ def LogAction(user, message):
     log_entry.save()
 
 
+def datetime_tag():
+    return datetime.datetime.now().strftime("[%d.%m.%Y %H:%M:%S]\t")
+
+
+@celery.task
+def run_console_script_async(script, task_name=None, output_file_path=""):
+    proc = subprocess.Popen(script, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+
+    if not task_name or not output_file_path:
+        return
+
+    if not os.path.exists(os.path.dirname(output_file_path)):
+        try:
+            os.makedirs(os.path.dirname(output_file_path))
+        except OSError as exc:  # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
+    output_file = open(output_file_path, "a+", buffering=1)
+
+    output_file.write("\n-------------------\n")
+    output_file.write(datetime_tag() + task_name + " started:\n")
+    for line in proc.stdout:
+        output_file.write(datetime_tag() + line)
+    output_file.write(datetime_tag() + task_name + " finished\n")
+
+
 class ServerControl(MethodView):
     decorators = [
         allows.requires(
@@ -71,81 +100,92 @@ class ServerControl(MethodView):
 class StartServer(ServerControl):
     _action = "started"
 
-    def get(self):
+    def post(self):
         if not hub_current_server:
             abort(404)
 
         command = "sudo systemctl start " + hub_current_server.service_name
-        os.system(command)
+        run_console_script_async.delay(command)
         self._report(current_user)
-        return redirect(url_for("hub.index", server=hub_current_server.id))
+        return redirect(url_for("hub.control", server=hub_current_server.id, view="HubLogs"))
 
 
 class StopServer(ServerControl):
     _action = "stopped"
 
-    def get(self):
+    def post(self):
         if not hub_current_server:
             abort(404)
 
         command = "sudo systemctl stop " + hub_current_server.service_name
-        os.system(command)
+        run_console_script_async.delay(command)
         self._report(current_user)
-        return redirect(url_for("hub.index", server=hub_current_server.id))
+        return redirect(url_for("hub.control", server=hub_current_server.id, view="HubLogs"))
 
 
 class RestartServer(ServerControl):
     _action = "restarted"
 
-    def get(self):
+    def post(self):
         if not hub_current_server:
             abort(404)
 
         command = "sudo systemctl restart " + hub_current_server.service_name
-        os.system(command)
+        run_console_script_async.delay(command)
         self._report(current_user)
-        return redirect(url_for("hub.index", server=hub_current_server.id))
+        return redirect(url_for("hub.control", server=hub_current_server.id, view="HubLogs"))
+
+
+def get_update_log_path(server_id):
+    return "logs/" + server_id + "/update.log"
+
+
+class UpdateServer(ServerControl):
+    _action = "updated"
+
+    def post(self):
+        if not hub_current_server:
+            abort(404)
+
+        update_script = \
+            '''
+                cd {path}
+                git fetch origin {branch}
+                git checkout -f FETCH_HEAD
+                DreamMaker -clean {dme}
+            '''.format(
+                path=hub_current_server.path,
+                branch=hub_current_server.branch_name,
+                dme=hub_current_server.dme_name
+            )
+
+        output_file = get_update_log_path(hub_current_server.id)
+        result = run_console_script_async.delay(update_script, "Update", output_file)
+        self._report(current_user)
+        return redirect(url_for("hub.control", server=hub_current_server.id, view="UpdateLogs"))
 
 
 class Hub(MethodView):
+    def _get_server_status(self):
+        command = "systemctl status " + hub_current_server.service_name
+        status = os.system(command)
+        if not status:
+            status = "online"
+        else:
+            status = "offline"
+        return status
+
     def __get_actions(self, server_status):
         actions = []
 
-        if Permission(CanAccessServerHub()):
+        if Permission(CanAccessServerHubAdditional()):
             actions.append(
                 NavigationLink(
-                    endpoint="hub.hublogs",
-                    name=_("Logs"),
-                    icon="fa fa-clock-o",
+                    endpoint="hub.control",
+                    name=_("Control"),
+                    icon="fa fa-tablet",
                     urlforkwargs={"server": hub_current_server.id},
                 ))
-
-        if Permission(CanAccessServerHubAdditional()):
-            if server_status == "online":
-                actions.append(
-                    NavigationLink(
-                        endpoint="hub.stop",
-                        name=_("Stop"),
-                        icon="fa fa-power-off",
-                        urlforkwargs={"server": hub_current_server.id},
-                    ))
-
-                actions.append(
-                    NavigationLink(
-                        endpoint="hub.restart",
-                        name=_("Restart"),
-                        icon="fa fa-undo",
-                        urlforkwargs={"server": hub_current_server.id},
-                    ))
-
-            else:
-                actions.append(
-                    NavigationLink(
-                        endpoint="hub.start",
-                        name=_("Start"),
-                        icon="fa fa-power-off",
-                        urlforkwargs={"server": hub_current_server.id},
-                    ))
 
         if Permission(CanAccessServerHubAdditional()):
             actions.append(
@@ -186,13 +226,7 @@ class Hub(MethodView):
         return actions
 
     def get_args(self):
-        command = "systemctl status " + hub_current_server.service_name
-        status = os.system(command)
-        if not status:
-            status = "online"
-        else:
-            status = "offline"
-
+        status = self._get_server_status()
         return {
             "server": hub_current_server,
             "server_status": status,
@@ -200,30 +234,53 @@ class Hub(MethodView):
         }
 
     def get(self):
-        if Permission(CanAccessServerHub()):
-            return redirect(url_for("hub.hublogs", server=hub_current_server.id))
-        return redirect(url_for("hub.bans", server=hub_current_server.id))
+        return render_template("hub/index.html", **self.get_args())
 
 
-class HubLogView(Hub):
+def get_server_log_file_path(server):
+    log_file_path = "logs/" + server.id + "/server.log"
+
+    script = '''
+            rm {log_file}
+            journalctl --unit={unit} -n 500 --no-pager >> {log_file}
+        '''.format(
+            unit=server.service_name,
+            log_file=log_file_path)
+    subprocess.run(script, shell=True)
+    return log_file_path
+
+
+class ControlView(Hub):
     decorators = [
         allows.requires(
-            CanAccessServerHub(),
-            on_fail=FlashAndRedirect(
-                message=_("You are not allowed to access the hub"),
-                level="danger",
-                endpoint="forum.index"
+            CanAccessServerHubAdditional(),
+            on_fail=FlashAndRedirectToHub(
+                message=_("You are not allowed to access this page"),
+                level="danger"
             )
         )
     ]
 
     def get(self):
-        logs = db.session.query(HubLog)\
-            .filter(HubLog.server_id == hub_current_server.id)\
-            .order_by(HubLog.id.desc())\
-            .limit(100)\
-            .all()
-        return render_template("hub/hublogs.html", **self.get_args(), logs=logs)
+        view = "HubLogs"
+        if "view" in request.args:
+            view = request.args["view"]
+
+        logs = []
+        if view == "HubLogs":
+            logs = db.session.query(HubLog) \
+                .filter(HubLog.server_id == hub_current_server.id) \
+                .order_by(HubLog.id.desc()) \
+                .limit(100) \
+                .all()
+        elif view == "UpdateLogs":
+            update_log_path = get_update_log_path(hub_current_server.id)
+            logs = open(update_log_path, 'r').read().split("\n")[-500:]
+        elif view == "ServerLogs":
+            server_log_path = get_server_log_file_path(hub_current_server)
+            logs = open(server_log_path, 'r').read().split("\n")[-500:]
+
+        return render_template("hub/control.html", **self.get_args(), view=view, logs=logs)
 
 
 class ConfigsView(Hub):
@@ -630,8 +687,8 @@ register_view(
 
 register_view(
     hub,
-    routes=["/hublogs"],
-    view_func=HubLogView.as_view("hublogs")
+    routes=["/control"],
+    view_func=ControlView.as_view("control")
 )
 
 register_view(
@@ -650,6 +707,12 @@ register_view(
     hub,
     routes=["/restart"],
     view_func=RestartServer.as_view("restart"),
+)
+
+register_view(
+    hub,
+    routes=["/update"],
+    view_func=UpdateServer.as_view("update")
 )
 
 register_view(
