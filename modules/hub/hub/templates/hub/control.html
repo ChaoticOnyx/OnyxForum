@@ -49,7 +49,33 @@
                     {% endfor %}
                 {% endif %}
                 {% if view == "UpdateLogs" or view == "ServerLogs" %}
-                    <div style="height: 300px; overflow: auto; display: flex; flex-direction: column-reverse;">
+                    <script>
+                        var logHighlights = [{
+                            regex: /(?<=\[)(ERROR)(?=\])/g,
+                            result: '<span class="log-error">$&</span>'
+                        }, {
+                            regex: /(?<=\[)(TESTING)(?=\])/g,
+                            result: '<span class="log-testing">$&</span>'
+                        }, {
+                            regex: /(?<=\[)(WARNING)(?=\])/g,
+                            result: '<span class="log-warning">$&</span>'
+                        }, {
+                            regex: /(?<=\[)(\d\d:\d\d:\d\d)(?=\])/g,
+                            result: '<span class="log-date">$&</span>'
+                        }]
+
+                        document.addEventListener("DOMContentLoaded", () => {
+                            var logPanel = document.getElementById('logs_panel');
+                            var resultHtml = logPanel.innerHTML;
+
+                            logHighlights.forEach(highlight => {
+                                resultHtml = resultHtml.replace(highlight.regex, highlight.result);
+                            })
+
+                            logPanel.innerHTML = resultHtml;
+                        });
+                    </script>
+                    <div id="logs_panel" style="height: 300px; overflow: auto;">
                         {% for log in logs %}
                             {{ log }}<br>
                         {% endfor %}
