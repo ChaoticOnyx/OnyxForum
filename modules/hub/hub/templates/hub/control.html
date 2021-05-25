@@ -69,7 +69,7 @@
                             var resultHtml = logPanel.innerHTML;
 
                             logHighlights.forEach(highlight => {
-                                resultHtml = resultHtml.replace(highlight.regex, highlight.result);
+                                resultHtml = resultHtml.replaceAll(highlight.regex, highlight.result);
                             })
 
                             logPanel.innerHTML = resultHtml;
