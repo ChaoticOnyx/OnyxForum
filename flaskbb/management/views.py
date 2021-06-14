@@ -285,9 +285,9 @@ class DeleteUser(MethodView):
     ]
 
     def post(self, user_id=None):
-        # ajax request
-        if request.is_xhr:
-            ids = request.get_json()["ids"]
+        json = request.get_json()
+        if json:
+            ids = json["ids"]
 
             data = []
             for user in User.query.filter(User.id.in_(ids)).all():
@@ -426,9 +426,9 @@ class BanUser(MethodView):
             )
             return redirect(url_for("management.overview"))
 
-        # ajax request
-        if request.is_xhr:
-            ids = request.get_json()["ids"]
+        json = request.get_json()
+        if json:
+            ids = json["ids"]
 
             data = []
             users = User.query.filter(User.id.in_(ids)).all()
@@ -499,9 +499,9 @@ class UnbanUser(MethodView):
             )
             return redirect(url_for("management.overview"))
 
-        # ajax request
-        if request.is_xhr:
-            ids = request.get_json()["ids"]
+        json = request.get_json()
+        if json:
+            ids = json["ids"]
 
             data = []
             for user in User.query.filter(User.id.in_(ids)).all():
@@ -952,10 +952,9 @@ class MarkReportRead(MethodView):
     ]
 
     def post(self, report_id=None):
-
-        # AJAX request
-        if request.is_xhr:
-            ids = request.get_json()["ids"]
+        json = request.get_json()
+        if json:
+            ids = json["ids"]
             data = []
 
             for report in Report.query.filter(Report.id.in_(ids)).all():
@@ -1023,9 +1022,9 @@ class DeleteReport(MethodView):
     ]
 
     def post(self, report_id=None):
-
-        if request.is_xhr:
-            ids = request.get_json()["ids"]
+        json = request.get_json()
+        if json:
+            ids = json["ids"]
             data = []
 
             for report in Report.query.filter(Report.id.in_(ids)).all():
