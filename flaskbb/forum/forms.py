@@ -140,7 +140,7 @@ class EditTopicForm(TopicForm):
             forum.last_post_title = self.title.data
 
         self.topic.first_post.date_modified = time_utcnow()
-        self.topic.first_post.modified_by = user.username
+        self.topic.first_post.modified_by = user.display_name
         self.topic.first_post.modified_by_user_id = user.id
 
         current_app.pluggy.hook.flaskbb_form_topic_save(
