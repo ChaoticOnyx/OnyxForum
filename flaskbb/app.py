@@ -242,8 +242,8 @@ def configure_extensions(app):
         whooshee.register_whoosheer(UserWhoosheer)
 
     # Flask-Login
-    login_manager.login_view = app.config["LOGIN_VIEW"]
-    login_manager.refresh_view = app.config["REAUTH_VIEW"]
+    login_manager.login_view = "auth.discord"
+    login_manager.refresh_view = "auth.discord"
     login_manager.login_message_category = app.config["LOGIN_MESSAGE_CATEGORY"]
     login_manager.needs_refresh_message_category = app.config[
         "REFRESH_MESSAGE_CATEGORY"
