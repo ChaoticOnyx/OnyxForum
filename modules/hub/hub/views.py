@@ -75,6 +75,10 @@ def run_console_script_async(script, task_name=None, output_file_path=""):
     output_file = open(output_file_path, "a+", buffering=1)
 
     output_file.write("\n-------------------\n")
+    output_file.write(datetime_tag() + task_name + " script:\n")
+    for script_line in script.split('\n'):
+        output_file.write(datetime_tag() + "> " + script_line + "\n")
+
     output_file.write(datetime_tag() + task_name + " started:\n")
     for line in proc.stdout:
         output_file.write(datetime_tag() + line)
@@ -152,10 +156,11 @@ class UpdateServer(ServerControl):
                 cd {path}
                 git fetch origin {branch}
                 git checkout -f FETCH_HEAD
-                DreamMaker -clean {dme}
+                {dreammaker} -clean {dme}
             '''.format(
                 path=hub_current_server.path,
                 branch=hub_current_server.branch_name,
+                dreammaker=hub_current_server.dream_maker_binary,
                 dme=hub_current_server.dme_name
             )
 
