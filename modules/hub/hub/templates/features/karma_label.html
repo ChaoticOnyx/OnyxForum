@@ -1,0 +1,52 @@
+<div class="karma-label">
+    <form class="inline-form" method="post" action="{{ url_for('hub.karma', user_id=user.id, post_id=post_id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+        <div class="btn-group btn-group-xs" role="group">
+            {% if available %}
+            <button {% if user_cant_change_reason or current_choice and current_choice > 0 %}
+                        class="btn btn-default disabled"
+                        {% if user_cant_change_reason %}
+                            data-toggle="tooltip" data-placement="top" data-container="body" title="{{ user_cant_change_reason }}"
+                        {% endif %}
+                    {% elif current_choice and current_choice < 0 %}
+                        class="btn btn-primary active"
+                        aria-pressed="true"
+                        name="Reset"
+                        data-toggle="tooltip" data-placement="top" data-container="body" title="{% trans %}Reset{% endtrans %}"
+                    {% else %}
+                        class="btn btn-danger"
+                        name="Dislike"
+                        data-toggle="tooltip" data-placement="top" data-container="body" title="{% trans %}Dislike{% endtrans %}"
+                    {% endif %}
+                    >
+                <span class="fa fa-minus-square"></span>
+            </button>
+            {% endif %}
+
+            <span class="btn btn-default karma-counter {{ karma_color }}">
+                {{ karma }}
+            </span>
+
+            {% if available %}
+            <button {% if user_cant_change_reason or current_choice and current_choice < 0 %}
+                        class="btn btn-default disabled"
+                        {% if user_cant_change_reason %}
+                            data-toggle="tooltip" data-placement="top" data-container="body" title="{{ user_cant_change_reason }}"
+                        {% endif %}
+                    {% elif current_choice and current_choice > 0 %}
+                        class="btn btn-primary active"
+                        aria-pressed="true"
+                        name="Reset"
+                        data-toggle="tooltip" data-placement="top" data-container="body" title="{% trans %}Reset{% endtrans %}"
+                    {% else %}
+                        class="btn btn-success"
+                        name="Like"
+                        data-toggle="tooltip" data-placement="top" data-container="body" title="{% trans %}Like{% endtrans %}"
+                    {% endif %}
+                    >
+                <span class="fa fa-plus-square"></span></button>
+            {% endif %}
+        </div>
+    </form>
+</div>

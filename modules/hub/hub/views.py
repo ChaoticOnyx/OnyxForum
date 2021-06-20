@@ -19,12 +19,14 @@ from flaskbb.utils.helpers import FlashAndRedirect
 from flaskbb.display.navigation import NavigationLink
 from flaskbb.extensions import allows, db, celery
 from flaskbb.user.models import User, Group
+from flaskbb.forum.models import Post
 
 from hub.forms import ConfigEditForm, BanSearchForm
 from hub.permissions import CanAccessServerHub, CanAccessServerHubAdditional, CanAccessServerHubManagement
 from hub.models import DiscordUser, DiscordUserRole, DiscordRole, HubLog
 from hub.utils import hub_current_server
 from hub.gameserver_models import game_models, ErroBan
+from hub.features.karma import change_user_karma
 
 from flaskbb.utils.helpers import (
     format_quote,
@@ -684,6 +686,26 @@ class BansView(Hub):
         return redirect(url_for("hub.bans", server=hub_current_server.id, search=search))
 
 
+class KarmaView(MethodView):
+    def post(self):
+        user_id = request.args.get("user_id", 0)
+        user = user_id and User.query.filter_by(id=user_id).first_or_404()
+
+        post_id = request.args.get("post_id", 0)
+        post: Post = post_id and Post.query.filter_by(id=post_id).first_or_404()
+
+        if "Like" in request.form:
+            change_user_karma(user.discord, current_user.discord, 1)
+        elif "Dislike" in request.form:
+            change_user_karma(user.discord, current_user.discord, -1)
+        elif "Reset" in request.form:
+            change_user_karma(user.discord, current_user.discord, 0)
+
+        if post:
+            return redirect(post.url)
+        return redirect(user.url)
+
+
 register_view(
     hub,
     routes=["/"],
@@ -754,4 +776,10 @@ register_view(
     hub,
     routes=["/bans"],
     view_func=BansView.as_view("bans")
+)
+
+register_view(
+    hub,
+    routes=["/karma"],
+    view_func=KarmaView.as_view("karma")
 )

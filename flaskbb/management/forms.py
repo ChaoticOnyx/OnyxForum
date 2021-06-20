@@ -262,6 +262,11 @@ class GroupForm(FlaskForm):
         description=_("Allows a user to hide posts and topics"),
     )
 
+    ignorekarma = BooleanField(
+        _("Ignore karma restrictions"),
+        description=_("Check this, if the users shouldn't be affected with karma restrictions")
+    )
+
     onyx_base = BooleanField(
         _("Onyx base permissions"),
         description=_("Readonly access to server logs"),
@@ -363,7 +368,8 @@ class GroupForm(FlaskForm):
         permission_fields = (
             self.editpost, self.deletepost, self.deletetopic,
             self.posttopic, self.postreply, self.mod_edituser,
-            self.mod_banuser, self.viewhidden, self.makehidden
+            self.mod_banuser, self.viewhidden, self.makehidden,
+            self.ignorekarma
         )
         group_fields = [
             self.admin, self.super_mod, self.mod, self.banned, self.guest

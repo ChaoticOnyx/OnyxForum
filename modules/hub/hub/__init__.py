@@ -11,6 +11,8 @@ from flask import current_app, url_for
 from .views import hub
 from .permissions import can_access_hub
 
+from .features.karma import render_karma
+
 __version__ = "1.0.0"
 SETTINGS = None
 
@@ -91,3 +93,13 @@ def flaskbb_event_post_save_after(post, is_new):
             webhook.send(embed=embed)
         except Exception:
             print(traceback.format_exc())
+
+
+@hookimpl
+def flaskbb_tpl_post_author_info_after(user, post):
+    return render_karma(user, post.id)
+
+
+@hookimpl
+def flaskbb_tpl_profile_sidebar_stats(user):
+    return render_karma(user)

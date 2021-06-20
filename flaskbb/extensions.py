@@ -45,6 +45,9 @@ metadata = MetaData(
 )
 db = SQLAlchemy(metadata=metadata)
 
+metadata_hub = copy.deepcopy(metadata)
+db_hub = SQLAlchemy(metadata=metadata_hub)
+
 metadata_onyx = copy.deepcopy(metadata)
 db_onyx = SQLAlchemy(metadata=metadata_onyx)
 
