@@ -40,7 +40,7 @@ from flaskbb.utils.helpers import (app_config_from_env, crop_title,
                                    forum_is_unread, get_alembic_locations,
                                    get_flaskbb_config, is_online, mark_online,
                                    render_template, time_since, time_utcnow,
-                                   topic_is_unread)
+                                   topic_is_unread, get_random_logo)
 # permission checks (here they are used for the jinja filters)
 from flaskbb.utils.requirements import (CanBanUser, CanEditUser, IsAdmin,
                                         IsAtleastModerator, can_delete_topic,
@@ -302,6 +302,7 @@ def configure_template_filters(app):
 
     app.jinja_env.globals["run_hook"] = template_hook
     app.jinja_env.globals["NavigationContentType"] = NavigationContentType
+    app.jinja_env.globals["get_random_logo"] = get_random_logo
 
     app.pluggy.hook.flaskbb_jinja_directives(app=app)
 

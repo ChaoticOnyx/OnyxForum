@@ -48,10 +48,7 @@
                 <!-- forum header - place for the project title and subtitle -->
                 {% block header %}
                 <div class="flaskbb-header">
-                    <div class="flaskbb-meta">
-                        <div class="flaskbb-title">{{ flaskbb_config["PROJECT_TITLE"] }}</div>
-                        <div class="flaskbb-subtitle">{{ flaskbb_config["PROJECT_SUBTITLE"] }}</div>
-                    </div>
+                    <img src="{{ get_random_logo() }}" alt="Onyx Logo" class="logo"/>
                 </div>
                 {% endblock %}
 

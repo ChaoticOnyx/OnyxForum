@@ -13,6 +13,7 @@ import itertools
 import logging
 import operator
 import os
+import random
 import re
 import time
 import warnings
@@ -868,3 +869,7 @@ class FlashAndRedirect(object):
     def __call__(self, *a, **k):
         flash(self._message, self._level)
         return redirect(self._endpoint(*a, **k))
+
+
+def get_random_logo():
+    return url_for("static", filename="img/logos/logo{}.png".format(random.randint(1, 84)))

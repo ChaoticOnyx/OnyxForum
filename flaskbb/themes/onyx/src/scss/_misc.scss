@@ -43,8 +43,10 @@ body {
 
     position: relative;
     height: 12em;
-    padding: 2.5em 2em;
     margin-top: 2.5em;
+    padding-left: 2em;
+    display: flex;
+    align-items: center;
 
     .flaskbb-meta {
         .flaskbb-title {
@@ -56,6 +58,10 @@ body {
             color: $header-subtitle-color;
         }
     }
+}
+
+.logo {
+    display: block;
 }
 
 .flaskbb-breadcrumb {
