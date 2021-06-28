@@ -24,17 +24,6 @@ impl = HookimplMarker('flaskbb')
 
 logger = logging.getLogger(__name__)
 
-_re_user = re.compile(r'@(\w+)', re.I)
-
-
-def userify(match):
-    value = match.group(1)
-    user = "<a href='{url}'>@{user}</a>".format(
-        url=url_for("user.profile", username=value, _external=False),
-        user=value
-    )
-    return user
-
 
 class FlaskBBRenderer(mistune.Renderer):
     """Markdown with some syntactic sugar, such as @user gettting linked
@@ -46,9 +35,7 @@ class FlaskBBRenderer(mistune.Renderer):
 
     def paragraph(self, text):
         """Render paragraph tags, autolinking user handles."""
-
-        text = _re_user.sub(userify, text)
-        return super(FlaskBBRenderer, self).paragraph(text)
+        return text
 
     def block_code(self, code, lang):
         if lang:
