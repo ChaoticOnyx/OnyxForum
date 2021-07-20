@@ -35,7 +35,7 @@ class FlaskBBRenderer(mistune.Renderer):
 
     def paragraph(self, text):
         """Render paragraph tags, autolinking user handles."""
-        return text
+        return super(FlaskBBRenderer, self).paragraph(text)
 
     def block_code(self, code, lang):
         if lang:
