@@ -63,7 +63,6 @@ install_requires = [
     "Flask-Themes2>=0.1.5",
     "flask-whooshee>=0.7.0",
     "Flask-WTF>=0.14.3",
-    "flaskbb-plugin-conversations>=1.0.7",
     "flaskbb-plugin-portal>=1.1.3",
     "future>=0.18.2",
     "idna>=2.10",
