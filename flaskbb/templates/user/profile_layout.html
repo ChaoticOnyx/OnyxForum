@@ -4,28 +4,28 @@
 
 {% block content %}
 
-{% block breadcrumb %}
-{% endblock %}
-
 <div class="page-view">
     <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="panel page-panel">
-                <div class="panel-heading page-head">
-                    <a href="{{ user.url }}">{{ user.display_name }}</a>
-                    {% if current_user|can_edit_user %}
+                <ul class="panel-heading page-head profile-head breadcrumb">
+                        <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+                        <li class="active">{{ user.display_name }}</li>
+                        {% if current_user|can_edit_user %}
                     <a class="btn btn-xs btn-default pull-right" href="{{ url_for('management.edit_user', user_id=user.id)}}"><i class="fa fa-pencil"></i> {% trans %}Edit{% endtrans %}</a>
                     {% endif %}
-                </div>
+                </ul>
                 <div class="panel-body page-body profile-body">
                     {% block profile_sidebar %}
                     <div class="col-md-3 col-sm-3 col-xs-12 profile-sidebar">
+                        <div class="profile-username">
+                            <a href="{{ user.url }}">{{ user.display_name }}</a>
+                        </div>
                         <div class="profile-picture">
                             {% if user.avatar %}
                             <img src="{{ user.avatar }}" alt="{{ user.display_name }}'s Avatar">
                             {% endif %}
                         </div>
-
                         <div class="profile-groupname">
                             {{ user.primary_group.name }}
                         </div>

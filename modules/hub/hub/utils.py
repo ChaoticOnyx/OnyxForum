@@ -2,6 +2,22 @@
 from werkzeug.local import LocalProxy
 from flask import request, current_app
 
+from flaskbb.extensions import db_hub
+from hub.models import Player
+
+
+def get_player_by_discord(discord_id):
+    if not discord_id:
+        return None
+    return db_hub.session.query(Player).filter(Player.discord_user_id == discord_id).one_or_none()
+
+
+def get_byond_ckey(user):
+    player: Player = get_player_by_discord(user.discord)
+    if player is None:
+        return None
+    return player.ckey
+
 
 @LocalProxy
 def hub_current_server():

@@ -34,6 +34,10 @@
     }
 }
 
+.page-head.profile-head {
+    margin-bottom: 0px;
+}
+
 .page-body.profile-body {
     background-color: $author-box-bg;
 }
@@ -41,7 +45,7 @@
 .profile-content {
     background-color: #fff;
     border-left: 1px solid $border-color;
-    min-height: 32.25em;
+    min-height: 40em;
 
     .topic-head {
         font-weight: normal;
@@ -71,7 +75,9 @@
     text-shadow: 0 1px 0 #fff;
 }
 
+.profile-username,
 .profile-groupname,
+.profile-picture,
 .profile-online,
 .profile-location,
 .profile-posts,
@@ -81,12 +87,16 @@
     margin-top: 0.2em;
 }
 
+.profile-username {
+    color: $fresh-blue;
+    font-size: 1.2em;
+    font-weight: 600;
+}
 
 .profile-groupname {
     text-align: center;
     margin-top: 0.75em;
-    color: $fresh-blue;
-    font-size: 1.2em;
+    font-size: 1em;
     font-weight: 600;
 }
 
@@ -102,6 +112,14 @@
         font-weight: 700;
         padding: 6px 15px;
     }
+}
+
+.profile-field {
+    padding-bottom: 10px;
+}
+
+.profile-about-label {
+    font-weight: bold;
 }
 
 // conversation specific values

@@ -7,23 +7,17 @@ from sqlalchemy.orm import aliased
 
 from flask_login import current_user
 
-from flaskbb.forum.models import Post
 from flaskbb.extensions import db_hub
 from flaskbb.utils.requirements import has_permission
 from flaskbb.utils.helpers import render_template
 from hub.models import Player, Karma
+from hub.utils import get_player_by_discord
 
 logger = logging.getLogger('onyx')
 
 
-def __get_player_by_discord(discord_id):
-    if not discord_id:
-        return None
-    return db_hub.session.query(Player).filter(Player.discord_user_id == discord_id).one_or_none()
-
-
 def is_user_has_karma(discord_id):
-    return bool(__get_player_by_discord(discord_id))
+    return bool(get_player_by_discord(discord_id))
 
 
 def get_user_karma(discord_id):
@@ -91,8 +85,8 @@ def is_user_can_change_karma(user, to_user=None) -> [bool, str]:
 
 
 def get_current_choice(to_discord_id, from_discord_id):
-    player_to: Player = __get_player_by_discord(to_discord_id)
-    player_from: Player = __get_player_by_discord(from_discord_id)
+    player_to: Player = get_player_by_discord(to_discord_id)
+    player_from: Player = get_player_by_discord(from_discord_id)
 
     if not player_to or not player_from:
         return None
@@ -120,8 +114,8 @@ def __log_karma_change(to: Player, _from: Player, value, change):
 
 
 def change_user_karma(to_discord_id, from_discord_id, value):
-    player_to: Player = __get_player_by_discord(to_discord_id)
-    player_from: Player = __get_player_by_discord(from_discord_id)
+    player_to: Player = get_player_by_discord(to_discord_id)
+    player_from: Player = get_player_by_discord(from_discord_id)
 
     assert player_to
     assert player_from

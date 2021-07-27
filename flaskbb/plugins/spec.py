@@ -874,6 +874,13 @@ def flaskbb_tpl_profile_sidebar_links(user):
 
 
 @spec
+def flaskbb_tpl_profile_contacts(user):
+    """
+
+    """
+
+
+@spec
 def flaskbb_tpl_admin_settings_menu(user):
     """This hook is emitted in the admin panel and used to add additional
     navigation links to the admin menu.

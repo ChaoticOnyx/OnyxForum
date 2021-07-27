@@ -10,8 +10,8 @@ from flask import current_app, url_for
 
 from .views import hub
 from .permissions import can_access_hub
-
 from .features.karma import render_karma
+from .utils import get_byond_ckey
 
 __version__ = "1.0.0"
 SETTINGS = None
@@ -103,3 +103,8 @@ def flaskbb_tpl_post_author_info_after(user, post):
 @hookimpl
 def flaskbb_tpl_profile_sidebar_stats(user):
     return render_karma(user)
+
+
+@hookimpl
+def flaskbb_tpl_profile_contacts(user):
+    return render_template("features/profile_contacts.html", ckey=get_byond_ckey(user))
