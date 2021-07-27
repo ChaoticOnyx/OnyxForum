@@ -177,6 +177,8 @@ class ChangeUserDetails(MethodView):
 
 
 class AllUserTopics(MethodView):  # pragma: no cover
+    decorators = [login_required]
+
     def get(self, userid):
         page = request.args.get("page", 1, type=int)
         user = User.query.filter_by(id=userid).first_or_404()
@@ -185,6 +187,8 @@ class AllUserTopics(MethodView):  # pragma: no cover
 
 
 class AllUserPosts(MethodView):  # pragma: no cover
+    decorators = [login_required]
+
     def get(self, userid):
         page = request.args.get("page", 1, type=int)
         user = User.query.filter_by(id=userid).first_or_404()
@@ -193,6 +197,8 @@ class AllUserPosts(MethodView):  # pragma: no cover
 
 
 class UserProfile(MethodView):  # pragma: no cover
+    decorators = [login_required]
+
     def get(self, userid):
         user = User.query.filter_by(id=userid).first_or_404()
         return render_template("user/profile.html", user=user)

@@ -8,6 +8,8 @@ import traceback
 from flaskbb.utils.helpers import render_template
 from flask import current_app, url_for
 
+from flask_login import current_user
+
 from .views import hub
 from .permissions import can_access_hub
 from .features.karma import render_karma
@@ -107,4 +109,7 @@ def flaskbb_tpl_profile_sidebar_stats(user):
 
 @hookimpl
 def flaskbb_tpl_profile_contacts(user):
-    return render_template("features/profile_contacts.html", ckey=get_byond_ckey(user))
+    return render_template(
+        "features/profile_contacts.html",
+        ckey=get_byond_ckey(user),
+        ckey_hidden=(get_byond_ckey(current_user) is None))

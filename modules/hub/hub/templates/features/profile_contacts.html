@@ -1,7 +1,13 @@
 
-{% if ckey %}
+{% if ckey_hidden %}
     <div>
-        <span class="profile-about-label">{% trans %}BYOND{% endtrans %}:</span>
-        {{ ckey }}
+        <span class="text-warning">{% trans %}Link your BYOND account to see other players BYOND keys!{% endtrans %}</span>
     </div>
+{% else %}
+    {% if ckey %}
+        <div>
+            <span class="profile-about-label">{% trans %}BYOND{% endtrans %}:</span>
+            {{ ckey }}
+        </div>
+    {% endif %}
 {% endif %}
