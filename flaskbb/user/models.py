@@ -203,6 +203,10 @@ class User(db.Model, UserMixin, CRUDMixin):
         return url_for("user.profile", userid=self.id)
 
     @property
+    def discord_url(self):
+        return self.discord and "https://discordapp.com/users/" + str(self.discord)
+
+    @property
     def permissions(self):
         """Returns the permissions for the user."""
         return self.get_permissions()

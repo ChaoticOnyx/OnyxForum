@@ -63,7 +63,7 @@
                         {% if user.discord %}
                             <div>
                                 <span class="profile-about-label">{% trans %}Discord Id{% endtrans %}:</span>
-                                {{ user.discord }}
+                                <a href="{{ user.discord_url }}">{{ user.discord }}</a>
                             </div>
                         {% endif %}
                         {{ run_hook("flaskbb_tpl_profile_contacts", user=user) }}
