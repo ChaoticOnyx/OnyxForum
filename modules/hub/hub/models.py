@@ -1,7 +1,7 @@
 from flaskbb.utils.database import UTCDateTime
 from flaskbb.utils.helpers import time_utcnow
 from flaskbb.extensions import db, db_hub
-from sqlalchemy import Column, ForeignKey, String, Integer, DateTime, text, Text, func
+from sqlalchemy import Column, ForeignKey, String, Integer, Float, DateTime, text, Text, func
 from sqlalchemy.dialects.mysql import VARCHAR
 from sqlalchemy.orm import relationship
 
@@ -103,3 +103,83 @@ class HubLog(db.Model):
         db.session.add(self)
         db.session.commit()
         return self
+
+
+class Issue(db_hub.Model):
+    __bind_key__ = 'hub'
+    __tablename__ = 'issues'
+
+    id = Column(Integer, primary_key=True)
+    votes = Column(Integer)
+    points = Column(Float)
+    close_votes = Column(Integer)
+    bounty = Column(Integer)
+
+
+class PointsTransactionType(db_hub.Model):
+    __bind_key__ = 'hub'
+    __tablename__ = 'points_transactions_types'
+
+    id = Column('id', Integer, primary_key=True)
+    type = Column('type', String(32))
+
+
+class PointsTransaction(db_hub.Model):
+    __bind_key__ = 'hub'
+    __tablename__ = 'points_transactions'
+
+    id = Column('id', Integer, primary_key=True)
+    player_id = Column('player', ForeignKey('players.id'), nullable=False, index=True)
+    type_id = Column('type', ForeignKey('points_transactions_types.id'), nullable=False, index=True)
+    datetime = Column('datetime', DateTime, nullable=False)
+    change = Column('change', Float, nullable=False)
+    comment = Column('comment', Text)
+
+    player = relationship('Player')
+    type = relationship('PointsTransactionType')
+
+
+class MoneyCurrency(db_hub.Model):
+    __bind_key__ = 'hub'
+    __tablename__ = 'money_currencies'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False)
+    division = Column(Integer, nullable=False)
+
+
+class DonationType(db_hub.Model):
+    __bind_key__ = 'hub'
+    __tablename__ = 'donations_types'
+
+    id = Column('id', Integer, primary_key=True)
+    type = Column('type', String(32))
+
+
+class MoneyTransaction(db_hub.Model):
+    __bind_key__ = 'hub'
+    __tablename__ = 'money_transactions'
+
+    id = Column(Integer, primary_key=True)
+    datetime = Column(DateTime, nullable=False)
+    currency_id = Column(ForeignKey('money_currencies.id'), nullable=False, index=True)
+    change = Column(Integer, nullable=False, server_default=text("0"))
+    reason = Column(Text, nullable=False, server_default=text("''"))
+    player_id = Column(ForeignKey('players.id'), index=True)
+    donation_type_id = Column(ForeignKey('donations_types.id'), index=True)
+    issue_id = Column(ForeignKey('issues.id'), index=True)
+
+    currency = relationship('MoneyCurrency')
+    donations_type = relationship('DonationType')
+    issue = relationship('Issue')
+    player = relationship('Player')
+
+
+class Token(db_hub.Model):
+    __bind_key__ = 'hub'
+    __tablename__ = 'tokens'
+
+    token = Column(String(50), primary_key=True)
+    discord_user_id = Column(ForeignKey('discord_users.id'), nullable=False, index=True)
+
+    discord_user = relationship('DiscordUser')

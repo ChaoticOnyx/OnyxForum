@@ -13,6 +13,7 @@ from flask_login import current_user
 from .views import hub
 from .permissions import can_access_hub
 from .features.karma import render_karma
+from .features.donations import render_donations_label
 from .utils import get_byond_ckey
 
 __version__ = "1.0.0"
@@ -113,3 +114,8 @@ def flaskbb_tpl_profile_contacts(user):
         "features/profile_contacts.html",
         ckey=get_byond_ckey(user),
         ckey_hidden=(get_byond_ckey(current_user) is None))
+
+
+@hookimpl
+def flaskbb_tpl_user_nav_loggedin_before():
+    return render_donations_label(current_user)

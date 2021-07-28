@@ -1,0 +1,19 @@
+
+{#<div class="">#}
+{#<a class="btn btn-primary dropdown dropdown-toggle" href="{{ url_for('user.profile', userid=current_user.id) }}">#}
+{#    {% trans %}Opyxes:{% endtrans %} {{ points_sum }}#}
+{#</a>#}
+{#</div>#}
+
+<li>
+    <div class="btn-group navbar-btn">
+        <a class="btn donations-label" href="{{ url_for('user.profile', userid=current_user.id) }}">
+            {% trans %}DONATE{% endtrans %}
+        </a>
+        {% if points_sum %}
+        <a class="btn btn-default donations-label-points" href="{{ url_for('user.profile', userid=current_user.id) }}">
+            <span class="donations-label-sum">{{ points_sum }}</span> <span class="emoji">🔆</span>
+        </a>
+        {% endif %}
+    </div>
+</li>

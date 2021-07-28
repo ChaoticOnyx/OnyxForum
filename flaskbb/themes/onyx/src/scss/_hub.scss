@@ -75,3 +75,22 @@
     width: 1%;
     white-space: nowrap;
 }
+
+.donations-label {
+    background-color: #f7ae00;
+    border-color: #f7ae00;
+    color: #ffffff;
+    border-radius: 0;
+    font-weight: bold;
+}
+
+.donations-label-points {
+    font-weight: bold;
+    font-family: monospace;
+    padding-top: 4px;
+    border-radius: 0;
+}
+
+.donations-label-sum {
+    vertical-align: middle;
+}
