@@ -2,12 +2,63 @@ from datetime import datetime
 import string
 import requests
 
-from flask import Flask, Blueprint, Response, request, url_for
+from flask import Blueprint, Response, request, url_for
 from flask.views import MethodView
-from flaskbb.utils.helpers import register_view
-from pluggy import HookimplMarker
 
-impl = HookimplMarker("flaskbb")
+from flask_babelplus import gettext as _
+
+from flaskbb.display.navigation import NavigationLink
+from flaskbb.utils.helpers import register_view, render_template
+
+donations = Blueprint("donations", __name__, template_folder="templates")
+
+
+class DonationsView(MethodView):
+    def __get_actions(self):
+        actions = []
+
+        actions.append(
+            NavigationLink(
+                endpoint="donations.info",
+                name=_("✨ Donate"),
+            ))
+
+        actions.append(
+            NavigationLink(
+                endpoint="donations.points_transactions",
+                name=_("🔆 Opyxes Transactions"),
+            ))
+
+        actions.append(
+            NavigationLink(
+                endpoint="donations.money_transactions",
+                name=_("💵 Money Transactions"),
+            ))
+
+        return actions
+
+    def get_args(self):
+        return {
+            "actions": self.__get_actions()
+        }
+
+    def get(self):
+        return render_template("features/donations/index.html", **self.get_args())
+
+
+class InfoView(DonationsView):
+    def get(self):
+        return render_template("features/donations/info.html", **self.get_args())
+
+
+class PointsTransactionsView(DonationsView):
+    def get(self):
+        return render_template("features/donations/points_transactions.html", **self.get_args())
+
+
+class MoneyTransactionsView(DonationsView):
+    def get(self):
+        return render_template("features/donations/money_transactions.html", **self.get_args())
 
 
 def parse_datetime(qiwi_format: str) -> datetime:
@@ -73,15 +124,32 @@ def register_webhooks_service(app):
     print("Res: " + str(res.__dict__))
 
 
-@impl(tryfirst=True)
-def flaskbb_load_blueprints(app: Flask):
-    donations = Blueprint("donations", __name__)
+register_view(
+    donations,
+    routes=["/"],
+    view_func=DonationsView.as_view("index"),
+)
 
-    register_view(
-        donations,
-        routes=['/qiwi_hook'],
-        view_func=QiwiHook.as_view('qiwi_hook')
-    )
+register_view(
+    donations,
+    routes=["/info"],
+    view_func=InfoView.as_view("info")
+)
 
-    app.register_blueprint(donations)
-    app.before_first_request(lambda: register_webhooks_service(app))
+register_view(
+    donations,
+    routes=["/points_transactions"],
+    view_func=PointsTransactionsView.as_view("points_transactions")
+)
+
+register_view(
+    donations,
+    routes=["/money_transactions"],
+    view_func=MoneyTransactionsView.as_view("money_transactions")
+)
+
+register_view(
+    donations,
+    routes=['/qiwi_hook'],
+    view_func=QiwiHook.as_view('qiwi_hook')
+)

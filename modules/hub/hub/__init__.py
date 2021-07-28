@@ -13,7 +13,8 @@ from flask_login import current_user
 from .views import hub
 from .permissions import can_access_hub
 from .features.karma import render_karma
-from .features.donations import render_donations_label
+from .features.donations.utils import render_donations_label
+from .features.donations.views import donations, register_webhooks_service
 from .utils import get_byond_ckey
 
 __version__ = "1.0.0"
@@ -35,9 +36,10 @@ def flaskbb_load_translations():
 
 @hookimpl
 def flaskbb_load_blueprints(app):
-    app.register_blueprint(
-        hub, url_prefix=app.config.get("PLUGIN_HUB_URL_PREFIX", "/hub")
-    )
+    app.register_blueprint(hub, url_prefix="/hub")
+    app.register_blueprint(donations, url_prefix="/donations")
+
+    app.before_first_request(lambda: register_webhooks_service(app))
 
 
 @hookimpl

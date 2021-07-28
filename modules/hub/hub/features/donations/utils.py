@@ -17,7 +17,7 @@ def get_user_points_sum(user: User) -> int:
         .join(PointsTransaction.player) \
         .filter(Player.discord_user_id == user.discord)
 
-    return math.floor(cursor.first()[0]) or 0
+    return math.floor(cursor.first()[0] or 0)
 
 
 def render_donations_label(user: User):
