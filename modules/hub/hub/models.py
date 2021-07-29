@@ -160,17 +160,17 @@ class MoneyTransaction(db_hub.Model):
     __bind_key__ = 'hub'
     __tablename__ = 'money_transactions'
 
-    id = Column(Integer, primary_key=True)
-    datetime = Column(DateTime, nullable=False)
-    currency_id = Column(ForeignKey('money_currencies.id'), nullable=False, index=True)
-    change = Column(Integer, nullable=False, server_default=text("0"))
-    reason = Column(Text, nullable=False, server_default=text("''"))
-    player_id = Column(ForeignKey('players.id'), index=True)
-    donation_type_id = Column(ForeignKey('donations_types.id'), index=True)
-    issue_id = Column(ForeignKey('issues.id'), index=True)
+    id = Column('id', Integer, primary_key=True)
+    datetime = Column('datetime', DateTime, nullable=False)
+    currency_id = Column('currency', ForeignKey('money_currencies.id'), nullable=False, index=True)
+    change = Column('change', Integer, nullable=False, server_default=text("0"))
+    reason = Column('reason', Text, nullable=False, server_default=text("''"))
+    player_id = Column('player', ForeignKey('players.id'), index=True)
+    donation_type_id = Column('donation_type', ForeignKey('donations_types.id'), index=True)
+    issue_id = Column('issue', ForeignKey('issues.id'), index=True)
 
     currency = relationship('MoneyCurrency')
-    donations_type = relationship('DonationType')
+    donation_type = relationship('DonationType')
     issue = relationship('Issue')
     player = relationship('Player')
 

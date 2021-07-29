@@ -1,5 +1,16 @@
 {% extends theme("features/donations/index.html") %}
+{% from theme('macros.html') import render_pagination %}
 
 {% block donations_content %}
-    Points Transactions
+    <div>
+        {{ render_pagination(pagination, url_for('donations.points_transactions')) }}
+    </div>
+    <table class="table table-striped table-condensed">
+        {% for transaction in transactions %}
+            <tr><td>
+                <b>{{ transaction.datetime|format_datetime() }}:</b> {{ transaction.change }}<br>
+                <i>{{ transaction.comment }}</i>
+            </td></tr>
+        {% endfor %}
+    </table>
 {% endblock %}
