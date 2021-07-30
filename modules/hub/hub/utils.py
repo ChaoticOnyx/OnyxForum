@@ -1,9 +1,12 @@
+import os
 
 from werkzeug.local import LocalProxy
 from flask import request, current_app
 
 from flaskbb.extensions import db_hub
 from hub.models import Player
+
+configs_path = os.path.dirname(os.path.abspath(__file__)) + "/configs"
 
 
 def get_player_by_discord(discord_id):

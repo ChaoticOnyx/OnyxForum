@@ -143,3 +143,5 @@ node_modules
 .pytest_cache
 test-results.xml
 /modules/hub/hub/servers_config.py
+/modules/hub/hub/configs/*
+!/modules/hub/hub/configs/example/

@@ -4,16 +4,17 @@ from typing import List
 import string
 import requests
 
-from flask import Blueprint, Response, request, url_for
+from flask import Blueprint, Response, request, url_for, redirect
 from flask.views import MethodView
 
 from flask_babelplus import gettext as _
-from flask_login import current_user
+from flask_login import current_user, login_required
 from flask_sqlalchemy import Pagination
 
 from flaskbb.display.navigation import NavigationLink
 from flaskbb.utils.helpers import register_view, render_template
 
+from hub.utils import configs_path
 from hub.models import Player, PointsTransaction, MoneyTransaction, DonationType
 
 donations = Blueprint("donations", __name__, template_folder="templates")
@@ -49,15 +50,22 @@ class DonationsView(MethodView):
         }
 
     def get(self):
-        return render_template("features/donations/index.html", **self.get_args())
+        return redirect(url_for("donations.info"))
 
 
 class InfoView(DonationsView):
+    decorators = [login_required]
+
     def get(self):
-        return render_template("features/donations/info.html", **self.get_args())
+        content = ""
+        with open(configs_path + "/donations_info.html", "r") as content_html:
+            content = content_html.read()
+        return render_template("features/donations/info.html", **self.get_args(), content=content)
 
 
 class PointsTransactionsView(DonationsView):
+    decorators = [login_required]
+
     def get(self):
         page = request.args.get('page', 1, type=int)
 
@@ -90,6 +98,8 @@ class PointsTransactionsView(DonationsView):
 
 
 class MoneyTransactionsView(DonationsView):
+    decorators = [login_required]
+
     def get(self):
         page = request.args.get('page', 1, type=int)
 
