@@ -167,3 +167,16 @@ $(document).ready(function () {
 
     parse_emoji(document.body);
 });
+
+var adjustTextAreaSize = function() {
+    if (this.scrollHeight > window.innerHeight / 2) {
+        this.style.height = window.innerHeight / 2 + "px";
+        this.style.overflowY = "auto";
+    } else {
+        this.style.height = "auto"
+        this.style.height = this.scrollHeight + "px";
+        this.style.overflowY = "hidden";
+    }
+};
+
+$("textarea").each(adjustTextAreaSize).on("input", adjustTextAreaSize);
