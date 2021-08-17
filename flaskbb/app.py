@@ -26,7 +26,8 @@ from flask_discord import DiscordOAuth2Session
 from flaskbb._compat import iteritems, string_types
 # extensions
 from flaskbb.extensions import (alembic, allows, babel, cache, celery, csrf,
-                                db, debugtoolbar, limiter, login_manager, mail,
+                                db, db_hub, db_eos, db_onyx, db_dragon,
+                                debugtoolbar, limiter, login_manager, mail,
                                 redis_store, themes, whooshee)
 from flaskbb.plugins import spec
 from flaskbb.plugins.manager import FlaskBBPluginManager
@@ -208,6 +209,10 @@ def configure_extensions(app):
 
     # Flask-SQLAlchemy
     db.init_app(app)
+    db_hub.init_app(app)
+    db_onyx.init_app(app)
+    db_eos.init_app(app)
+    db_dragon.init_app(app)
 
     # Flask-Alembic
     alembic.init_app(app, command_name="db")
