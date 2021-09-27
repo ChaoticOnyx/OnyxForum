@@ -21,7 +21,7 @@ from flaskbb.extensions import allows, db, celery
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post
 
-from hub.forms import ConfigEditForm, BanSearchForm
+from hub.forms import ConfigEditForm, BanSearchForm, ConnectionSearchForm
 from hub.permissions import CanAccessServerHub, CanAccessServerHubAdditional, CanAccessServerHubManagement
 from hub.models import DiscordUser, DiscordUserRole, DiscordRole, HubLog
 from hub.utils import hub_current_server
@@ -220,6 +220,16 @@ class Hub(MethodView):
                 urlforkwargs={"server": hub_current_server.id},
             )
         )
+
+        if Permission(CanAccessServerHub()):
+            actions.append(
+                NavigationLink(
+                    endpoint="hub.connections",
+                    name=_("Connections"),
+                    icon="fa fa-sign-in",
+                    urlforkwargs={"server": hub_current_server.id},
+                )
+            )
 
         if Permission(CanAccessServerHubManagement()):
             actions.append(
@@ -667,7 +677,13 @@ class BansView(Hub):
 
         bans_records_page: Pagination = query.paginate(page, 50)
         bans = bans_records_from_db_records(bans_records_page.items)
-        return render_template("hub/bans.html", **self.get_args(), bans=bans, page=bans_records_page, form=form, search=search)
+        return render_template(
+            "hub/bans.html",
+            **self.get_args(),
+            bans=bans,
+            page=bans_records_page,
+            form=form,
+            search=search)
 
     def post(self):
         form = BanSearchForm()
@@ -684,6 +700,74 @@ class BansView(Hub):
                 search = {"type": "reason", "text": form.searchText.data}
 
         return redirect(url_for("hub.bans", server=hub_current_server.id, search=search))
+
+
+class ConnectionsView(Hub):
+    decorators = [
+        allows.requires(
+            CanAccessServerHub(),
+            on_fail=FlashAndRedirect(
+                message=_("You are not allowed to access the hub"),
+                level="danger",
+                endpoint="forum.index"
+            )
+        )
+    ]
+
+    def get(self):
+        page = request.args.get('page', 1, type=int)
+        search = request.args.get('search')
+
+        connection_model = game_models[hub_current_server.id]["Connection"]
+        query = connection_model.query.order_by(connection_model.id.desc())
+
+        form = ConnectionSearchForm()
+
+        if search is not None:
+            search = ast.literal_eval(search)
+            if not search["text"]:
+                abort(404)
+
+            form.searchText.data = search["text"]
+
+            if search["type"] == "ckey":
+                query = query.filter(connection_model.ckey == search["text"])
+                form.searchType.data = "Ckey"
+            elif search["type"] == "cid":
+                query = query.filter(connection_model.computerid == search["text"])
+                form.searchType.data = "Computer ID"
+            elif search["type"] == "ip":
+                query = query.filter(connection_model.ip.like(search["text"]))
+                form.searchType.data = "IP"
+            else:
+                abort(404)
+
+        connections_records_page: Pagination = query.paginate(page, 50)
+        connections = [c.get_record() for c in connections_records_page.items]
+
+        return render_template(
+            "hub/connections.html",
+            **self.get_args(),
+            connections=connections,
+            page=connections_records_page,
+            form=form,
+            search=search)
+
+    def post(self):
+        form = ConnectionSearchForm()
+
+        search = None
+        if form.validate_on_submit() and form.searchText.data:
+            if form.searchType.data == "Ckey":
+                ckey = re.sub(r'[^\w\d]', '', form.searchText.data)
+                search = {"type": "ckey", "text": ckey}
+            elif form.searchType.data == "Computer ID":
+                computerId = re.sub(r'[^\w\d]', '', form.searchText.data)
+                search = {"type": "cid", "text": computerId}
+            elif form.searchType.data == "IP":
+                search = {"type": "ip", "text": form.searchText.data}
+
+        return redirect(url_for("hub.connections", server=hub_current_server.id, search=search))
 
 
 class KarmaView(MethodView):
@@ -776,6 +860,12 @@ register_view(
     hub,
     routes=["/bans"],
     view_func=BansView.as_view("bans")
+)
+
+register_view(
+    hub,
+    routes=["/connections"],
+    view_func=ConnectionsView.as_view("connections")
 )
 
 register_view(

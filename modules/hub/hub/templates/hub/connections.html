@@ -1,0 +1,50 @@
+{% extends theme("hub/index.html") %}
+{% from theme('macros.html') import render_pagination %}
+
+{% block hub_content %}
+    <div class="row controls-row">
+        <div class="col-md-6 col-sm-6 col-xs-6 controls-col">
+            <form class="form-inline" role="form" method="post">
+                {{ form.hidden_tag() }}
+
+                {{ form.searchText(class="form-control") }}
+                {{ form.searchType(class="form-control") }}
+                {{ form.searchButton(class="btn btn-default") }}
+            </form>
+        </div>
+        <div class="pull-right">
+            {{ render_pagination(page, url_for('hub.connections', server=server.id), with_args=True) }}
+        </div>
+    </div>
+    <table class="table table-striped table-condensed">
+        <tr>
+            <th>Datetime</th>
+            <th>Ckey</th>
+            <th>Computer ID</th>
+            <th>IP</th>
+        </tr>
+        {% for connection in connections %}
+            <tr>
+                <td>
+                    {{ connection.datetime|format_datetime() }}
+                </td>
+                <td>
+                    {{ connection.ckey }}
+                </td>
+                <td>
+                    {{ connection.computerid }}
+                </td>
+                <td>
+                    {{ connection.ip }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <div class="panel-footer">
+    <div class="row controls-row">
+        <div class="pull-right">
+            {{ render_pagination(page, url_for('hub.connections', server=server.id), with_args=True) }}
+        </div>
+    </div>
+    </div>
+{% endblock %}

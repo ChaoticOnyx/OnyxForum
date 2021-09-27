@@ -3,7 +3,7 @@ import attr
 import datetime
 from flaskbb.extensions import db_onyx, db_eos, db_dragon
 from sqlalchemy import Column, DateTime, Integer, String, Text, Index, text
-from sqlalchemy.dialects.mysql import TINYINT, INTEGER, SMALLINT
+from sqlalchemy.dialects.mysql import TINYINT, INTEGER, SMALLINT, VARCHAR
 
 
 @attr.s
@@ -143,11 +143,77 @@ class ErroBanDragon(db_dragon.Model):
         )
 
 
+@attr.s
+class ConnectionRecord:
+    datetime = attr.ib()
+    ckey = attr.ib()
+    ip = attr.ib()
+    computerid = attr.ib()
+
+
+class Connection():
+    id = Column(Integer, primary_key=True)
+    datetime = Column(DateTime)
+    ckey = Column(VARCHAR(50))
+    ip = Column(VARCHAR(50), nullable=False)
+    computerid = Column(VARCHAR(50), nullable=False)
+
+    def get_record(self):
+        return ConnectionRecord(
+            datetime=self.datetime,
+            ckey=self.ckey,
+            ip=self.ip,
+            computerid=self.computerid
+        )
+
+
+class ConnectionChaotic(db_onyx.Model, Connection):
+    __bind_key__ = 'chaotic'
+    __tablename__ = 'connection'
+
+
+class ConnectionEos(db_eos.Model, Connection):
+    __bind_key__ = 'eos'
+    __tablename__ = 'connection'
+
+
+class ConnectionDragon(db_dragon.Model):
+    __bind_key__ = 'dragon'
+    __tablename__ = 'SS13_connection_log'
+
+    id = Column(Integer, primary_key=True)
+    datetime = Column(DateTime)
+    server_name = Column(String(32))
+    server_ip = Column(INTEGER, nullable=False)
+    server_port = Column(SMALLINT, nullable=False)
+    round_id = Column(INTEGER, nullable=False)
+    ckey = Column(String(45))
+    ip = Column(INTEGER, nullable=False)
+    computerid = Column(String(45))
+
+    def get_record(self):
+        return ConnectionRecord(
+            datetime=self.datetime,
+            ckey=self.ckey,
+            ip=self.ip,
+            computerid=self.computerid
+        )
+
+
 game_models = {
     "chaotic":
-        {"ErroBan": ErroBanChaotic},
+        {
+            "ErroBan": ErroBanChaotic,
+            "Connection": ConnectionChaotic
+        },
     "eos":
-        {"ErroBan": ErroBanEos},
+        {
+            "ErroBan": ErroBanEos,
+            "Connection": ConnectionEos
+        },
     "dragon":
-        {"ErroBan": ErroBanDragon}
+        {
+            "ErroBan": ErroBanDragon,
+            "Connection": ConnectionDragon
+        }
 }

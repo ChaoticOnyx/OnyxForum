@@ -11,3 +11,9 @@ class BanSearchForm(FlaskForm):
     searchText = StringField("Search Text")
     searchType = SelectField("Search Field", choices=["Ckey", "Admin", "Reason"])
     searchButton = SubmitField("Search")
+
+
+class ConnectionSearchForm(FlaskForm):
+    searchText = StringField("Search Text")
+    searchType = SelectField("Search Field", choices=["Ckey", "Computer ID", "IP"])
+    searchButton = SubmitField("Search")
