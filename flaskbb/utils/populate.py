@@ -180,11 +180,12 @@ def create_default_groups():
     return result
 
 
-def create_user(username, password, email, groupname):
+def create_user(username, display_name, password, email, groupname):
     """Creates a user.
     Returns the created user.
 
     :param username: The username of the user.
+    :param display_name: The username of the user that everyone will see.
     :param password: The password of the user.
     :param email: The email address of the user.
     :param groupname: The name of the group to which the user
@@ -195,16 +196,17 @@ def create_user(username, password, email, groupname):
     else:
         group = Group.query.filter(getattr(Group, groupname) == True).first()
 
-    user = User.create(username=username, password=password, email=email,
+    user = User.create(username=username, display_name=display_name, password=password, email=email,
                        primary_group_id=group.id, activated=True)
     return user
 
 
-def update_user(username, password, email, groupname):
+def update_user(username, displayname, password, email, groupname):
     """Update an existing user.
     Returns the updated user.
 
     :param username: The username of the user.
+    :param display_name: The username of the user that everyone will see.
     :param password: The password of the user.
     :param email: The email address of the user.
     :param groupname: The name of the group to which the user
@@ -219,6 +221,7 @@ def update_user(username, password, email, groupname):
     else:
         group = Group.query.filter(getattr(Group, groupname) == True).first()
 
+    user.displayname = displayname
     user.password = password
     user.email = email
     user.primary_group = group
