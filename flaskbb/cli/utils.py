@@ -134,8 +134,8 @@ def prompt_save_user(username, email, password, group, only_update=False):
         )
 
     if only_update:
-        return update_user(username, password, email, group)
-    return create_user(username, password, email, group)
+        return update_user(username, username, password, email, group)
+    return create_user(username, username, password, email, group)
 
 
 def prompt_config_path(config_path):
