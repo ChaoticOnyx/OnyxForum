@@ -1,6 +1,7 @@
 # coding: utf-8
 import attr
 import datetime
+import pytz
 from flaskbb.extensions import db_onyx, db_eos, db_dragon
 from sqlalchemy import Column, DateTime, Integer, String, Text, Index, text
 from sqlalchemy.dialects.mysql import TINYINT, INTEGER, SMALLINT, VARCHAR
@@ -52,17 +53,17 @@ class ErroBan:
     def get_ban_record(self):
         return BanRecord(
             ckey=self.ckey,
-            bantime=self.bantime,
-            expiration_time=self.expiration_time,
+            bantime=self.bantime and self.bantime.astimezone(pytz.UTC),
+            expiration_time=self.expiration_time and self.expiration_time.astimezone(pytz.UTC),
             a_ckey=self.a_ckey,
             bantype=self.bantype.lower(),
             expired=(self.bantype.lower() != "permaban" and
                      self.bantype.lower() != "job_permaban" and
-                     self.expiration_time < datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)),
+                     self.expiration_time.astimezone(pytz.UTC) < datetime.datetime.now(datetime.timezone.utc)),
             role=self.job,
             unbanned=self.unbanned,
             unbanned_ckey=self.unbanned_ckey,
-            unbanned_datetime=self.unbanned_datetime,
+            unbanned_datetime=self.unbanned_datetime and self.unbanned_datetime.astimezone(pytz.UTC),
             reason=self.reason
         )
 
@@ -128,17 +129,17 @@ class ErroBanDragon(db_dragon.Model):
 
         return BanRecord(
             ckey=self.ckey,
-            bantime=self.bantime,
-            expiration_time=self.expiration_time,
+            bantime=self.bantime and self.bantime.astimezone(pytz.UTC),
+            expiration_time=self.expiration_time and self.expiration_time.astimezone(pytz.UTC),
             a_ckey=self.a_ckey,
             bantype=bantype,
             expired=(bantype != "permaban" and
                      bantype != "job_permaban" and
-                     self.expiration_time < datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)),
+                     self.expiration_time.astimezone(pytz.UTC) < datetime.datetime.now(datetime.timezone.utc)),
             role=self.role,
             unbanned=bool(self.unbanned_datetime),
             unbanned_ckey=self.unbanned_ckey,
-            unbanned_datetime=self.unbanned_datetime,
+            unbanned_datetime=self.unbanned_datetime and self.unbanned_datetime.astimezone(pytz.UTC),
             reason=self.reason
         )
 
@@ -160,7 +161,7 @@ class Connection():
 
     def get_record(self):
         return ConnectionRecord(
-            datetime=self.datetime,
+            datetime=self.datetime.astimezone(pytz.UTC),
             ckey=self.ckey,
             ip=self.ip,
             computerid=self.computerid
@@ -193,7 +194,7 @@ class ConnectionDragon(db_dragon.Model):
 
     def get_record(self):
         return ConnectionRecord(
-            datetime=self.datetime,
+            datetime=self.datetime.astimezone(pytz.UTC),
             ckey=self.ckey,
             ip=self.ip,
             computerid=self.computerid
