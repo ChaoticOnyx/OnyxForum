@@ -130,7 +130,6 @@ tags
 *.iml
 .directory
 
-*.cfg
 *.rdb
 *.db
 *.sqlite
@@ -143,5 +142,6 @@ node_modules
 .pytest_cache
 test-results.xml
 /modules/hub/hub/servers_config.py
-/modules/hub/hub/configs/*
-!/modules/hub/hub/configs/example/
+modules/hub/hub/configs/*
+!modules/hub/hub/configs/example/
+/flaskbb.cfg
