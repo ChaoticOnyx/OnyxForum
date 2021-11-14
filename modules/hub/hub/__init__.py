@@ -10,18 +10,23 @@ from flask import current_app, url_for
 
 from flask_login import current_user
 
-from .views import hub
+from .blueprint import hub
 from .permissions import can_access_hub
 from .features.karma import render_karma
 from .features.donations.utils import render_donations_label
 from .features.donations.views import donations, register_webhooks_service
-from .utils import get_byond_ckey
+from .utils import get_byond_ckey, configs_path
 
 __version__ = "1.0.0"
 SETTINGS = None
 
 
 hookimpl = HookimplMarker("flaskbb")
+
+
+@hookimpl
+def flaskbb_extensions(app):
+    app.config.from_pyfile(configs_path + "/hub.cfg")
 
 
 @hookimpl

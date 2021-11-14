@@ -9,13 +9,24 @@ from hub.models import Player
 configs_path = os.path.dirname(os.path.abspath(__file__)) + "/configs"
 
 
+def byond_key_to_ckey(key):
+    assert key
+    key = key.lower()
+    return "".join([c for c in key if c.isalnum()])
+
+
 def get_player_by_discord(discord_id):
-    if not discord_id:
-        return None
+    assert discord_id
     return db_hub.session.query(Player).filter(Player.discord_user_id == discord_id).one_or_none()
 
 
+def get_player_by_ckey(ckey):
+    assert ckey
+    return db_hub.session.query(Player).filter(Player.ckey == ckey).one_or_none()
+
+
 def get_byond_ckey(user):
+    assert user
     player: Player = get_player_by_discord(user.discord)
     if player is None:
         return None

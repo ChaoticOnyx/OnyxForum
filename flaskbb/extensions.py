@@ -8,8 +8,11 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import asyncio
+
 from celery import Celery
 from sqlalchemy import MetaData
+import discord
 
 from flask_alembic import Alembic
 from flask_allows import Allows
@@ -92,3 +95,6 @@ limiter = Limiter(auto_check=False, key_func=get_remote_address)
 
 # Celery
 celery = Celery("flaskbb")
+
+asyncio.set_event_loop(asyncio.SelectorEventLoop())
+discordClient: discord.Client = discord.Client()

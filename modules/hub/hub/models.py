@@ -1,3 +1,5 @@
+import datetime
+
 from flaskbb.utils.database import UTCDateTime
 from flaskbb.utils.helpers import time_utcnow
 from flaskbb.extensions import db, db_hub
@@ -131,12 +133,12 @@ class PointsTransaction(db_hub.Model):
     id = Column('id', Integer, primary_key=True)
     player_id = Column('player', ForeignKey('players.id'), nullable=False, index=True)
     type_id = Column('type', ForeignKey('points_transactions_types.id'), nullable=False, index=True)
-    datetime = Column('datetime', DateTime, nullable=False)
+    datetime = Column('datetime', UTCDateTime(timezone=True), nullable=False, default=datetime.datetime.utcnow)
     change = Column('change', Float, nullable=False)
     comment = Column('comment', Text)
 
-    player = relationship('Player')
-    type = relationship('PointsTransactionType')
+    player = relationship('Player', lazy='immediate')
+    type = relationship('PointsTransactionType', lazy='immediate')
 
 
 class MoneyCurrency(db_hub.Model):
@@ -161,18 +163,26 @@ class MoneyTransaction(db_hub.Model):
     __tablename__ = 'money_transactions'
 
     id = Column('id', Integer, primary_key=True)
-    datetime = Column('datetime', DateTime, nullable=False)
+    datetime = Column('datetime', UTCDateTime(timezone=True), nullable=False, default=datetime.datetime.utcnow)
     currency_id = Column('currency', ForeignKey('money_currencies.id'), nullable=False, index=True)
-    change = Column('change', Integer, nullable=False, server_default=text("0"))
+    change_raw = Column('change', Integer, nullable=False, server_default=text("0"))
     reason = Column('reason', Text, nullable=False, server_default=text("''"))
     player_id = Column('player', ForeignKey('players.id'), index=True)
     donation_type_id = Column('donation_type', ForeignKey('donations_types.id'), index=True)
     issue_id = Column('issue', ForeignKey('issues.id'), index=True)
 
-    currency = relationship('MoneyCurrency')
-    donation_type = relationship('DonationType')
-    issue = relationship('Issue')
-    player = relationship('Player')
+    currency = relationship('MoneyCurrency', lazy='immediate')
+    donation_type = relationship('DonationType', lazy='immediate')
+    issue = relationship('Issue', lazy='immediate')
+    player = relationship('Player', lazy='immediate')
+
+    @property
+    def change(self):
+        return self.change_raw / self.currency.division
+
+    @change.setter
+    def change(self, value):
+        self.change_raw = int(value * self.currency.division)
 
 
 class Token(db_hub.Model):

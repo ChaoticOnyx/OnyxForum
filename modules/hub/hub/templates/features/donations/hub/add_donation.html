@@ -1,0 +1,19 @@
+{% extends theme("features/donations/hub/index.html") %}
+
+{% from theme("macros.html") import horizontal_field, horizontal_select_field with context %}
+
+{% block hub_content %}
+<div class="panel page-panel">
+    <div class="panel-body">
+        <form class="form-horizontal" role="form" method="post">
+            {{ form.hidden_tag() }}
+            {{ horizontal_field(form.datetime, label_text='DD.MM.YYYY HH:MM') }}
+            {{ horizontal_field(form.ckey) }}
+            {{ horizontal_field(form.amount, label_text='0.0') }}
+            {{ horizontal_field(form.type) }}
+
+            {{ horizontal_field(form.submit) }}
+        </form>
+    </div>
+</div>
+{% endblock %}

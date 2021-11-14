@@ -28,7 +28,7 @@ from babel.core import get_locale_identifier
 from babel.dates import format_date as babel_format_date, get_timezone
 from babel.dates import format_datetime as babel_format_datetime
 from babel.dates import format_timedelta as babel_format_timedelta
-from flask import flash, g, redirect, request, session, url_for
+from flask import flash, g, redirect, request, session, url_for, current_app
 from flask_allows import Permission
 from flask_babelplus import lazy_gettext as _
 from flask_login import current_user
@@ -873,3 +873,9 @@ class FlashAndRedirect(object):
 
 def get_random_logo():
     return url_for("static", filename="img/logos/logo{}.png".format(random.randint(1, 84)))
+
+
+def discord_task(func):
+    def wrapper(*args, **kwargs):
+        return current_app.add_discord_task(func(*args, **kwargs))
+    return wrapper

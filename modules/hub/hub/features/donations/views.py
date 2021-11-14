@@ -20,7 +20,7 @@ from hub.models import Player, PointsTransaction, MoneyTransaction, DonationType
 donations = Blueprint("donations", __name__, template_folder="templates")
 
 
-class DonationsView(MethodView):
+class UserDonationsView(MethodView):
     def __get_actions(self):
         actions = []
 
@@ -53,7 +53,7 @@ class DonationsView(MethodView):
         return redirect(url_for("donations.info"))
 
 
-class InfoView(DonationsView):
+class DonationsInfoView(UserDonationsView):
     decorators = [login_required]
 
     def get(self):
@@ -63,7 +63,7 @@ class InfoView(DonationsView):
         return render_template("features/donations/info.html", **self.get_args(), content=content)
 
 
-class PointsTransactionsView(DonationsView):
+class UserPointsTransactionsView(UserDonationsView):
     decorators = [login_required]
 
     def get(self):
@@ -97,7 +97,7 @@ class PointsTransactionsView(DonationsView):
             pagination=pagination)
 
 
-class MoneyTransactionsView(DonationsView):
+class UserMoneyTransactionsView(UserDonationsView):
     decorators = [login_required]
 
     def get(self):
@@ -127,7 +127,7 @@ class MoneyTransactionsView(DonationsView):
 
             data.append(TransactionData(
                 datetime=transaction.datetime,
-                change="{:+2}".format(float(transaction.change) / 100).rstrip('0').rstrip('.') + " рублей",
+                change="{:+2}".format(transaction.change).rstrip('0').rstrip('.') + " ₽",
                 comment=type_str
             ))
 
@@ -204,25 +204,25 @@ def register_webhooks_service(app):
 register_view(
     donations,
     routes=["/"],
-    view_func=DonationsView.as_view("index"),
+    view_func=UserDonationsView.as_view("index"),
 )
 
 register_view(
     donations,
     routes=["/info"],
-    view_func=InfoView.as_view("info")
+    view_func=DonationsInfoView.as_view("info")
 )
 
 register_view(
     donations,
     routes=["/points_transactions"],
-    view_func=PointsTransactionsView.as_view("points_transactions")
+    view_func=UserPointsTransactionsView.as_view("points_transactions")
 )
 
 register_view(
     donations,
     routes=["/money_transactions"],
-    view_func=MoneyTransactionsView.as_view("money_transactions")
+    view_func=UserMoneyTransactionsView.as_view("money_transactions")
 )
 
 register_view(

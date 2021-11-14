@@ -1,0 +1,45 @@
+{% extends theme("features/donations/hub/index.html") %}
+{% from theme('macros.html') import render_pagination %}
+
+{% block hub_content %}
+    <div class="row controls-row">
+        <div class="col-md-6 col-sm-6 col-xs-6 controls-col">
+            <form class="inline-form" method="get" action="{{ url_for('hub.add_points_transaction') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button class="btn btn-success">{% trans %}Add Transaction{% endtrans %}</button>
+            </form>
+        </div>
+        <div class="pull-right">
+            {{ render_pagination(pagination, url_for('hub.points_transactions')) }}
+        </div>
+    </div>
+    <table class="table table-striped table-condensed">
+        <thead>
+            <th>Datetime</th>
+            <th>Player</th>
+            <th style="text-align: right">Change</th>
+            <th>Comment</th>
+        </thead>
+        {% for transaction in transactions %}
+            <tr>
+                <td>
+                    {{ transaction.datetime|format_datetime() }}
+                </td>
+                <td>
+                    {{ transaction.player }}
+                </td>
+                <td style="text-align: right">
+                    {{ transaction.change }}
+                </td>
+                <td>
+                    {{ transaction.comment }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <div class="row controls-row">
+        <div class="pull-right">
+            {{ render_pagination(pagination, url_for('hub.points_transactions')) }}
+        </div>
+    </div>
+{% endblock %}

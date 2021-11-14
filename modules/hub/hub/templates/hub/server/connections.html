@@ -1,4 +1,4 @@
-{% extends theme("hub/index.html") %}
+{% extends theme("hub/server/index.html") %}
 {% from theme('macros.html') import render_pagination %}
 
 {% block hub_content %}
@@ -17,12 +17,12 @@
         </div>
     </div>
     <table class="table table-striped table-condensed">
-        <tr>
+        <thead>
             <th>Datetime</th>
             <th>Ckey</th>
             <th>Computer ID</th>
             <th>IP</th>
-        </tr>
+        </thead>
         {% for connection in connections %}
             <tr>
                 <td>

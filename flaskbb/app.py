@@ -8,12 +8,18 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+import asyncio
+import atexit
 import logging
 import logging.config
 import os
+import signal
 import sys
+import threading
 import time
+import traceback
 import warnings
+import werkzeug
 from datetime import datetime
 
 from flask import Flask, request
@@ -28,7 +34,7 @@ from flaskbb._compat import iteritems, string_types
 from flaskbb.extensions import (alembic, allows, babel, cache, celery, csrf,
                                 db, db_hub, db_eos, db_onyx, db_dragon,
                                 debugtoolbar, limiter, login_manager, mail,
-                                redis_store, themes, whooshee)
+                                redis_store, themes, whooshee, discordClient)
 from flaskbb.plugins import spec
 from flaskbb.plugins.manager import FlaskBBPluginManager
 from flaskbb.plugins.models import PluginRegistry
@@ -267,6 +273,40 @@ def configure_extensions(app):
 
     if "DISCORD_CLIENT_ID" in app.config:
         app.discordAuth = DiscordOAuth2Session(app)
+
+    if "DISCORD_BOT_TOKEN" in app.config:
+        if not app.debug or werkzeug.serving.is_running_from_reloader():
+            loop = asyncio.get_event_loop()
+
+            def exception_handler(loop, context):
+                print("Error: Exception is caught during execution of coro: " + str(context.get('future')))
+                try:
+                    raise context.get('exception')
+                except Exception:
+                    traceback.print_exc()
+            loop.set_exception_handler(exception_handler)
+
+            loop.create_task(discordClient.start(app.config["DISCORD_BOT_TOKEN"]))
+            discordClientThread = threading.Thread(target=loop.run_forever)
+            discordClientThread.start()
+
+            def add_discord_task(async_task):
+                async def context_task(app):
+                    with app.app_context():
+                        return await async_task
+                return loop.create_task(context_task(app))
+
+            app.add_discord_task = add_discord_task
+
+            def interupt():
+                discordClient.logout()
+                discordClientThread.cancel()
+            atexit.register(interupt)
+
+
+@discordClient.event
+async def on_ready():
+    print("Discord bot logged in as: %s, %s" % (discordClient.user.name, discordClient.user.id))
 
 
 def configure_template_filters(app):

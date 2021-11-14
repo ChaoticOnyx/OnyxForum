@@ -6,10 +6,11 @@ import ast
 import errno
 import datetime
 import subprocess
+import logging
 from collections import OrderedDict
 from typing import List
 
-from flask import Blueprint, redirect, request, url_for, current_app, abort, flash, send_file
+from flask import redirect, request, url_for, current_app, abort, flash, send_file
 from flask_babelplus import gettext as _
 from flask_allows import Permission
 from flask_login import current_user
@@ -31,12 +32,9 @@ from hub.features.karma import change_user_karma
 from flaskbb.utils.helpers import (
     format_quote,
     real,
-    register_view,
     render_template,
     time_utcnow,
 )
-
-hub = Blueprint("hub", __name__, template_folder="templates")
 
 
 class FlashAndRedirectToHub(object):
@@ -251,7 +249,7 @@ class Hub(MethodView):
         }
 
     def get(self):
-        return render_template("hub/index.html", **self.get_args())
+        return render_template("hub/server/index.html", **self.get_args())
 
 
 def get_server_log_file_path(server):
@@ -297,7 +295,7 @@ class ControlView(Hub):
             server_log_path = get_server_log_file_path(hub_current_server)
             logs = open(server_log_path, 'r').read().split("\n")[-500:]
 
-        return render_template("hub/control.html", **self.get_args(), view=view, logs=logs)
+        return render_template("hub/server/control.html", **self.get_args(), view=view, logs=logs)
 
 
 class ConfigsView(Hub):
@@ -325,9 +323,9 @@ class ConfigsView(Hub):
                 config_files_names = [f for f in config_files_names if f not in server.configs_exclude]
                 config_files_names.sort()
 
-                return render_template("hub/configs.html", **self.get_args(), configs=config_files_names)
+                return render_template("hub/server/configs.html", **self.get_args(), configs=config_files_names)
 
-        return render_template("hub/configs.html", **self.get_args())
+        return render_template("hub/server/configs.html", **self.get_args())
 
 
 class ConfigEditView(Hub):
@@ -360,7 +358,7 @@ class ConfigEditView(Hub):
         with open(os.path.join(server.configs_path, config_name)) as f:
             form.content.data = f.read()
 
-        return render_template("hub/config_edit.html", **self.get_args(), config_name=config_name, form=form)
+        return render_template("hub/server/config_edit.html", **self.get_args(), config_name=config_name, form=form)
 
     def post(self):
         server_id = request.args["server"]
@@ -384,7 +382,7 @@ class ConfigEditView(Hub):
                 LogAction(current_user, 'updated server\'s config file "{}"'.format(config_name))
                 flash("Configuration file was saved!")
 
-        return render_template("hub/config_edit.html", **self.get_args(), config_name=config_name, form=form)
+        return render_template("hub/server/config_edit.html", **self.get_args(), config_name=config_name, form=form)
 
     def form(self):
         return ConfigEditForm()
@@ -460,7 +458,7 @@ class LogsView(Hub):
                 entries[entry_pure] = url_for("hub.gamelogs", server=server_id, path=os.path.relpath(entry, server.logs_path))
 
         return render_template(
-            "hub/gamelogs.html",
+            "hub/server/gamelogs.html",
             **self.get_args(),
             entries=sorted(entries.items()),
             title_parent_folders=title_parent_folders
@@ -618,7 +616,7 @@ class TeamView(Hub):
                 members_from_discord.append(TeamMember(id=discord_user.id, username=discord_user.pure_name, discord_role=discord_role.title))
 
         return render_template(
-            "hub/team.html",
+            "hub/server/team.html",
             **self.get_args(),
             members=members + members_from_discord
         )
@@ -678,7 +676,7 @@ class BansView(Hub):
         bans_records_page: Pagination = query.paginate(page, 50)
         bans = bans_records_from_db_records(bans_records_page.items)
         return render_template(
-            "hub/bans.html",
+            "hub/server/bans.html",
             **self.get_args(),
             bans=bans,
             page=bans_records_page,
@@ -746,7 +744,7 @@ class ConnectionsView(Hub):
         connections = [c.get_record() for c in connections_records_page.items]
 
         return render_template(
-            "hub/connections.html",
+            "hub/server/connections.html",
             **self.get_args(),
             connections=connections,
             page=connections_records_page,
@@ -788,88 +786,3 @@ class KarmaView(MethodView):
         if post:
             return redirect(post.url)
         return redirect(user.url)
-
-
-register_view(
-    hub,
-    routes=["/"],
-    view_func=Hub.as_view("index"),
-)
-
-register_view(
-    hub,
-    routes=["/control"],
-    view_func=ControlView.as_view("control")
-)
-
-register_view(
-    hub,
-    routes=["/start"],
-    view_func=StartServer.as_view("start"),
-)
-
-register_view(
-    hub,
-    routes=["/stop"],
-    view_func=StopServer.as_view("stop"),
-)
-
-register_view(
-    hub,
-    routes=["/restart"],
-    view_func=RestartServer.as_view("restart"),
-)
-
-register_view(
-    hub,
-    routes=["/update"],
-    view_func=UpdateServer.as_view("update")
-)
-
-register_view(
-    hub,
-    routes=["/configs"],
-    view_func=ConfigsView.as_view("configs"),
-)
-
-register_view(
-    hub,
-    routes=["/config_edit"],
-    view_func=ConfigEditView.as_view("config_edit"),
-)
-
-register_view(
-    hub,
-    routes=["/gamelogs"],
-    view_func=LogsView.as_view("gamelogs")
-)
-
-register_view(
-    hub,
-    routes=["/download_gamelog"],
-    view_func=LogDownload.as_view("download_gamelog")
-)
-
-register_view(
-    hub,
-    routes=["/team"],
-    view_func=TeamView.as_view("team")
-)
-
-register_view(
-    hub,
-    routes=["/bans"],
-    view_func=BansView.as_view("bans")
-)
-
-register_view(
-    hub,
-    routes=["/connections"],
-    view_func=ConnectionsView.as_view("connections")
-)
-
-register_view(
-    hub,
-    routes=["/karma"],
-    view_func=KarmaView.as_view("karma")
-)

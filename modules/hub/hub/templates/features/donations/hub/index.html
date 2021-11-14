@@ -1,0 +1,30 @@
+{% extends theme("layout.html") %}
+{%- from theme("macros.html") import sidebar with context -%}
+{% set active_hub_nav=True %}
+
+{% block content %}
+<div class="page-view">
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="panel page-panel">
+                <div class="panel-heading page-head">
+                    Donations Control Panel
+                </div>
+                <div class="panel-body page-body profile-body">
+                    {% block server_sidebar %}
+                    <div class="col-md-3 col-sm-3 col-xs-12 server-sidebar">
+                        {{ sidebar(actions, extra_class="profile-sidebar") }}
+                    </div>
+                    {% endblock %}
+
+                    <div class="col-md-9 col-sm-9 col-xs-12 server-content">
+                        {% block hub_content %}
+                        {% endblock %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
