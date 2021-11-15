@@ -165,15 +165,17 @@ class ForumNotLocked(Requirement):
         raise FlaskBBError("Could not determine forum")
 
 
-class CanAccessForum(Requirement):
+def can_user_access_forum(user, forum):
+    user_groups = {g.id for g in user.groups}
+    forum_groups = {g.id for g in forum.groups}
+    return bool(forum_groups & user_groups)
 
+
+class CanAccessForum(Requirement):
     def fulfill(self, user):
         if not current_forum:
             raise FlaskBBError("Could not load forum data")
-
-        forum_groups = {g.id for g in current_forum.groups}
-        user_groups = {g.id for g in user.groups}
-        return bool(forum_groups & user_groups)
+        return can_user_access_forum(user, current_forum)
 
 
 def IsAtleastModeratorInForum(forum_id=None, forum=None):
@@ -241,6 +243,10 @@ def permission_with_identity(requirement, name=None):
 
 def has_permission(user, permission):
     return Permission(Has(permission), identity=user)
+
+
+def can_access(user, forum):
+    return can_user_access_forum(user, forum)
 
 
 def can_moderate(user, forum):

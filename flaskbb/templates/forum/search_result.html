@@ -16,7 +16,7 @@
             {% trans %}Posts{% endtrans %}
         </div>
         <div class="panel-body topic-body">
-            {% for post in result['post'] %}
+            {% for post in result['post'] if current_user|can_access(post.topic.forum) %}
             <div id="{{ post.id }}" class="row post-row clearfix">
 
                 <div class="author col-md-2 col-sm-3 col-xs-12">
@@ -131,7 +131,7 @@
                 <div class="col-md-3 col-sm-3 col-xs-4 topic-last-post">{% trans %}Last Post{% endtrans %}</div>
             </div>
 
-            {% for topic in result['topic'].all() %}
+            {% for topic in result['topic'].all() if current_user|can_access(topic.forum) %}
             <div class="row forum-row hover clearfix">
 
                 <div class="col-md-5 col-sm-5 col-xs-8 topic-info">
@@ -209,7 +209,7 @@
                 <div class="col-md-2 col-sm-2 hidden-xs forum-stats">{% trans %}Posts{% endtrans %}</div>
                 <div class="col-md-3 col-sm-3 col-xs-4 forum-last-post">{% trans %}Last Post{% endtrans %}</div>
             </div>
-            {% for forum in result['forum'].all() %}
+            {% for forum in result['forum'].all() if current_user|can_access(forum) %}
             <div class="row category-row hover">
 
                 {% if forum.external %}
