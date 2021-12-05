@@ -46,19 +46,17 @@ metadata = MetaData(
         "pk": "pk_%(table_name)s",
     }
 )
-db = SQLAlchemy(metadata=metadata)
 
 metadata_hub = copy.deepcopy(metadata)
-db_hub = SQLAlchemy(metadata=metadata_hub)
-
 metadata_onyx = copy.deepcopy(metadata)
-db_onyx = SQLAlchemy(metadata=metadata_onyx)
-
 metadata_eos = copy.deepcopy(metadata)
-db_eos = SQLAlchemy(metadata=metadata_eos)
-
 metadata_dragon = copy.deepcopy(metadata)
+
+db_hub = SQLAlchemy(metadata=metadata_hub)
+db_onyx = SQLAlchemy(metadata=metadata_onyx)
+db_eos = SQLAlchemy(metadata=metadata_eos)
 db_dragon = SQLAlchemy(metadata=metadata_dragon)
+db = SQLAlchemy(metadata=metadata)
 
 # Whooshee (Full Text Search)
 whooshee = Whooshee()

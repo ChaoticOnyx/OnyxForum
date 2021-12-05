@@ -214,11 +214,11 @@ def configure_extensions(app):
     csrf.init_app(app)
 
     # Flask-SQLAlchemy
-    db.init_app(app)
     db_hub.init_app(app)
     db_onyx.init_app(app)
     db_eos.init_app(app)
     db_dragon.init_app(app)
+    db.init_app(app)
 
     # Flask-Alembic
     alembic.init_app(app, command_name="db")

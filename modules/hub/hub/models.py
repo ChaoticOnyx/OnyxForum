@@ -62,30 +62,6 @@ class Player(db_hub.Model):
     patron_type = relationship('PatronType')
 
 
-class Karma(db_hub.Model):
-    __bind_key__ = 'hub'
-    __tablename__ = 'karma'
-
-    id = Column(Integer, primary_key=True)
-    player_to_id = Column('to', ForeignKey('players.id'), nullable=False, index=True)
-    player_from_id = Column('from', ForeignKey('players.id'), nullable=False, index=True)
-    change = Column(Integer, nullable=False)
-    datetime = Column(DateTime, nullable=False, default=func.now())
-
-    player_to = relationship('Player', primaryjoin='Karma.player_to_id == Player.id')
-    player_from = relationship('Player', primaryjoin='Karma.player_from_id == Player.id')
-
-    def save(self):
-        db_hub.session.add(self)
-        db_hub.session.commit()
-        return self
-
-    def delete(self):
-        db_hub.session.delete(self)
-        db_hub.session.commit()
-        return self
-
-
 class HubLog(db.Model):
     id = Column(Integer, primary_key=True)
     server_id = Column(String(50), nullable=False)

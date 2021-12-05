@@ -3,6 +3,7 @@ from flaskbb.utils.helpers import register_view
 
 from .views import *
 from .features.donations.hub.views import *
+from .features.karma.views import *
 
 hub = Blueprint("hub", __name__, template_folder="templates")
 
@@ -88,6 +89,12 @@ register_view(
     hub,
     routes=["/karma"],
     view_func=KarmaView.as_view("karma")
+)
+
+register_view(
+    hub,
+    routes=["/post_rate"],
+    view_func=PostRateView.as_view("post_rate")
 )
 
 register_view(

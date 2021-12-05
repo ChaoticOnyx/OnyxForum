@@ -1,4 +1,3 @@
-import enum
 import os
 import attr
 import re
@@ -6,8 +5,6 @@ import ast
 import errno
 import datetime
 import subprocess
-import logging
-from collections import OrderedDict
 from typing import List
 
 from flask import redirect, request, url_for, current_app, abort, flash, send_file
@@ -27,13 +24,9 @@ from hub.permissions import CanAccessServerHub, CanAccessServerHubAdditional, Ca
 from hub.models import DiscordUser, DiscordUserRole, DiscordRole, HubLog
 from hub.utils import hub_current_server
 from hub.gameserver_models import game_models, ErroBan
-from hub.features.karma import change_user_karma
 
 from flaskbb.utils.helpers import (
-    format_quote,
-    real,
     render_template,
-    time_utcnow,
 )
 
 
@@ -766,23 +759,3 @@ class ConnectionsView(Hub):
                 search = {"type": "ip", "text": form.searchText.data}
 
         return redirect(url_for("hub.connections", server=hub_current_server.id, search=search))
-
-
-class KarmaView(MethodView):
-    def post(self):
-        user_id = request.args.get("user_id", 0)
-        user = user_id and User.query.filter_by(id=user_id).first_or_404()
-
-        post_id = request.args.get("post_id", 0)
-        post: Post = post_id and Post.query.filter_by(id=post_id).first_or_404()
-
-        if "Like" in request.form:
-            change_user_karma(user.discord, current_user.discord, 1)
-        elif "Dislike" in request.form:
-            change_user_karma(user.discord, current_user.discord, -1)
-        elif "Reset" in request.form:
-            change_user_karma(user.discord, current_user.discord, 0)
-
-        if post:
-            return redirect(post.url)
-        return redirect(user.url)

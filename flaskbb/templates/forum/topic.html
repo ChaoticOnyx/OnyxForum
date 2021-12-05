@@ -97,8 +97,6 @@
 
                         {{ post.content|markup }}
 
-                        {{ run_hook("flaskbb_tpl_post_content_after", post=post) }}
-
                         <!-- Signature Begin -->
                         {% if flaskbb_config["SIGNATURE_ENABLED"] and post.user_id and user.signature %}
                         <div class="post-signature hidden-xs">
@@ -107,14 +105,16 @@
                         </div>
                         {% endif %}
                         <!-- Signature End -->
+
+                        {{ run_hook("flaskbb_tpl_post_content_after", post=post) }}
                     </div>
 
                         <div class="post-footer clearfix">
 
-                            <!-- Report/Edit/Delete/Quote Post-->
-                            <div class="post-menu pull-right">
                             {{ run_hook("flaskbb_tpl_post_menu_before", post=post) }}
 
+                            <!-- Report/Edit/Delete/Quote Post-->
+                            <div class="post-menu pull-right">
                             {% if current_user|post_reply(topic) %}
                                 <!-- Quick quote -->
                                 <a href="#" class="btn btn-icon icon-reply quote-btn" data-post-id="{{ post.id }}" data-toggle="tooltip" data-placement="top" title="{% trans %}Quote this post{% endtrans %}"></a>

@@ -1,0 +1,31 @@
+<div class="post-rating-label pull-left">
+    <form class="inline-form" method="post" action="{{ url_for('hub.post_rate', post_id=post_id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <span class="btn btn-sm btn-default post-rating-counter {{ rating_color }}">
+            {{ post_rating }}
+        </span>
+
+        {% if available %}
+            {% if not user_cant_change_reason %}
+                <button class="btn btn-icon btn-xs" name="Like">
+                    <img src="{{ url_for('static', filename='img/repup.png') }}" />
+                </button>
+            {% else %}
+                <button class="btn btn-icon btn-xs disabled" name="Like"
+                       data-toggle="tooltip" data-placement="top" data-container="body" title="{{ user_cant_change_reason }}">
+                    <img src="{{ url_for('static', filename='img/repup.png') }}" />
+                </button>
+            {% endif %}
+            {% if not user_cant_change_reason %}
+                <button class="btn btn-icon btn-xs" name="Dislike">
+                    <img src="{{ url_for('static', filename='img/repdown.png') }}" />
+                </button>
+            {% else %}
+                <button class="btn btn-icon btn-xs disabled" name="Dislike"
+                       data-toggle="tooltip" data-placement="top" data-container="body" title="{{ user_cant_change_reason }}">
+                    <img src="{{ url_for('static', filename='img/repdown.png') }}" />
+                </button>
+            {% endif %}
+        {% endif %}
+    </form>
+</div>

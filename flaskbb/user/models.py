@@ -10,6 +10,8 @@
 """
 import logging
 
+from sqlalchemy import text
+
 from flask import url_for
 from flask_login import AnonymousUserMixin, UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -136,6 +138,8 @@ class User(db.Model, UserMixin, CRUDMixin):
 
     primary_group_id = db.Column(db.Integer, db.ForeignKey('groups.id'),
                                  nullable=False)
+
+    rate_weight = db.Column(db.Integer, server_default=text("1"), nullable=False)
 
     posts = db.relationship(
         "Post",

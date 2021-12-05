@@ -59,3 +59,27 @@
     border-color: #8a0d00;
     color: #ffffff;
 }
+
+.post-rating-label {
+    text-align: right;
+    margin-top: 0.2em;
+    margin-left: 1em;
+}
+
+.post-rating-counter {
+    width: 50px;
+    font-weight: bold;
+    border-radius: 25px;
+}
+
+.rating-good {
+    background-color: #48a219;
+    border-color: #5c790c;
+    color: #dcfdc3;
+}
+
+.rating-bad {
+    background-color: #ff4a4a;
+    border-color: #b9522e;
+    color: #882020;
+}

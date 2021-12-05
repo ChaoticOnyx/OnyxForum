@@ -12,7 +12,7 @@ from flask_login import current_user
 
 from .blueprint import hub
 from .permissions import can_access_hub
-from .features.karma import render_karma
+from hub.features.karma.render import render_karma, render_post_rating
 from .features.donations.utils import render_donations_label
 from .features.donations.views import donations, register_webhooks_service
 from .utils import get_byond_ckey, configs_path
@@ -103,6 +103,11 @@ def flaskbb_event_post_save_after(post, is_new):
             webhook.send(embed=embed)
         except Exception:
             print(traceback.format_exc())
+
+
+@hookimpl
+def flaskbb_tpl_post_menu_before(post):
+    return render_post_rating(post)
 
 
 @hookimpl
