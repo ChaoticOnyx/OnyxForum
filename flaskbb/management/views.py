@@ -1273,13 +1273,6 @@ class InstallPlugin(MethodView):
 def flaskbb_load_blueprints(app):
     management = Blueprint("management", __name__)
 
-    @management.before_request
-    def check_fresh_login():
-        """Checks if the login is fresh for the current user, otherwise the user
-        has to reauthenticate."""
-        if not login_fresh():
-            return current_app.login_manager.needs_refresh()
-
     # Categories
     register_view(
         management,
