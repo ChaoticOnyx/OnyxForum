@@ -5,6 +5,7 @@ import ast
 import errno
 import datetime
 import subprocess
+from subprocess import DEVNULL, PIPE, STDOUT
 from typing import List
 
 from flask import redirect, request, url_for, current_app, abort, flash, send_file
@@ -54,7 +55,7 @@ def datetime_tag():
 
 @celery.task
 def run_console_script_async(script, task_name=None, output_file_path=""):
-    proc = subprocess.Popen(script, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+    proc = subprocess.Popen(script, shell=True, stdout=PIPE, stderr=STDOUT, text=True, bufsize=1)
 
     if not task_name or not output_file_path:
         return
@@ -166,8 +167,8 @@ class UpdateServer(ServerControl):
 class Hub(MethodView):
     def _get_server_status(self):
         command = "systemctl status " + hub_current_server.service_name
-        status = os.system(command)
-        if not status:
+        result = subprocess.run(command, stdout=DEVNULL, shell=True)
+        if not result.returncode:
             status = "online"
         else:
             status = "offline"
