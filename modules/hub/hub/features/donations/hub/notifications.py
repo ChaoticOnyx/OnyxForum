@@ -1,4 +1,5 @@
 import discord
+from datetime import datetime
 from dateutil import tz
 
 from flask import current_app
@@ -7,13 +8,31 @@ from flaskbb.utils.helpers import discord_task
 from flaskbb.extensions import discordClient
 from flaskbb.utils.settings import flaskbb_config
 
+from hub.features.donations.utils import get_donations_host_user
 from hub.models import PointsTransaction, MoneyTransaction
+
+@discord_task
+async def notify_user_donation_registration_error(dt: datetime, amount, comment: str):
+    host = await get_donations_host_user()
+
+    color = 0xff0000
+    embed = discord.Embed(color=color)
+    embed.title = "Неполучилось автоматически обработать донат!"
+    embed.add_field(name="Время", value=dt.strftime("%d.%m.%y %H:%M"), inline=False)
+    embed.add_field(name="Рублей задоначено", value=amount, inline=False)
+    embed.add_field(name="Комментарий", value=comment, inline=False)
+
+    if host:
+        await host.send(embed=embed)
 
 
 @discord_task
 async def notify_user_about_points_transaction(initiator: User, transaction: PointsTransaction):
     user: discord.User = await discordClient.fetch_user(int(transaction.player.discord_user_id))
-    initiator: discord.User = await discordClient.fetch_user(int(initiator.discord))
+    if initiator:
+        initiator: discord.User = await discordClient.fetch_user(int(initiator.discord))
+    else:
+        initiator = await get_donations_host_user()
 
     color = 0xff0000 if transaction.change < 0 else 0xffd000
     embed = discord.Embed(color=color)

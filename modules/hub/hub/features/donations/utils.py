@@ -25,8 +25,8 @@ def render_donations_label(user: User):
     return render_template("features/donations_label.html", points_sum=get_user_points_sum(user))
 
 
-def get_donations_host_user() -> DiscordUser:
-    host_user: DiscordUser = discordClient.get_user(current_app.config["DONATIONS_HOST_DISCORD_ID"])
+async def get_donations_host_user() -> DiscordUser:
+    host_user: DiscordUser = await discordClient.fetch_user(current_app.config["DONATIONS_HOST_DISCORD_ID"])
     if host_user is None:
         print("Error: Donations host cannot be found!")
     return host_user

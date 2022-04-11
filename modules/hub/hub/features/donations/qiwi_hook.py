@@ -2,12 +2,14 @@ import datetime
 import requests
 import traceback
 import string
+from datetime import datetime
 
 from flask import Response, request, url_for
 from flask.views import MethodView
 
 from hub.models import Player
 from hub.utils import get_player_by_ckey
+from hub.features.donations.hub.notifications import notify_user_donation_registration_error
 from . import actions
 
 
@@ -36,9 +38,10 @@ class QiwiHook(MethodView):
 
         print("-- New donation from " + ckey + ". Amount: " + str(amount) + ". Datetime: " + dt.isoformat())
 
-        player: Player = get_player_by_ckey(ckey)
+        player: Player = get_player_by_ckey(ckey) if ckey else None
         if player is None:
-            pass
+            notify_user_donation_registration_error(dt, amount, content['payment']['comment'])
+            print("-- Failed to process donation automatically (comment: \"{}\")".format(content['payment']['comment']))
         else:
             actions.add_donation_and_notify(dt, ckey, float(amount), type="qiwi", registered_by=None)
 
