@@ -27,7 +27,7 @@ from sqlalchemy_utils.functions import database_exists
 from werkzeug.utils import import_string
 
 from flaskbb import create_app
-from flaskbb.cli.utils import (EmailType, FlaskBBCLIError, get_version,
+from flaskbb.cli.utils import (FlaskBBCLIError, get_version,
                                prompt_config_path, prompt_save_user,
                                write_config)
 from flaskbb.extensions import alembic, celery, db, whooshee
@@ -125,13 +125,11 @@ flaskbb.add_command(alembic_click, "db")
 @click.option("--force", "-f", default=False, is_flag=True,
               help="Doesn't ask for confirmation.")
 @click.option("--username", "-u", help="The username of the user.")
-@click.option("--email", "-e", type=EmailType(),
-              help="The email address of the user.")
 @click.option("--password", "-p", help="The password of the user.")
 @click.option("--no-plugins", "-n", default=False, is_flag=True,
               help="Don't run the migrations for the default plugins.")
 @with_appcontext
-def install(welcome, force, username, email, password, no_plugins):
+def install(welcome, force, username, password, no_plugins):
     """Installs flaskbb. If no arguments are used, an interactive setup
     will be run.
     """
@@ -153,7 +151,7 @@ def install(welcome, force, username, email, password, no_plugins):
     create_default_settings()
 
     click.secho("[+] Creating admin user...", fg="cyan")
-    prompt_save_user(username, email, password, "admin")
+    prompt_save_user(username, password, "admin")
 
     if welcome:
         click.secho("[+] Creating welcome forum...", fg="cyan")
@@ -396,7 +394,6 @@ def generate_config(development, output, force):
         "mail_password": "",
         "mail_sender_name": "FlaskBB Mailer",
         "mail_sender_address": "noreply@yourdomain",
-        "mail_admin_address": "admin@yourdomain",
         "secret_key": binascii.hexlify(os.urandom(24)).decode(),
         "csrf_secret_key": binascii.hexlify(os.urandom(24)).decode(),
         "timestamp": datetime.utcnow().strftime("%A, %d. %B %Y at %H:%M"),
@@ -509,11 +506,6 @@ def generate_config(development, output, force):
         click.style("Mail Sender Address", fg="magenta"),
         default=default_conf.get("mail_sender_address"))
     # ADMINS
-    click.secho("Logs and important system messages are sent to this address. "
-                "Use your email address for gmail here.", fg="cyan")
-    default_conf["mail_admin_address"] = click.prompt(
-        click.style("Mail Admin Email", fg="magenta"),
-        default=default_conf.get("mail_admin_address"))
 
     click.secho("Optional filepath to load a logging configuration file from. "
                 "See the Python logging documentation for more detail.\n"
