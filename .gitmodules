@@ -1,6 +1,3 @@
 [submodule "modules/portal"]
 	path = modules/portal
 	url = https://github.com/flaskbb/flaskbb-plugin-portal
-[submodule "modules/conversations"]
-	path = modules/conversations
-	url = https://github.com/flaskbb/flaskbb-plugin-conversations
