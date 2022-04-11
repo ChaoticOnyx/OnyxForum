@@ -21,9 +21,7 @@ from flask_themes2 import get_theme
 from flaskbb import __version__
 from flaskbb.utils.populate import create_user, update_user
 
-
 _email_regex = r"[^@]+@[^@]+\.[^@]+"
-
 
 class FlaskBBCLIError(click.ClickException):
     """An exception that signals a usage error including color support.
@@ -42,7 +40,6 @@ class FlaskBBCLIError(click.ClickException):
         click.secho("error: %s" % self.format_message(), file=file,
                     **self.styles)
 
-
 class EmailType(click.ParamType):
     """The choice type allows a value to be checked against a fixed set of
     supported values.  All of these values have to be strings.
@@ -59,7 +56,6 @@ class EmailType(click.ParamType):
 
     def __repr__(self):
         return "email"
-
 
 def validate_plugin(plugin):
     """Checks if a plugin is installed.
@@ -111,15 +107,11 @@ def get_version(ctx, param, value):
     ctx.exit()
 
 
-def prompt_save_user(username, email, password, group, only_update=False):
+def prompt_save_user(username, group, only_update=False):
     if not username:
         username = click.prompt(
             click.style("Username", fg="magenta"), type=str,
             default=os.environ.get("USER", "")
-        )
-    if not email:
-        email = click.prompt(
-            click.style("Email address", fg="magenta"), type=EmailType()
         )
     if not password:
         password = click.prompt(
@@ -134,8 +126,8 @@ def prompt_save_user(username, email, password, group, only_update=False):
         )
 
     if only_update:
-        return update_user(username, username, password, email, group)
-    return create_user(username, username, password, email, group)
+        return update_user(username, username, password, group)
+    return create_user(username, username, password, group)
 
 
 def prompt_config_path(config_path):
