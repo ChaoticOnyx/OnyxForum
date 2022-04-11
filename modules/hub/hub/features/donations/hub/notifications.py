@@ -15,6 +15,9 @@ from hub.models import PointsTransaction, MoneyTransaction
 async def notify_user_donation_registration_error(dt: datetime, amount, comment: str):
     host = await get_donations_host_user()
 
+    if not comment:
+        comment = "<Отсутствует>"
+
     color = 0xff0000
     embed = discord.Embed(color=color)
     embed.title = "Неполучилось автоматически обработать донат!"
