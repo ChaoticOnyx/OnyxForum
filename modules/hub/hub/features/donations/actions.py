@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import logging
 from dateutil import tz
 from typing import Optional
@@ -10,7 +10,7 @@ from . import money
 logger = logging.getLogger('donations')
 
 
-def add_donation_and_notify(dt: datetime.datetime, ckey: str, amount: float, type: str, registered_by: Optional[User]):
+def add_donation_and_notify(dt: datetime, ckey: str, amount: float, type: str, registered_by: Optional[User]):
     utc_datetime = dt.astimezone(tz.tzutc())
     money_transaction, points_transaction = money.add_donation(utc_datetime, ckey, amount, type)
     if type != "patreon":
