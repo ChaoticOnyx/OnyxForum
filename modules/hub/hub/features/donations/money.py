@@ -1,6 +1,6 @@
 import datetime
 import math
-from typing import Optional
+from typing import Optional, Tuple
 
 from sqlalchemy import func
 
@@ -20,7 +20,7 @@ def __donation_type_to_description(donation_type):
 
 
 def add_donation(dt: datetime.datetime, ckey: str, donation: float, donation_type: str) \
-        -> (MoneyTransaction, PointsTransaction):
+        -> Tuple[MoneyTransaction, PointsTransaction]:
     assert dt
     assert ckey
     assert donation

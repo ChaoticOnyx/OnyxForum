@@ -1,11 +1,9 @@
 import datetime
 import logging
-import asyncio
 from dataclasses import dataclass
-from dateutil import tz
 from typing import List
 
-from flask import redirect, request, url_for, current_app, abort, flash
+from flask import request, flash
 from flask.views import MethodView
 from flask_allows import Permission
 from flask_babelplus import gettext as _
@@ -15,18 +13,13 @@ from flask_sqlalchemy import Pagination
 from flaskbb.display.navigation import NavigationLink
 from flaskbb.utils.requirements import IsAdmin
 from flaskbb.utils.helpers import FlashAndRedirect
-from flaskbb.extensions import allows, discordClient
-from hub.features.donations import money
-from hub.models import PointsTransaction, MoneyTransaction, Player, DonationType
+from flaskbb.extensions import allows
+from hub.features.donations import money, actions
+from hub.models import PointsTransaction, MoneyTransaction
 from .forms import AddDonationForm, AddMoneyTransactionForm, AddPointsTransactionForm
 from .notifications import *
 
-from flaskbb.utils.helpers import (
-    format_quote,
-    real,
-    render_template,
-    time_utcnow,
-)
+from flaskbb.utils.helpers import render_template
 
 logger = logging.getLogger('donations')
 
@@ -101,26 +94,7 @@ class AddDonationView(DonationsView):
         form = AddDonationForm()
 
         if form.validate_on_submit():
-            utc_datetime = form.datetime.data.astimezone(tz.tzutc())
-
-            money_transaction, points_transaction = money.add_donation(utc_datetime, form.ckey.data, form.amount.data, form.type.data)
-            if form.type.data != "patreon":
-                report_money_transaction(money.get_current_balance(), money_transaction)
-            notify_user_about_points_transaction(current_user._get_current_object(), points_transaction)
-            logger.info(
-                "[AddDonation] "
-                "registered_by: {user} ({user_discord_id}), "
-                "datetime: {datetime}, "
-                "ckey: {ckey}, "
-                "amount: {amount}, "
-                "type: {type}".format(
-                    user=current_user.display_name,
-                    user_discord_id=current_user.discord,
-                    datetime=form.datetime.data.strftime("%d.%m.%Y %H:%M"),
-                    ckey=form.ckey.data,
-                    amount=form.amount.data,
-                    type=form.type.data))
-
+            actions.add_donation_and_notify(form.datetime.data, form.ckey.data, form.amount.data, form.type.data, current_user)
             flash("Donation is added", "success")
 
         return render_template(

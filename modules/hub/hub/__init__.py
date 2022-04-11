@@ -14,7 +14,8 @@ from .blueprint import hub
 from .permissions import can_access_hub
 from hub.features.karma.render import render_karma, render_post_rating
 from .features.donations.utils import render_donations_label
-from .features.donations.views import donations, register_webhooks_service
+from .features.donations.blueprint import donations
+from .features.donations.qiwi_hook import register_webhooks_service
 from .utils import get_byond_ckey, configs_path
 
 __version__ = "1.0.0"
