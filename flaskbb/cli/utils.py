@@ -21,6 +21,8 @@ from flask_themes2 import get_theme
 from flaskbb import __version__
 from flaskbb.utils.populate import create_user, update_user
 
+_email_regex = r"[^@]+@[^@]+\.[^@]+"
+
 class FlaskBBCLIError(click.ClickException):
     """An exception that signals a usage error including color support.
     This aborts any further handling.
@@ -38,6 +40,22 @@ class FlaskBBCLIError(click.ClickException):
         click.secho("error: %s" % self.format_message(), file=file,
                     **self.styles)
 
+class EmailType(click.ParamType):
+    """The choice type allows a value to be checked against a fixed set of
+    supported values.  All of these values have to be strings.
+    See :ref:`choice-opts` for an example.
+    """
+    name = "email"
+
+    def convert(self, value, param, ctx):
+        # Exact match
+        if re.match(_email_regex, value):
+            return value
+        else:
+            self.fail(("invalid email: %s" % value), param, ctx)
+
+    def __repr__(self):
+        return "email"
 
 def validate_plugin(plugin):
     """Checks if a plugin is installed.
