@@ -67,8 +67,6 @@ try:
 except ImportError:
     servers_config = []
 
-import modules.portal
-
 from . import markup  # noqa
 from .auth import views as auth_views  # noqa
 from .deprecation import FlaskBBDeprecation
