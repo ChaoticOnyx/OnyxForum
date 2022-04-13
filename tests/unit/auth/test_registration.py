@@ -27,6 +27,7 @@ class RaisingValidator(UserValidator):
 class TestRegistrationService(object):
     fred = UserRegistrationInfo(
         username="Fred",
+        display_name="Fred",
         password="Fred",
         email="fred@fred.com",
         language="fred",
