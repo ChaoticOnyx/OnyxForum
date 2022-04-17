@@ -1,0 +1,41 @@
+FROM python:3.8-alpine3.15
+
+EXPOSE 5000
+
+RUN apk upgrade &&\
+    apk add make git nodejs npm
+
+RUN addgroup -g 2000 onyxforum &&\
+    adduser -u 2000 -G onyxforum -s /bin/sh -D onyxforum
+
+WORKDIR /usr/src/OnyxForum
+
+RUN chown -R onyxforum:onyxforum /usr/src/OnyxForum && su onyxforum
+
+COPY . .
+
+ENV PATH "${PATH}:/home/onyxforum/.local/bin"
+
+# Install Aurora theme.
+RUN cd flaskbb/themes/aurora &&\
+    npm install --include=dev &&\
+    npm run build:all
+
+# Install Onyx theme.
+RUN cd flaskbb/themes/onyx &&\
+    npm install --include=dev &&\
+    npm run build:all
+
+# Copy HUB configs.
+RUN cp modules/hub/hub/configs/example/* modules/hub/hub/configs/
+
+# Install flaskbb requirements.
+RUN pip install -r requirements.txt &&\
+    pip install -r requirements-dev.txt
+
+# Configure flaskbb.
+RUN echo -ne "\n" | flaskbb makeconfig -d &&\
+    flaskbb --config ./flaskbb.cfg install -u root -p root -f
+
+
+CMD ["flaskbb", "run", "--debugger", "--reload", "--host", "0.0.0.0"]

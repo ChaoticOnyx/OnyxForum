@@ -107,7 +107,7 @@ def get_version(ctx, param, value):
     ctx.exit()
 
 
-def prompt_save_user(username, group, only_update=False):
+def prompt_save_user(username, password, group, only_update=False):
     if not username:
         username = click.prompt(
             click.style("Username", fg="magenta"), type=str,
@@ -126,8 +126,8 @@ def prompt_save_user(username, group, only_update=False):
         )
 
     if only_update:
-        return update_user(username, username, password, group)
-    return create_user(username, username, password, group)
+        return update_user(username, username, password, None, group)
+    return create_user(username, username, password, None, group)
 
 
 def prompt_config_path(config_path):

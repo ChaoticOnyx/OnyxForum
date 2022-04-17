@@ -19,13 +19,13 @@
   "scripts": {
     "clean": "rm -f node_modules",
     "autoprefixer": "postcss -u autoprefixer -r static/css/*",
-    "scss": "./tools/build_css",
+    "scss": "sass --no-source-map --style=compressed --load-path=./ src/scss/styles.scss:static/css/styles.css",
     "uglify": "./tools/build_js",
-    "imagemin": "imagemin src/img/* -o static/img",
+    "images": "cp src/img/* static/img",
     "fonts": "./tools/build_fonts",
     "build:css": "npm run scss && npm run autoprefixer",
     "build:js": "npm run uglify",
-    "build:images": "npm run imagemin && npm run fonts",
+    "build:images": "npm run images && npm run fonts",
     "build:all": "npm run build:css && npm run build:js && npm run build:images",
     "watch:css": "onchange 'src/scss' -- npm run build:css",
     "watch:js": "onchange 'src/js' -- npm run build:js",
@@ -33,11 +33,10 @@
   },
   "devDependencies": {
     "autoprefixer": "^8.2.0",
-    "imagemin-cli": "^3.0.0",
-    "node-sass": "^4.8.3",
     "npm-run-all": "^4.1.2",
     "onchange": "^3.3.0",
     "postcss-cli": "^5.0.0",
+    "sass": "^1.49.0",
     "uglify-js": "^3.3.16"
   },
   "dependencies": {
