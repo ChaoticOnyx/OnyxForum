@@ -19,6 +19,8 @@ from flaskbb.display.navigation import NavigationLink
 from flaskbb.extensions import allows, db, celery
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post
+from werkzeug.utils import safe_join 
+
 
 from hub.forms import ConfigEditForm, BanSearchForm, ConnectionSearchForm
 from hub.permissions import CanAccessServerHub, CanAccessServerHubAdditional, CanAccessServerHubManagement
@@ -489,7 +491,7 @@ class LogDownload(Hub):
         if server is None:
             abort(404)
 
-        file_path = os.path.join(server.logs_path, path)
+        file_path = safe_join(server.logs_path, path)
         return send_file(file_path, as_attachment=True)
 
 
