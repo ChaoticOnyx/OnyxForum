@@ -8,7 +8,7 @@ import subprocess
 from subprocess import DEVNULL, PIPE, STDOUT
 from typing import List
 
-from flask import redirect, request, url_for, current_app, abort, flash, send_file
+from flask import redirect, request, url_for, current_app, abort, flash, send_file, safe_join
 from flask_babelplus import gettext as _
 from flask_allows import Permission
 from flask_login import current_user
@@ -19,7 +19,6 @@ from flaskbb.display.navigation import NavigationLink
 from flaskbb.extensions import allows, db, celery
 from flaskbb.user.models import User, Group
 from flaskbb.forum.models import Post
-from werkzeug.utils import safe_join 
 
 
 from hub.forms import ConfigEditForm, BanSearchForm, ConnectionSearchForm
@@ -312,7 +311,7 @@ class ConfigsView(Hub):
 
         for server in servers:
             if server.id == server_id:
-                config_folder_entries = [os.path.join(server.configs_path, f) for f in os.listdir(server.configs_path)]
+                config_folder_entries = [safe_join(server.configs_path, f) for f in os.listdir(server.configs_path)]
                 config_files = [f for f in config_folder_entries if os.path.isfile(f)]
 
                 config_files_names = [os.path.split(f)[1] for f in config_files]
@@ -350,8 +349,11 @@ class ConfigEditView(Hub):
         if server is None:
             abort(404)
 
+        if os.path.split(config_name)[1] in server.configs_exclude:
+            abort(404)
+
         form = self.form()
-        with open(os.path.join(server.configs_path, config_name)) as f:
+        with open(safe_join(server.configs_path, config_name)) as f:
             form.content.data = f.read()
 
         return render_template("hub/server/config_edit.html", **self.get_args(), config_name=config_name, form=form)
@@ -371,9 +373,12 @@ class ConfigEditView(Hub):
         if server is None:
             abort(404)
 
+        if os.path.split(config_name)[1] in server.configs_exclude:
+            abort(404)
+
         form = self.form()
         if form.validate_on_submit():
-            with open(os.path.join(server.configs_path, config_name), "w") as f:
+            with open(safe_join(server.configs_path, config_name), "w") as f:
                 f.write(form.content.data)
                 LogAction(current_user, 'updated server\'s config file "{}"'.format(config_name))
                 flash("Configuration file was saved!")
@@ -436,13 +441,13 @@ class LogsView(Hub):
 
         current_path = server.logs_path
         if path:
-            current_path = os.path.realpath(os.path.join(current_path, path))
+            current_path = os.path.realpath(safe_join(current_path, path))
             if not current_path.startswith(server.logs_path + os.sep):
                 abort(404)
 
         title_parent_folders = self.get_title_parent_folders(server_id, server.logs_path, current_path)
 
-        logs_folder_entries = [os.path.join(current_path, f) for f in os.listdir(current_path)]
+        logs_folder_entries = [safe_join(current_path, f) for f in os.listdir(current_path)]
         entries = {}
 
         for entry in logs_folder_entries:
