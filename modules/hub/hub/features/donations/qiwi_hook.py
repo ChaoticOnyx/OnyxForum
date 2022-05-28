@@ -33,12 +33,16 @@ class QiwiHook(MethodView):
             return Response(status=200)
 
         dt = parse_datetime(content['payment']['date'])
-        ckey = content['payment']['comment'].split(' ')[0].lower().strip(string.punctuation)
         amount = content['payment']['sum']['amount']
+        ckey = content['payment']['comment'].split(' ')[0].lower().strip(string.punctuation)
+
+        player: Player = get_player_by_ckey(ckey) if ckey else None
+        if player is None:
+            ckey = "".join(filter(str.isalpha, content['payment']['comment'].lower()))
+            player: Player = get_player_by_ckey(ckey) if ckey else None
 
         print("-- New donation from " + ckey + ". Amount: " + str(amount) + ". Datetime: " + dt.isoformat())
 
-        player: Player = get_player_by_ckey(ckey) if ckey else None
         if player is None:
             notify_user_donation_registration_error(dt, amount, content['payment']['comment'])
             print("-- Failed to process donation automatically (comment: \"{}\")".format(content['payment']['comment']))
