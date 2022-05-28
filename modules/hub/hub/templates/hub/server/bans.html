@@ -59,8 +59,16 @@
 
                                         {% if ban.unbanned %}
                                             <span class="text-success"><strong>
-                                                <br>{{ ban.unbanned_ckey }} unbaned on:
-                                                <br>{{ ban.unbanned_datetime|format_datetime() }}
+                                                <br>
+                                                {% if ban.unbanned_ckey %}
+                                                    {{ ban.unbanned_ckey }} unbanned
+                                                {% else %}
+                                                    Unbanned
+                                                {% endif %}
+                                                {% if ban.unbanned_datetime %}
+                                                    on:
+                                                    <br>{{ ban.unbanned_datetime|format_datetime() }}
+                                                {% endif %}
                                             </strong></span>
                                         {% elif ban.expired %}
                                             <span class="text-success"><strong>
