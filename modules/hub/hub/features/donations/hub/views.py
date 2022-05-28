@@ -256,6 +256,7 @@ class AddPointsTransactionView(DonationsView):
 
         if form.validate_on_submit():
             points_transaction = money.add_points_transaction(form.ckey.data, form.amount.data, form.reason.data)
+            report_points_transaction(points_transaction)
             notify_user_about_points_transaction(current_user._get_current_object(), points_transaction)
             logger.info(
                 "[AddPointsTransaction] "

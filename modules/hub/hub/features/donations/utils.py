@@ -20,6 +20,16 @@ def get_user_points_sum(user: User) -> int:
     return math.floor(cursor.first()[0] or 0)
 
 
+def get_player_points_sum(player: Player) -> int:
+    assert player
+
+    cursor: db_hub.Query = db_hub.session.query(0 + func.sum(PointsTransaction.change)) \
+        .join(PointsTransaction.player) \
+        .filter(Player.ckey == player.ckey)
+
+    return math.floor(cursor.first()[0] or 0)
+
+
 def render_donations_label(user: User):
     assert user
     return render_template("features/donations_label.html", points_sum=get_user_points_sum(user))

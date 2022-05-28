@@ -8,7 +8,7 @@ from flaskbb.utils.helpers import discord_task
 from flaskbb.extensions import discordClient
 from flaskbb.utils.settings import flaskbb_config
 
-from hub.features.donations.utils import get_donations_host_user
+from hub.features.donations.utils import get_donations_host_user, get_player_points_sum
 from hub.models import PointsTransaction, MoneyTransaction
 
 @discord_task
@@ -83,3 +83,25 @@ async def report_money_transaction(balance, transaction: MoneyTransaction):
     else:
         await reports_channel.send(
             "__{}__ _{}: **{:+.0f} ₽**. Сумма: {:.0f} ₽._".format(timestr, transaction.reason, transaction.change, balance))
+
+
+@discord_task
+async def report_points_transaction(transaction: PointsTransaction):
+    reports_channel = discordClient.get_channel(current_app.config["DONATIONS_POINTS_REPORT_CHANNEL_ID"])
+    timestr = transaction.datetime.astimezone(tz.tzlocal()).strftime("%d.%m.%Y %H:%M")
+
+    message = None
+    if transaction.change > 0:
+        message = "\n_**{}** добавили **{:+.0f}** опиксов: \"{}\"_".format(
+                transaction.player.ckey,
+                transaction.change,
+                transaction.comment)
+    else:
+        message = "\n_**{}** сняли **{:+.0f}** опиксов: \"{}\"_".format(
+                transaction.player.ckey,
+                transaction.change,
+                transaction.comment)
+
+    summary = get_player_points_sum(transaction.player)
+    message += "\n_Текущий баланс: {:.0f} опиксов._".format(summary)
+    await reports_channel.send(message)

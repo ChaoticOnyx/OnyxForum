@@ -15,6 +15,7 @@ def add_donation_and_notify(dt: datetime, ckey: str, amount: float, type: str, r
     money_transaction, points_transaction = money.add_donation(utc_datetime, ckey, amount, type)
     if type != "patreon":
         report_money_transaction(money.get_current_balance(), money_transaction)
+    report_points_transaction(points_transaction)
     notify_user_about_points_transaction(None if registered_by is None else registered_by._get_current_object(), points_transaction)
     registered_by_str = ""
     if registered_by is not None:
