@@ -31,7 +31,6 @@ async def notify_user_donation_registration_error(dt: datetime, amount, comment:
 
 @discord_task
 async def notify_user_about_points_transaction(initiator: User, transaction: PointsTransaction):
-    user: discord.User = await discordClient.fetch_user(int(transaction.player.discord_user_id))
     if initiator:
         initiator: discord.User = await discordClient.fetch_user(int(initiator.discord))
     else:
@@ -48,10 +47,17 @@ async def notify_user_about_points_transaction(initiator: User, transaction: Poi
     embed.add_field(name="Комментарий", value=transaction.comment, inline=False)
     embed.add_field(name="Время транзакции", value=transaction.datetime.astimezone(tz.tzlocal()).strftime("%d.%m.%y %H:%M"), inline=False)
 
-    embed.title = "{}#{}".format(user.name, user.discriminator) + \
+    user: discord.User = None
+    if transaction.player.discord_user_id:
+        user = await discordClient.fetch_user(int(transaction.player.discord_user_id))
+
+    embed.title = "{}#{}".format(user.name, user.discriminator) if user else "Неизвестный пользователь" + \
                   (" потратил опиксы." if transaction.change < 0 else " получил опиксы.")
     if initiator:
         await initiator.send(embed=embed)
+
+    if not user:
+        return
 
     embed.title = "Вы потратили опиксы!" if transaction.change < 0 else "Вы получили опиксы!"
     try:
