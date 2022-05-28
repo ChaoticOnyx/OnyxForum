@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import logging
 from dataclasses import dataclass
 from typing import List
@@ -125,7 +125,7 @@ class PointsTransactionsView(DonationsView):
 
         @dataclass
         class TransactionData:
-            datetime: datetime.datetime
+            datetime: datetime
             player: str
             change: str
             comment: str
