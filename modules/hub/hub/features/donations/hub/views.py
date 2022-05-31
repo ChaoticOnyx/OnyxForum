@@ -258,6 +258,8 @@ class AddPointsTransactionView(DonationsView):
             points_transaction = money.add_points_transaction(form.ckey.data, form.amount.data, form.reason.data)
             report_points_transaction(points_transaction)
             notify_user_about_points_transaction(current_user._get_current_object(), points_transaction)
+            if points_transaction.player.discord_user_id and form.amount.data > 0:
+                discord.add_opyxholder_role_if_needed(points_transaction.player.discord_user_id)
             logger.info(
                 "[AddPointsTransaction] "
                 "registered_by: {user} ({user_discord_id}), "
