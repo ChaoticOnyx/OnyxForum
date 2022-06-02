@@ -94,7 +94,7 @@ class AddDonationView(DonationsView):
         form = AddDonationForm()
 
         if form.validate_on_submit():
-            actions.add_donation_and_notify(form.datetime.data, form.ckey.data, form.amount.data, form.type.data, current_user)
+            actions.add_donation_and_notify(form.datetime.data, form.ckey.data, form.amount.data, form.type.data, form.issue.data, current_user)
             flash("Donation is added", "success")
 
         return render_template(

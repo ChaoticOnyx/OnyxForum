@@ -5,12 +5,15 @@
 {% block hub_content %}
 <div class="panel page-panel">
     <div class="panel-body">
-        <form class="form-horizontal" role="form" method="post">
+        <form class="form-horizontal donation-form" role="form" method="post">
             {{ form.hidden_tag() }}
             {{ horizontal_field(form.datetime, label_text='DD.MM.YYYY HH:MM') }}
             {{ horizontal_field(form.ckey) }}
             {{ horizontal_field(form.amount, label_text='0.0') }}
             {{ horizontal_field(form.type) }}
+            <div id="issue_row" style="display:none;">
+                {{ horizontal_field(form.issue, label_text='0000') }}
+            </div>
 
             {{ horizontal_field(form.submit) }}
         </form>

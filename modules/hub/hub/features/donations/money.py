@@ -1,25 +1,36 @@
 import datetime
 import math
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 
 from sqlalchemy import func
 
 from flaskbb.extensions import db_hub
 
-from hub.models import MoneyTransaction, MoneyCurrency, DonationType, PointsTransaction, PointsTransactionType
+from hub.models import Issue, MoneyTransaction, MoneyCurrency, DonationType, PointsTransaction, PointsTransactionType
 from hub.utils import get_player_by_ckey
 
 
 def __donation_type_to_description(donation_type):
     if donation_type == "qiwi":
         return "Пожертвование через QIWI"
+    elif donation_type == "payeer":
+        return "Пожертвование через Payeer"
+    elif donation_type == "cryptocurrency":
+        return "Пожертвование криптовалютой"
     elif donation_type == "patreon":
         return "Подписка Patreon"
+    elif donation_type == "reject_bounty":
+        return "Отказ от награды"
     else:
         return donation_type
 
 
-def add_donation(dt: datetime.datetime, ckey: str, donation: float, donation_type: str) \
+def get_donation_types():
+    donation_types: List[DonationType] = db_hub.session.query(DonationType).all()
+    return [str(donation_type.type) for donation_type in donation_types]
+
+
+def add_donation(dt: datetime.datetime, ckey: str, donation: float, donation_type: str, issue_id: Optional[int] = None) \
         -> Tuple[MoneyTransaction, PointsTransaction]:
     assert dt
     assert ckey
@@ -36,11 +47,16 @@ def add_donation(dt: datetime.datetime, ckey: str, donation: float, donation_typ
     money_transaction.donation_type = \
         db_hub.session.query(DonationType).filter(DonationType.type == donation_type).one_or_none()
     money_transaction.reason = 'Пожертвование игрока'
+    if issue_id:
+        issue = db_hub.session.query(Issue).filter(Issue.id == issue_id).one_or_none()
+        assert issue
+        money_transaction.issue = issue
 
     points_transaction = PointsTransaction()
     points_transaction.player = money_transaction.player
     points_transaction.change = money_transaction.change / 10
     points_transaction.comment = __donation_type_to_description(money_transaction.donation_type.type)
+    points_transaction.comment += " (#{})".format(issue_id) if issue_id else ""
     points_transaction.type = \
         db_hub.session.query(PointsTransactionType).filter(PointsTransactionType.type == "donation").one_or_none()
 

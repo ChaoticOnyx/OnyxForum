@@ -10,9 +10,16 @@ from . import money, discord
 logger = logging.getLogger('donations')
 
 
-def add_donation_and_notify(dt: datetime, ckey: str, amount: float, type: str, registered_by: Optional[User]):
+def add_donation_and_notify(
+    dt: datetime,
+    ckey: str,
+    amount: float,
+    type: str,
+    issue: Optional[int] = None,
+    registered_by: Optional[User] = None
+):
     utc_datetime = dt.astimezone(tz.tzutc())
-    money_transaction, points_transaction = money.add_donation(utc_datetime, ckey, amount, type)
+    money_transaction, points_transaction = money.add_donation(utc_datetime, ckey, amount, type, issue)
     if type != "patreon":
         report_money_transaction(money.get_current_balance(), money_transaction)
     report_points_transaction(points_transaction)
