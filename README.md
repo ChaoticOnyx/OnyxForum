@@ -202,3 +202,13 @@ servers_config = [
         logs_path="~/OnyxBay/data/logs")
 ]
 ```
+
+# Misc
+
+* For hub log
+**Don't forget change <server_id>**
+```
+mkdir logs/<serverd_id>
+touch logs/<serverd_id>/update.log
+touch logs/<serverd_id>/server.log
+```
