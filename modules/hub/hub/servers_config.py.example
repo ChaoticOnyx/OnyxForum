@@ -1,0 +1,45 @@
+import attr
+from typing import List, Dict
+
+
+@attr.s(auto_attribs=True)
+class ServerDescriptor:
+    id: str
+    name: str
+    service_name: str
+    path: str
+    branch_name: str
+    dream_maker_binary: str
+    dme_name: str
+    base_permission: str
+    additional_permission: str
+    management_permission: str
+    discord_full_access_titles: List[str]
+    discord_base_access_titles: List[str]
+    discord_role_to_group: Dict[str, int]
+    configs_path: str
+    configs_exclude: List[str]
+    logs_path: str
+
+servers_config = [
+    ServerDescriptor(
+        id="chaotic",
+        name="Local Server",
+        service_name="onyx.service",
+        path="/home/OnyxBay",
+        branch_name="release/chaotic",
+        dream_maker_binary="DreamMaker",
+        dme_name="baystation12.dme",
+        base_permission="onyx_base",
+        additional_permission="onyx_additional",
+        management_permission="onyx_management",
+        discord_full_access_titles=[
+        ],
+        discord_base_access_titles=[
+        ],
+        discord_role_to_group = {
+        },
+        configs_path="/home/OnyxBay/config/",
+        configs_exclude=["dbconfig.txt", "dbconfig_docker.txt"],
+        logs_path="/home/OnyxBay/data/logs")
+]

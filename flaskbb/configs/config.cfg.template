@@ -37,6 +37,10 @@ SESSION_COOKIE_HTTPONLY = True
 #SQLALCHEMY_DATABASE_URI = "postgresql://flaskbb@localhost:5432/flaskbb"
 # For SQLite:
 SQLALCHEMY_DATABASE_URI = "{{ database_uri }}"
+SQLALCHEMY_BINDS = {
+    "hub": "mysql://username:password@localhost/hub_DB?charset=utf8mb4",
+    "chaotic": "mysql://username:password@localhost/server_DB?charset=utf8mb4"""
+}
 
 # This option will be removed as soon as Flask-SQLAlchemy removes it.
 # At the moment it is just used to suppress the super annoying warning
@@ -274,3 +278,9 @@ REMOVE_DEAD_PLUGINS = False
 
 # determines the warning level for FlaskBB Deprecations
 DEPRECATION_LEVEL = "{{ deprecation_level }}"
+
+DISCORD_CLIENT_ID = [Place_Client_ID_Here]
+DISCORD_CLIENT_SECRET = "[Place_Client_Secret_Here]"
+DISCORD_REDIRECT_URI = "http://example.test:5000/auth/discord-callback" #Site need to be equal SERVER_NAME
+DISCORD_BOT_TOKEN = "[Place_Bot_Token_Here]"
+DEBUG_TB_INTERCEPT_REDIRECTS = False

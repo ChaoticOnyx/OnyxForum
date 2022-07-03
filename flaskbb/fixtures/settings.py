@@ -318,7 +318,7 @@ fixture = (
                 (
                     "default_theme",
                     {
-                        "value": "aurora",
+                        "value": "onyx",
                         "value_type": SettingValueType.select,
                         "extra": {"choices": available_themes},
                         "name": "Default Theme",
