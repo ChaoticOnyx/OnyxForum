@@ -71,6 +71,7 @@ Edit your DB address and replace `"server"`
 * Compile themes
 ```
 cd ./flaskbb/themes/onyx && sudo npm run build:all
+cd ../aurora && sudo npm run build:all
 ```
 
 ### Starting this monster:
