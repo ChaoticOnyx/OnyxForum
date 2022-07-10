@@ -17,6 +17,9 @@ from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import current_user, login_required
 from pluggy import HookimplMarker
+from flaskbb.extensions import db_hub
+from hub.models import Token
+import secrets
 
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import register_view, render_template
@@ -203,6 +206,26 @@ class UserProfile(MethodView):  # pragma: no cover
         user = User.query.filter_by(id=userid).first_or_404()
         return render_template("user/profile.html", user=user)
 
+class GenerateToken(MethodView):  # pragma: no cover
+    decorators = [login_required]
+
+    def get(self, userid):
+        user = User.query.filter_by(id=userid).first_or_404()
+        Token.query.filter(Token.discord_user_id == user.discord).delete()
+        new_token = Token()
+        new_token.token = secrets.token_hex(16)
+        new_token.discord_user_id = user.discord
+
+
+        db_hub.session.add(new_token)
+        db_hub.session.commit()
+
+        db_hub.session.refresh(new_token)
+        db_hub.session.expunge_all()
+
+        flash("Ваш токен {}. Чтобы выполнить привязку BYOND аккаунта, введите его, с помощью консольной команды `.chaotic-token` на одном из наших серверов.".format(new_token.token))
+        return redirect(url_for("user.profile", userid=user.id))
+
 
 @impl(tryfirst=True)
 def flaskbb_load_blueprints(app):
@@ -232,6 +255,11 @@ def flaskbb_load_blueprints(app):
         user,
         routes=["/user<userid>/topics"],
         view_func=AllUserTopics.as_view("view_all_topics"),
+    )
+    register_view(
+        user,
+        routes=["/user<userid>/generate-token"],
+        view_func=GenerateToken.as_view("generate_token"),
     )
 
     register_view(
