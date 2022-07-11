@@ -166,6 +166,11 @@ class Token(db_hub.Model):
     __tablename__ = 'tokens'
 
     token = Column(String(50), primary_key=True)
-    discord_user_id = Column(ForeignKey('discord_users.id'), nullable=False, index=True)
+    discord_user_id = Column('discord', ForeignKey('discord_users.id'), nullable=False, index=True)
 
     discord_user = relationship('DiscordUser')
+    
+    def delete(self):
+        db_hub.session.delete(self)
+        db_hub.session.commit()
+        return self

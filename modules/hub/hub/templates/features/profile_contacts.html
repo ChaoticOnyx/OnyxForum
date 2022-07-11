@@ -2,6 +2,9 @@
 {% if ckey_hidden %}
     <div>
         <span class="text-warning">{% trans %}Link your BYOND account to see other players BYOND keys!{% endtrans %}</span>
+        <a class="btn btn-warning" href="{{ url_for('user.generate_token', userid=current_user.id) }}">
+            {%trans%}Link{%endtrans%}
+        </a>
     </div>
 {% else %}
     {% if ckey %}
