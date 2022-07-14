@@ -435,7 +435,18 @@ class ForumForm(FlaskForm):
         validators=[DataRequired(message=_("Please enter a position for the"
                                            "forum."))]
     )
-
+    is_subforum = BooleanField(
+        _("Subforum?"),
+        description=_("Makes subforum of forum?")
+    )
+    subforum_parent_id = QuerySelectField(
+        _("Parent forum"),
+        validators=[Optional()],
+        query_factory=selectable_forums,
+        allow_blank=False,
+        get_label="title",
+        description=_("The forum that contains this forum.")
+    )
     category = QuerySelectField(
         _("Category"),
         query_factory=selectable_categories,
@@ -443,6 +454,7 @@ class ForumForm(FlaskForm):
         get_label="title",
         description=_("The category that contains this forum.")
     )
+
 
     external = StringField(
         _("External link"),
@@ -474,6 +486,14 @@ class ForumForm(FlaskForm):
     )
 
     submit = SubmitField(_("Save"))
+
+    def validate_subforum_parent_id(self, field):
+        if not self.is_subforum:
+            self.subforum_parent_id = None
+        else:
+            if self.subforum_parent_id == None:
+                raise ValidationError(_("You need to specify parent forum"))
+
 
     def validate_external(self, field):
         if hasattr(self, "forum"):
@@ -508,7 +528,10 @@ class ForumForm(FlaskForm):
         # delete submit and csrf_token from data
         data.pop('submit', None)
         data.pop('csrf_token', None)
+        data.pop('is_subforum', None)
+        data['subforum_parent_id'] = data['subforum_parent_id'].id
         forum = Forum(**data)
+
         return forum.save()
 
 
