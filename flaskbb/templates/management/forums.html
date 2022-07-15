@@ -63,8 +63,8 @@
                             <div class="col-md-5 col-sm-5 col-xs-4 forum-last-post"></div>
                         </div>
                         {% for forum in category.forums %}
+                        {% if not forum.subforum_parent_id %}
                         <div class="row category-row hover">
-
                             {% if forum.external %}
                             <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
                                 <div class="row">
@@ -126,7 +126,7 @@
                                         </div>
 
                                         <!-- Forum Description -->
-                                        <div class="forum-description">
+                                        <div class="forum-description" style="display:inline">
                                             {{ forum.description|nonpost_markup }}
                                         </div>
 
@@ -166,7 +166,7 @@
 
                         {% endif %} {# endif forum.external #}
                         </div> <!-- end category-content -->
-
+                        {% endif %} {# endif forum.subforum_parent_id #}
                         {% endfor %}
                     </div>
                 </div>
