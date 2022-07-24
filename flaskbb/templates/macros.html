@@ -476,3 +476,249 @@ For example, on id should continue with 11 on page 2 if per_page is set to 10
         {{ page + (obj.page - 1) * per_page }}
     {%- endif -%}
 {%- endmacro -%}
+
+{%- macro render_forum_managment(forum, render_subforums) -%}
+<div class="row category-row hover">
+        {% if forum.external %}
+        <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
+            <div class="row">
+                <!-- Icon -->
+                <div class="col-md-1 col-sm-2 col-xs-2 forum-status">
+                    <span class="fa fa-external-link forum-external"></span>
+                </div>
+
+                <div class="col-md-11 col-sm-10 col-xs-10">
+                    <!-- Forum Name -->
+                    <div class="forum-name">
+                        <span class="forum-link">{% trans %}Link to{% endtrans %}:</span> <a href="{{ forum.url }}">{{ forum.title }}</a>
+                    </div>
+
+                    <!-- Forum Description -->
+                    <div class="forum-description">
+                        {{ forum.description|nonpost_markup }}
+                    </div>
+                </div>
+            </div>
+        </div> <!-- end forum-info -->
+
+        <!-- Post Count -->
+        <div class="col-md-2 col-sm-2 hidden-xs forum-posts">
+            - -
+        </div>
+
+        <!-- Forum Actions -->
+        <div class="col-md-5 col-sm-5 col-xs-4 forum-last-post">
+            <div class="forum-actions pull-right">
+                <a class="btn btn-sm btn-success" href="{{ url_for('management.add_forum', is_subforum = True, subforum_parent_id = forum) }}">
+                    <span class="fa fa-plus"></span> {% trans %}Add Forum{% endtrans %}
+                </a>
+                
+                <a class="btn btn-sm btn-success" href="{{ url_for('management.edit_forum', forum_id = forum.id) }}">
+                    <span class="fa fa-pencil"></span> {% trans %}Edit Link{% endtrans %}
+                </a>
+
+                <form class="inline-form" method="post" action="{{ url_for('management.delete_forum', forum_id=forum.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <button class="btn btn-sm btn-danger" name="confirmDialog">
+                        <span class="fa fa-trash"></span> {% trans %}Delete Link{% endtrans %}
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
+            <div class="row">
+                <!-- Icon -->
+                <div class="col-md-1 col-sm-2 col-xs-2 forum-status">
+                    {% if forum.locked %}
+                        <span class="fa fa-lock forum-locked"></span>
+                    {% else %}
+                        <span class="fa fa-comments-o forum-read"></span>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-11 col-sm-10 col-xs-10">
+                    <!-- Forum Name -->
+                    <div class="forum-name">
+                        <a href="{{ forum.url }}">{{ forum.title }}</a>
+                    </div>
+
+                    <!-- Forum Description -->
+                    <div class="forum-description" style="display:inline">
+                        {{ forum.description|nonpost_markup }}
+                    </div>
+
+                    <!-- Forum Moderators -->
+                    {% if forum.show_moderators %}
+                    <div class="forum-moderators">
+                        {% trans %}Moderators{% endtrans %}:
+                        {% for moderator in forum.moderators %}
+                        <a href="{{ moderator.url }}">{{ moderator.display_name }}</a>{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                </div>
+                
+            </div>
+        </div> <!-- end forum-info -->
+
+        <!-- Post Count -->
+        <div class="col-md-2 col-sm-2 hidden-xs forum-topics">
+            {{ forum.topic_count }} / {{ forum.post_count }}
+        </div>
+
+        <!-- Forum Actions -->
+        <div class="col-md-5 col-sm-5 col-xs-4 forum-last-post">
+            <div class="forum-actions pull-right">
+                <a class="btn btn-sm btn-success" href="{{ url_for('management.add_forum', is_subforum = True, subforum_parent_id = forum.id) }}">
+                    <span class="fa fa-plus"></span> {% trans %}Add Forum{% endtrans %}
+                </a>
+
+                <a class="btn btn-sm btn-primary" href="{{ url_for('management.edit_forum', forum_id = forum.id) }}">
+                    <span class="fa fa-pencil"></span> {% trans %}Edit Forum{% endtrans %}
+                </a>
+
+                <form class="inline-form" method="post" action="{{ url_for('management.delete_forum', forum_id=forum.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <button class="btn btn-sm btn-danger" name="confirmDialog">
+                        <span class="fa fa-trash"></span> {% trans %}Delete Forum{% endtrans %}
+                    </button>
+                </form>
+            </div>
+        </div>
+</div> <!-- end category-content -->
+<!-- Forum Subforums -->
+{% if render_subforums %}
+    {% if forum.subforums.all() != [] %}
+    <div class="forum-subforums" style="margin-left: 1em; border-color: #cad7e1;">
+        <details>
+            <summary><b>Subforums</b></summary>
+            {% for subforum in forum.subforums %}
+                {{ render_forum_managment(subforum, True) }}
+            {% endfor %} {# endfor subforum in forum.subforums #}
+        </details>
+    </div>
+    {% endif %} {# endif forum.subforums #}
+{% endif %} {# endif render_subforums #}    
+{% endif %} {# endif forum.external #}
+{% endmacro %}
+
+{%- macro render_subforums(forum) -%}
+{% for forum in forum.subforums %}
+            <div class="row category-row hover">
+    
+                {% if forum.external %}
+                <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
+                    <div class="row">
+                        <!-- Icon -->
+                        <div class="col-md-1 col-sm-2 col-xs-2 forum-status">
+                            <span class="fa fa-external-link fa-fw forum-external"></span>
+                        </div>
+    
+                        <div class="col-md-11 col-sm-10 col-xs-10">
+                            <!-- Forum Name -->
+                            <div class="forum-name">
+                                <span class="forum-link">{% trans %}Link to{% endtrans %}:</span> <a href="{{ forum.url }}">{{ forum.title }}</a>
+                            </div>
+    
+                            <!-- Forum Description -->
+                            <div class="forum-description">
+                                {{ forum.description|nonpost_markup }}
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- end forum-info -->
+    
+                <!-- Post Count -->
+                <div class="col-md-2 col-sm-2 hidden-xs forum-posts">
+                    -
+                </div>
+    
+                <!-- Topic Count -->
+                <div class="col-md-2 col-sm-2 hidden-xs forum-topics">
+                    -
+                </div>
+    
+                <!-- Last Post -->
+                <div class="col-md-3 col-sm-3 col-xs-4 forum-last-post">
+                    ---
+                </div>
+                {% else %}
+                <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
+                    <div class="row">
+                        <!-- Icon -->
+                        <div class="col-md-1 col-sm-2 col-xs-2 forum-status">
+                            {% if forum.locked %}
+                                <span class="fa fa-lock fa-fw forum-locked"></span>
+                            {% else %}
+                                <span class="fa fa-comments-o fa-fw forum-read"></span>
+                            {% endif %}
+                        </div>
+    
+                        <div class="col-md-11 col-sm-10 col-xs-10">
+                            <!-- Forum Name -->
+                            <div class="forum-name">
+                                <a href="{{ forum.url }}">{{ forum.title }}</a>
+                            </div>
+    
+                            <!-- Forum Description -->
+                            <div class="forum-description">
+                                {{ forum.description|nonpost_markup }}
+                            </div>
+    
+                            <!-- Forum Moderators -->
+                            {% if forum.show_moderators %}
+                            <div class="forum-moderators">
+                                {% trans %}Moderators{% endtrans %}:
+                                {% for moderator in forum.moderators %}
+                                <a href="{{ url_for('user.profile', userid=moderator.id) }}">{{ moderator.display_name }}</a>{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div> <!-- end forum-info -->
+    
+                <!-- Post Count -->
+                <div class="col-md-2 col-sm-2 hidden-xs forum-topics">
+                {{ forum.topic_count }}
+                </div>
+    
+                <!-- Topic Count -->
+                <div class="col-md-2 col-sm-2 hidden-xs forum-posts">
+                {{ forum.post_count }}
+                </div>
+    
+                <!-- Last Post -->
+                <div class="col-md-3 col-sm-3 col-xs-4 forum-last-post">
+                    {% if forum.last_post_id %}
+                    <div class="last-post-title">
+                        <a href="{{ forum.last_post_url }}" title="{{ forum.last_post_title }}">
+                            {{ forum.last_post_title|crop_title }}
+                        </a>
+                    </div>
+    
+                    <div class="last-post-time">
+                        {{ forum.last_post_created|time_since }}
+                    </div>
+    
+                    <div class="last-post-author">
+                        {% trans %}by{% endtrans %}
+                        {% if forum.last_post_user_id %}
+                        <a href="{{ url_for('user.profile', userid=forum.last_post_user_id) }}">{{ forum.last_post_user_display_name }}</a>
+                        {% else %}
+                        {{ forum.last_post_user_display_name }}
+                        {% endif %}
+                    </div>
+    
+                    {% else %}
+                    {% trans %}No posts.{% endtrans %}
+                    {% endif %} {# endif forum.last_post_id #}
+                </div>
+    
+            {% endif %} {# endif forum.external #}
+            </div> <!-- end category-content -->
+    
+            {% endfor %}
+{% endmacro %}
