@@ -120,7 +120,7 @@ class ViewForum(MethodView):
             page=page,
             per_page=flaskbb_config["TOPICS_PER_PAGE"]
         )
-        print(forum_instance.subforums.all())
+
         return render_template(
             "forum/forum.html",
             forum=forum_instance,

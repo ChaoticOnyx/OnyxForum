@@ -549,6 +549,8 @@ class EditForumForm(ForumForm):
         # delete submit and csrf_token from data
         data.pop('submit', None)
         data.pop('csrf_token', None)
+        data.pop('is_subforum', None)
+        data['subforum_parent_id'] = data['subforum_parent_id'].id
         forum = Forum(**data)
         # flush SQLA info from created instance so that it can be merged
         make_transient(forum)
