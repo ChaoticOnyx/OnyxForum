@@ -168,7 +168,11 @@ class ForumNotLocked(Requirement):
 def can_user_access_forum(user, forum):
     user_groups = {g.id for g in user.groups}
     forum_groups = {g.id for g in forum.groups}
-    return bool(forum_groups & user_groups)
+    if forum.subforum_parent_id:
+        parent_access = {can_user_access_forum(user, Forum.query.filter_by(id=forum.subforum_parent_id).first())}
+        return bool(forum_groups & user_groups & parent_access)
+    else:
+        return bool(forum_groups & user_groups)
 
 
 class CanAccessForum(Requirement):
