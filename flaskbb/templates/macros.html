@@ -509,10 +509,6 @@ For example, on id should continue with 11 on page 2 if per_page is set to 10
         <!-- Forum Actions -->
         <div class="col-md-5 col-sm-5 col-xs-4 forum-last-post">
             <div class="forum-actions pull-right">
-                <a class="btn btn-sm btn-success" href="{{ url_for('management.add_forum', is_subforum = True, subforum_parent_id = forum) }}">
-                    <span class="fa fa-plus"></span> {% trans %}Add Forum{% endtrans %}
-                </a>
-                
                 <a class="btn btn-sm btn-success" href="{{ url_for('management.edit_forum', forum_id = forum.id) }}">
                     <span class="fa fa-pencil"></span> {% trans %}Edit Link{% endtrans %}
                 </a>
@@ -571,8 +567,8 @@ For example, on id should continue with 11 on page 2 if per_page is set to 10
         <!-- Forum Actions -->
         <div class="col-md-5 col-sm-5 col-xs-4 forum-last-post">
             <div class="forum-actions pull-right">
-                <a class="btn btn-sm btn-success" href="{{ url_for('management.add_forum', is_subforum = True, subforum_parent_id = forum.id) }}">
-                    <span class="fa fa-plus"></span> {% trans %}Add Forum{% endtrans %}
+                <a class="btn btn-sm btn-success" href="{{ url_for('management.add_forum', category_id=forum.category_id, is_subforum=1, parent_id=forum.id) }}">
+                    <span class="fa fa-plus"></span> {% trans %}Add Suborum{% endtrans %}
                 </a>
 
                 <a class="btn btn-sm btn-primary" href="{{ url_for('management.edit_forum', forum_id = forum.id) }}">

@@ -743,20 +743,29 @@ class AddForum(MethodView):
 
     def get(self, category_id=None):
         form = self.form()
-
+        is_subforum = request.args.get("is_subforum", 0, type=int)
+        parent_id = request.args.get("parent_id", 0, type=int)
         form.groups.data = Group.query.order_by(Group.id.asc()).all()
 
         if category_id:
             category = Category.query.filter_by(id=category_id).first()
             form.category.data = category
-
+        if is_subforum:
+            form.is_subforum.data = True
+        if parent_id:
+            parent = Forum.query.filter_by(id=parent_id).first_or_404()
+            form.subforum_parent_id.data = parent
+        print(category_id)
+        print(is_subforum)
+        print(parent_id)
         return render_template(
             'management/forum_form.html', form=form, title=_('Add Forum')
         )
 
     def post(self, category_id=None):
         form = self.form()
-
+        is_subforum = request.args.get("is_subforum", 0, type=int)
+        parent_id = request.args.get("parent_id", 0, type=int)
         if form.validate_on_submit():
             form.save()
             flash(_('Forum added.'), 'success')
@@ -766,6 +775,11 @@ class AddForum(MethodView):
             if category_id:
                 category = Category.query.filter_by(id=category_id).first()
                 form.category.data = category
+            if is_subforum:
+                form.is_subforum.data = True
+            if parent_id:
+                parent = Forum.query.filter_by(id=parent_id).first_or_404()
+                form.subforum_parent_id.data = parent
 
         return render_template(
             'management/forum_form.html', form=form, title=_('Add Forum')
