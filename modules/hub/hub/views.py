@@ -767,3 +767,11 @@ class ConnectionsView(Hub):
                 search = {"type": "ip", "text": form.searchText.data}
 
         return redirect(url_for("hub.connections", server=hub_current_server.id, search=search))
+
+class GetAdmins(Hub):
+
+    def get(self):
+        server_admins = game_models[hub_current_server.id]["ErroAdmin"]
+        ranks = [admin.rank for admin in server_admins.query.order_by(server_admins.rank).all()]
+        result = {rank:[admin.ckey for admin in server_admins.query.filter(server_admins.rank==rank, server_admins.flags).all()] for rank in ranks}
+        return result
