@@ -437,7 +437,7 @@ class ForumForm(FlaskForm):
     )
     is_subforum = BooleanField(
         _("Subforum?"),
-        description=_("Makes subforum of forum?")
+        description=_("It's forum or subforum?")
     )
     subforum_parent_id = QuerySelectField(
         _("Parent forum"),

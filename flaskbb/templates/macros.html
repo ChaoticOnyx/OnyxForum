@@ -589,7 +589,7 @@ For example, on id should continue with 11 on page 2 if per_page is set to 10
         </div>
         <!-- Forum Subforums -->
         {% if render_subforums %}
-            {% if forum.subforums.all() != [] %}
+            {% if forum.subforums.all() %}
             <div class="col-md-12 col-sm-5 col-xs-4 forum-subforums" style="margin-left: 0.5em;">
                 <details>
                     <summary><b>Subforums</b></summary>
