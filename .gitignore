@@ -145,3 +145,4 @@ test-results.xml
 modules/hub/hub/configs/*
 !modules/hub/hub/configs/example/
 /flaskbb.cfg
+uploads/

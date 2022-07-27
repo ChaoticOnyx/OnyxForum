@@ -284,3 +284,9 @@ DISCORD_CLIENT_SECRET = "[Place_Client_Secret_Here]"
 DISCORD_REDIRECT_URI = "http://example.test:5000/auth/discord-callback" #Site need to be equal SERVER_NAME
 DISCORD_BOT_TOKEN = "[Place_Bot_Token_Here]"
 DEBUG_TB_INTERCEPT_REDIRECTS = False
+
+# File uploading Settings
+# ------------------------------ #
+UPLOAD_FOLDER = os.path.join(DefaultConfig.basedir, 'uploads')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+

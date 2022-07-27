@@ -1,0 +1,10 @@
+{% extends theme("layout.html") %}
+{% block content %}
+        <title>Upload new File</title>
+        <h1>Upload new File</h1>
+        <form method=post enctype=multipart/form-data>
+            <div style="display:none;"><input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}"></div>
+            <input type=file name=file>
+            <input type=submit value=Upload>
+        </form>
+{% endblock %}
