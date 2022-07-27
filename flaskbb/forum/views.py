@@ -41,7 +41,7 @@ from flaskbb.utils.requirements import (CanAccessForum, CanDeletePost,
 from flaskbb.utils.settings import flaskbb_config
 
 from .locals import current_category, current_forum, current_topic
-from .utils import force_login_if_needed
+from .utils import force_login_if_needed, hash_file
 
 impl = HookimplMarker("flaskbb")
 
@@ -1135,7 +1135,8 @@ class UploadFile(MethodView):
             flash('No selected file')
             return redirect(request.url)
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
+            filename = hash_file(file)
+            file.seek(0)
             file.save(os.path.join(current_app.config["UPLOAD_FOLDER"], filename))
             return redirect(url_for('forum.index'))
 
