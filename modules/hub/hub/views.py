@@ -785,7 +785,6 @@ class AdminsView(Hub):
 
     def get(self):
         is_json = request.endpoint
-        print(is_json)
         admins = get_admins()
         if is_json == "hub.admins_json":
             return admins
