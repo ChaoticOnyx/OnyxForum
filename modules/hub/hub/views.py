@@ -233,6 +233,14 @@ class Hub(MethodView):
                     urlforkwargs={"server": hub_current_server.id},
                 ))
 
+        actions.append(
+                NavigationLink(
+                    endpoint="hub.admins",
+                    name=_("Admins"),
+                    icon="fa fa-group",
+                    urlforkwargs={"server": hub_current_server.id},
+                )
+            )
         return actions
 
     def get_args(self):
@@ -768,10 +776,21 @@ class ConnectionsView(Hub):
 
         return redirect(url_for("hub.connections", server=hub_current_server.id, search=search))
 
-class GetAdmins(Hub):
-
-    def get(self):
+class AdminsView(Hub):
+    def get_admins():
         server_admins = game_models[hub_current_server.id]["ErroAdmin"]
         admins = [admin for admin in server_admins.query.order_by(server_admins.rank).all()]
         result = {rank:[admin.ckey for admin in admins if admin.rank == rank] for rank in [admin.rank for admin in admins]}
         return result
+
+    def get(self):
+        is_json = request.endpoint
+        print(is_json)
+        admins = get_admins()
+        if is_json == "hub.admins_json":
+            return admins
+        
+        return render_template(
+            "hub/server/admins.html",
+            **self.get_args(),
+            admins=admins)

@@ -1,0 +1,25 @@
+{% extends theme("hub/server/index.html") %}
+
+
+{% block hub_content %}
+    <div class="main">
+    <table class="table table-striped table-condensed">
+        {% for rank in admins %}
+        <thead>
+            <tr>
+                <th>{{rank}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for admin in admins[rank] %}
+            <tr>
+                <td>
+                    {{admin}}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        {% endfor %}
+    </table>
+    </div>
+{% endblock %}

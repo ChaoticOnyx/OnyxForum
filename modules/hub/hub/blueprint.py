@@ -87,10 +87,14 @@ register_view(
 
 register_view(
     hub,
-    routes=["/get_admins"],
-    view_func=GetAdmins.as_view("get_admins")
+    routes=["/admins"],
+    view_func=AdminsView.as_view("admins"),
 )
-
+register_view(
+    hub,
+    routes=["/admins/json"],
+    view_func=AdminsView.as_view("admins_json"),
+)
 register_view(
     hub,
     routes=["/karma"],
