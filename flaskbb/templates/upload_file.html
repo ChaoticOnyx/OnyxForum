@@ -1,10 +1,7 @@
 {% extends theme("layout.html") %}
-{% block content %}
-        <title>Upload new File</title>
-        <h1>Upload new File</h1>
-        <form method=post enctype=multipart/form-data>
-            <div style="display:none;"><input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}"></div>
-            <input type=file name=file>
-            <input type=submit value=Upload>
-        </form>
+{% block upload_file %}
+<div>
+    <input id="fileupload" type="file" name="fileupload" />
+    <span class="btn btn-warning" id="upload-button" onclick="uploadFile('{{url_for('forum.upload_file')}}','{{ csrf_token() }}')">Upload</span>
+</div>
 {% endblock %}

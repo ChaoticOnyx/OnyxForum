@@ -1116,7 +1116,7 @@ class UploadFile(MethodView):
         filename = request.args.get("file")
         if filename:
             return send_from_directory(current_app.config["UPLOAD_FOLDER"], filename, as_attachment=True)
-        return render_template("upload_file.html")
+        return redirect(url_for('forum.index'))
 
     def post(self):
         ALLOWED_EXTENSIONS = current_app.config["ALLOWED_EXTENSIONS"]
@@ -1126,19 +1126,18 @@ class UploadFile(MethodView):
 
         # check if the post request has the file part
         if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
+            return 'failed-request'
         file = request.files['file']
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
         if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
+            return 'empty-file'
         if file and allowed_file(file.filename):
             filename = hash_file(file)
             file.seek(0)
             file.save(os.path.join(current_app.config["UPLOAD_FOLDER"], filename))
-            return redirect(url_for('forum.index'))
+            return url_for("forum.upload_file")+"?file="+filename
+        return 'bad-file'
 
 @impl(tryfirst=True)
 def flaskbb_load_blueprints(app):

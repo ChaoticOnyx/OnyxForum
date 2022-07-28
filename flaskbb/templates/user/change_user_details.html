@@ -1,5 +1,4 @@
 {% extends theme("user/settings_layout.html") %}
-
 {% block settings_content %}
 {% from theme("macros.html") import horizontal_field, horizontal_select_field %}
 
@@ -16,7 +15,23 @@
             {{ horizontal_field(form.gender) }}
             {{ horizontal_field(form.location) }}
             {{ horizontal_field(form.website) }}
+            {% if form.avatar %}
+                <div class="author-box">
+                    <div class="author-avatar hidden-xs"><img src="{{ form.avatar.value }}" name="avatar" alt="avatar" width="150" height="150"></div>
+                </div>
+            {% endif %}
             {{ horizontal_field(form.avatar) }}
+            <div>
+                <input id="fileupload" type="file" name="fileupload" />
+                <span class="btn btn-warning" id="upload-button" onclick="UploadAvatar('{{url_for('forum.upload_file')}}','{{ csrf_token() }}')">Upload</span>
+                <label class="filestatus">
+                    <span id="error none"></span>
+                    <span id="error bad-file" style = "display: none;">We don’t support that file type.</span>
+                    <span id="error empty-file" style = "display: none;">No file selected</span>
+                    <span id="error too-big js-upload-too-big" style = "display: none;">File size too big</span>
+                    <span id="error failed-request" style = "display: none;">Something went really wrong, and we can’t process that file.</span>
+                </label>
+            </div>
             {{ horizontal_field(form.signature, div_class="col-sm-8 editor", rows="5", placeholder="", **{'data-provide': 'markdown', 'class': 'flaskbb-editor'}) }}
             {{ horizontal_field(form.notes, div_class="col-sm-8 editor", rows="12", placeholder="", **{'data-provide': 'markdown', 'class': 'flaskbb-editor'}) }}
             {{ run_hook('flaskbb_tpl_form_user_details_after', form=form) }}
