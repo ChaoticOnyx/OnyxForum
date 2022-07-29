@@ -76,10 +76,9 @@ function UploadAvatar(endpoint_url, csrf_token) {
     })
     };
 
-function resize(item, item_type){
-    //define the width to resize e.g 600px
-    var resize_width = 150;//without px
-  
+function resize(item, item_type, width){
+    //define the width to resize e.g 150px
+    var resize_width=width||150;
     //create a FileReader
     var reader = new FileReader();
   

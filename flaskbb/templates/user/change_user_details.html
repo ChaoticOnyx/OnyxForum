@@ -19,7 +19,7 @@
             <div class = "form-group row">
                 <div class = "col-md-5 control-label">
                     <div class="author-box">
-                        <div class="author-avatar hidden-xs"><img src="" name="avatar" alt="avatar" width="150" height="150"></div>
+                        <div class="author-avatar hidden-xs"><img src="" name="avatar" alt="avatar" width="150" max-height="150"></div>
                     </div>
                 </div>
             </div>
@@ -51,5 +51,8 @@
 </div>
 <script>
     document.querySelector('img[name="avatar"]').src = document.querySelector('input[name="avatar"]').value
+    document.querySelector('input[name="avatar"]').addEventListener('focusout', function(event){
+        document.querySelector('img[name="avatar"]').src = document.querySelector('input[name="avatar"]').value
+    });
 </script>
 {% endblock %}
