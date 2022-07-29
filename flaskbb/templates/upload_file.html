@@ -1,7 +1,0 @@
-{% extends theme("layout.html") %}
-{% block upload_file %}
-<div>
-    <input id="fileupload" type="file" name="fileupload" />
-    <span class="btn btn-warning" id="upload-button" onclick="uploadFile('{{url_for('forum.upload_file')}}','{{ csrf_token() }}')">Upload</span>
-</div>
-{% endblock %}

@@ -30,7 +30,7 @@
                     <input id="fileupload" type="file" name="fileupload" style="display:inline-block"/>
                     <span class="btn btn-warning" id="upload-button" onclick="UploadAvatar('{{url_for('forum.upload_file')}}','{{ csrf_token() }}')">Upload</span>
                 </div>
-                <div class = "col-sm-3 control-label">
+                <div class = "col-sm-5 control-label" style="padding-top: 7px; margin-bottom: 0; text-align: left;">
                     <label class="filestatus">
                         <span id="error none"></span>
                         <span id="error bad-file" style = "display: none;">We don’t support that file type.</span>
