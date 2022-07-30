@@ -85,4 +85,10 @@
         </div>
     </div>
 </div>
+<script>
+    document.querySelector('img[name="avatar"]').src = document.querySelector('input[name="avatar"]').value
+    document.querySelector('input[name="avatar"]').addEventListener('focusout', function(event){
+        document.querySelector('img[name="avatar"]').src = document.querySelector('input[name="avatar"]').value
+    });
+</script>
 {% endblock %}
