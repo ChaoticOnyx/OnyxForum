@@ -47,3 +47,4 @@ def hash_file(file):
 
     # return the hex representation of digest
     return h.hexdigest()
+    
