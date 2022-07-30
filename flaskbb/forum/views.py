@@ -1135,8 +1135,11 @@ class UploadFile(MethodView):
         if file and allowed_file(file.filename):
             filename = hash_file(file)
             file.seek(0)
-            file.save(os.path.join(current_app.config["UPLOAD_FOLDER"], filename))
-            return url_for("forum.upload_file")+"?file="+filename
+            path = os.path.join(current_app.config["UPLOAD_FOLDER"],current_user.discord)
+            if not os.path.exists(path):
+                os.mkdir(path)
+            file.save(os.path.join(path,filename))
+            return url_for("forum.upload_file")+"?file="+current_user.discord+"/"+filename
         return 'bad-file'
 
 @impl(tryfirst=True)
