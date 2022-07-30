@@ -164,7 +164,14 @@ function dragOverHandler(ev) {
 }
 
 function filestatus_click_handler(endpoint_url, csrf_token) {
-    UploadFile(endpoint_url, csrf_token, callback=file_link_append)
+    var fileElement = document.getElementById('fileupload')
+        // check if user had selected a file
+        if (fileElement.files.length === 0) {
+            alert('Please choose some files')
+            return
+        }
+        file = fileElement.files[0]
+    UploadFile(endpoint_url, csrf_token, file, file_link_append)
 }
 
 function file_link_append(file_type, file_link){
