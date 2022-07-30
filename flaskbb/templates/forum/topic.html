@@ -201,12 +201,31 @@
         {{ form.hidden_tag() }}
         <div class="row">
             <div class="col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9 col-xs-12">
-                <div class="editor-box">
+                <div class="editor-box" ondrop="dropHandler(event,'{{url_for('forum.upload_file')}}','{{ csrf_token() }}')" ondragover="dragOverHandler(event)">
                     <div class="editor quickreply">
                             {{ render_quickreply(form.content, div_class="new-message", rows=7, cols=75, placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'false', 'class': 'flaskbb-editor'}) }}
                     </div>
                     <div class="editor-submit">
                         {{ render_submit_field(form.submit, input_class="btn btn-success pull-right") }}
+                    </div>
+                    <div class="editor-filestatus">
+                        <label class="filestatus">
+                            <input id="fileupload" type="file" name="fileupload" style="display:none" onchange="filestatus_click_handler('{{url_for('forum.upload_file')}}','{{ csrf_token() }}')"/>
+                            <span id="error none">
+                                Attach files by dragging & dropping or selecting.
+                            </span>
+                            <span id="error bad-file" style = "display: none;">
+                                We don’t support that file type.</span>
+                            <span id="error empty-file" style = "display: none;">
+                                No file selected.
+                            </span>
+                            <span id="error too-big" style = "display: none;">
+                                File size too big.
+                            </span>
+                            <span id="error failed-request" style = "display: none;">
+                                Something went really wrong, and we can’t process that file.
+                            </span>
+                        </label>
                     </div>
                 </div>
             </div>

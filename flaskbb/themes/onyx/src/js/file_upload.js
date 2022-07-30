@@ -1,34 +1,43 @@
-function UploadFile(endpoint_url, csrf_token) {
-    var fileElement = document.getElementById('fileupload')
-      // check if user had selected a file
-    if (fileElement.files.length === 0) {
-        alert('Please choose some files')
-        return
+function UploadFile(endpoint_url, csrf_token, uploaded_file, callback) {
+    var file = null
+    var formData = new FormData();
+    if(!uploaded_file){
+        var fileElement = document.getElementById('fileupload')
+        // check if user had selected a file
+        if (fileElement.files.length === 0) {
+            alert('Please choose some files')
+            return
+        }
+        file = fileElement.files[0]
+        formData.append('file', file);
+    }else{
+        file = uploaded_file
+        formData.append('file', file);
     }
 
-    var files = Array.from(fileElement.files)
+    if(file.size > 5242880)
+        return HandleResult('too-big')
 
-    var formData = new FormData();
-    files.forEach(function (file) {
-        formData.append('file', file);
-    });
     formData.append('csrf_token', csrf_token)
-
+    var res = [file.type]
     $.ajax({
-    url: endpoint_url,
-    type: "POST",
-    data:formData,
-    contentType: false,
-    processData: false,
-    success: HandleResult
-    });
+        url: endpoint_url,
+        type: "POST",
+        data:formData,
+        contentType: false,
+        processData: false,
+        success: function(data){
+            res.push(HandleResult(data))
+            callback(res[0],res[1])
+        }
+    })
+    
+    
 };
 
 function HandleResult(data) {
     var defaultbar = document.querySelector('label.filestatus span[id="error none"]')
     var errorbars = document.querySelectorAll('label.filestatus span')
-    console.log(defaultbar)
-    console.log(errorbars)
     errorbars.forEach(function(errorbar) {
         errorbar.style.display = "none";
     });
@@ -38,7 +47,7 @@ function HandleResult(data) {
     }else{
         defaultbar.style.display = "none";
         document.getElementById("error "+data).style.display = "inline-block";
-        return document.location.origin+data
+        return FALSE
     }
 };
 
@@ -128,4 +137,41 @@ function dataURLtoFile(dataurl, filename) {
     }
     
     return new File([u8arr], filename, {type:mime});
+}
+
+function dropHandler(ev, endpoint_url, csrf_token) {
+    // Prevent default behavior (Prevent file from being opened)
+    ev.preventDefault();
+    if (ev.dataTransfer.items) {
+      // Use DataTransferItemList interface to access the file(s)
+      for (var i = 0; i < ev.dataTransfer.items.length; i++) {
+        // If dropped items aren't files, reject them
+        if (ev.dataTransfer.items[i].kind === 'file') {
+          var file = ev.dataTransfer.items[i].getAsFile();
+         UploadFile(endpoint_url, csrf_token, file,file_link_append)
+        }
+      }
+    } else {
+      // Use DataTransfer interface to access the file(s)
+      for (var i = 0; i < ev.dataTransfer.files.length; i++) {
+        UploadFile(endpoint_url, csrf_token, ev.dataTransfer.files[i],file_link_append)
+      }
+    }
+}
+
+function dragOverHandler(ev) {
+    ev.preventDefault();
+}
+
+function filestatus_click_handler(endpoint_url, csrf_token) {
+    UploadFile(endpoint_url, csrf_token, callback=file_link_append)
+}
+
+function file_link_append(file_type, file_link){
+    if(file_link)
+        if(file_type.includes("image")){
+            document.querySelector('textarea').value += '\n![enter image description here]('+file_link+' "enter image title here")'
+        }else{
+            document.querySelector('textarea').value += '\n[enter link description here]('+file_link+')'
+        }
 }
