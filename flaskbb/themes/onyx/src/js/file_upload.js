@@ -103,11 +103,15 @@ function resize(item, item_type, width){
             img.size = event.target.size;//set size (optional)
             img.onload = function(el) {
               var elem = document.createElement('canvas');//create a canvas
-        
-              //scale the image to 600 (width) and keep aspect ratio
+            
+              elem.width = el.target.width
+              elem.height = el.target.height
+              //scale the image to 150 (width) and keep aspect ratio
+              if(el.target.width>resize_width){
               var scaleFactor = resize_width / el.target.width;
               elem.width = resize_width;
               elem.height = el.target.height * scaleFactor;
+            }
         
               //draw in canvas
               var ctx = elem.getContext('2d');

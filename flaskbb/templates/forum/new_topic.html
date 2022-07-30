@@ -45,10 +45,6 @@
                                 {{ render_boolean_field(form.track_topic) }}
 
                                 {{ run_hook("flaskbb_tpl_form_new_topic_after", form=form) }}
-
-                                <div class="editor-submit">
-                                    {{ render_submit_field(form.submit, input_class="btn btn-success pull-right") }}
-                                </div>
                                 <div class="editor-filestatus">
                                     <label class="filestatus">
                                         <input id="fileupload" type="file" name="fileupload" style="display:none" onchange="filestatus_click_handler('{{url_for('forum.upload_file')}}','{{ csrf_token() }}')"/>
@@ -68,8 +64,11 @@
                                         </span>
                                     </label>
                                 </div>
+                                <div class="editor-submit">
+                                    {{ render_submit_field(form.submit, input_class="btn btn-success pull-right") }}
+                                </div>
+                                
                             </div>
-                            
                         </div>
                     </div>
                 </div>

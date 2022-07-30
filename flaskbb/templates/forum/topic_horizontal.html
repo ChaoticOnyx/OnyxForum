@@ -186,9 +186,6 @@
                     <div class="editor quickreply">
                             {{ render_quickreply(form.content, div_class="new-message", rows=7, cols=75, placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'false', 'class': 'flaskbb-editor'}) }}
                     </div>
-                    <div class="editor-submit">
-                        {{ render_submit_field(form.submit, input_class="btn btn-success pull-right") }}
-                    </div>
                     <div class="editor-filestatus">
                         <label class="filestatus">
                             <input id="fileupload" type="file" name="fileupload" style="display:none" onchange="filestatus_click_handler('{{url_for('forum.upload_file')}}','{{ csrf_token() }}')"/>
@@ -207,6 +204,9 @@
                                 Something went really wrong, and we can’t process that file.
                             </span>
                         </label>
+                    </div>
+                    <div class="editor-submit">
+                        {{ render_submit_field(form.submit, input_class="btn btn-success pull-right") }}
                     </div>
                 </div>
                 
