@@ -1,11 +1,13 @@
 
 {%- macro editor_file_upload() -%}
+<label class="filestatus">    
     <input id="fileupload" type="file" name="fileupload" style="display:none" onchange="filestatus_click_handler('{{url_for('forum.upload_file')}}','{{ csrf_token() }}')"/>
     {{ editor_file_upload_errors() }}
+</label>
 {%- endmacro -%}
 
 {%- macro editor_file_upload_errors() -%}
-    <label class="filestatus">
+
         <span id="error none">
             Attach files by dragging & dropping or selecting.
         </span>
@@ -20,7 +22,7 @@
         <span id="error failed-request" style = "display: none;">
             Failed to process file.
         </span>
-    </label>
+
 {%- endmacro -%}
 
 {%- macro file_upload_errors() -%}

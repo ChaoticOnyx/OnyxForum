@@ -1,7 +1,7 @@
 {% extends theme("user/settings_layout.html") %}
 {% block settings_content %}
 {% from theme("macros.html") import horizontal_field, horizontal_select_field %}
-{% from theme("forum/editor_file_upload.html") import file_upload_errors %}
+{% from theme("forum/file_upload_macros.html") import file_upload_errors %}
 <div class="panel page-panel">
     <div class="panel-heading page-head">
         {% trans %}Change User Details{% endtrans %}
