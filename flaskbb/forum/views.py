@@ -1123,7 +1123,14 @@ class UploadFile(MethodView):
             return 'failed-request'
 
         file = request.files['file']
+        
+        file.seek(0, os.SEEK_END)
+        file_length = file.tell()
 
+        if file_length > current_app.config["MAX_UPLOAD_SIZE"]:
+            return 'too-big'
+
+        file.seek(0)
         if file.filename == '':
             return 'empty-file'
         if file and is_extension_allowed(file.filename):

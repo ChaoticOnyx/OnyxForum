@@ -15,11 +15,8 @@ function UploadFile(endpoint_url, csrf_token, uploaded_file, callback) {
         formData.append('file', file);
     }
 
-    if(file.size > 5242880)
-        return HandleResult('too-big')
-
     formData.append('csrf_token', csrf_token)
-    var res = [file.type]
+    var link = [file.type]
     $.ajax({
         url: endpoint_url,
         type: "POST",
@@ -27,8 +24,10 @@ function UploadFile(endpoint_url, csrf_token, uploaded_file, callback) {
         contentType: false,
         processData: false,
         success: function(data){
-            res.push(HandleResult(data))
-            callback(res[0],res[1])
+            if(HandleResult(data)){
+                link.push(document.location.origin+data)
+                callback(link[0],link[1])
+            }
         }
     })
     
@@ -43,11 +42,11 @@ function HandleResult(data) {
     });
     if(data.includes("/uploads?file=")){
         defaultbar.style.display = "inline-block";
-        return document.location.origin+data
+        return true
     }else{
         defaultbar.style.display = "none";
         document.getElementById("error "+data).style.display = "inline-block";
-        return FALSE
+        return false
     }
 };
 
@@ -62,8 +61,7 @@ function UploadAvatar(endpoint_url, csrf_token) {
     var file = fileElement.files[0]
     if(!file.type.includes("image"))
         return HandleResult('bad-file')
-    if(file.size > 5242880)
-        return HandleResult('too-big')
+
     resize(file, file.type).then(function(temp_file){
         var formData = new FormData();
         formData.append('file', dataURLtoFile(temp_file[0],temp_file[1]))
@@ -75,10 +73,10 @@ function UploadAvatar(endpoint_url, csrf_token) {
         contentType: false,
         processData: false,
         success: function(data){
-            HandleResult(data)
-            console.log(data)
-            document.querySelector('input[name="avatar"]').value = document.location.origin+data;
-            document.querySelector('img[name="avatar"]').src = document.location.origin+data;
+            if(HandleResult(data)){
+                document.querySelector('input[name="avatar"]').value = document.location.origin+data;
+                document.querySelector('img[name="avatar"]').src = document.location.origin+data;
+            }
         }
         });
     
