@@ -200,17 +200,46 @@ class ConnectionDragon(db_dragon.Model):
             computerid=self.computerid
         )
 
+@attr.s
+class AdminRecord:
+    ckey = attr.ib()
+    rank = attr.ib()
+    flags = attr.ib()
+
+class ErroAdmin():
+    id = Column(Integer, primary_key=True)
+    ckey = Column(VARCHAR(50), nullable=False)
+    rank = Column(VARCHAR(50), nullable=False)
+    flags = Column(INTEGER, nullable=False)
+    
+    def get_record(self):
+        return AdminRecord(
+            ckey=self.ckey,
+            rank=self.rank,
+            flags=self.flags
+        )
+
+class ErroAdminChaotic(db_onyx.Model, ErroAdmin):
+    __bind_key__ = 'chaotic'
+    __tablename__ = 'erro_admin'
+
+
+class ErroAdminEos(db_eos.Model, ErroAdmin):
+    __bind_key__ = 'eos'
+    __tablename__ = 'erro_admin'
 
 game_models = {
     "chaotic":
         {
             "ErroBan": ErroBanChaotic,
-            "Connection": ConnectionChaotic
+            "Connection": ConnectionChaotic,
+            "ErroAdmin": ErroAdminChaotic
         },
     "eos":
         {
             "ErroBan": ErroBanEos,
-            "Connection": ConnectionEos
+            "Connection": ConnectionEos,
+            "ErroAdmin": ErroAdminEos
         },
     "dragon":
         {
