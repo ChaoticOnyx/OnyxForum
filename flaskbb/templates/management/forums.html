@@ -64,9 +64,9 @@
                             <div class="col-md-5 col-sm-5 col-xs-4 forum-last-post"></div>
                         </div>
                         {% for forum in category.forums %}
-                            {% if not forum.subforum_parent_id %}
-                                {{ render_forum_managment(forum, True) }}
-                            {% endif %} {# endif forum.subforum_parent_id #}
+                            {% if not forum.parent_id %}
+                                {{ render_forum_managment(forum) }}
+                            {% endif %} {# endif forum.parent_id #}
                         {% endfor %} {# endfor forum in category.forums#}
                     </div>
                 </div>

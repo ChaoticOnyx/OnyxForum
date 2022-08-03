@@ -846,8 +846,8 @@ class Forum(db.Model, CRUDMixin):
     category_id = db.Column(db.Integer,
                             db.ForeignKey("categories.id", ondelete="CASCADE"),
                             nullable=False)
-    subforum_parent_id = db.Column(db.Integer,
-                            db.ForeignKey("forums.id", ondelete="CASCADE"))
+    parent_id = db.Column(db.Integer,
+                          db.ForeignKey("forums.id", ondelete="CASCADE"))
 
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=True)
@@ -886,7 +886,7 @@ class Forum(db.Model, CRUDMixin):
                              cascade="all, delete-orphan")
 
     subforums = db.relationship("Forum", lazy="dynamic",
-                             primaryjoin='Forum.id == Forum.subforum_parent_id',
+                             primaryjoin='Forum.id == Forum.parent_id',
                              order_by='asc(Forum.position)',
                              cascade="all, delete-orphan")
     # Many-to-many
@@ -1177,7 +1177,6 @@ class Forum(db.Model, CRUDMixin):
         return topics
     
 
-
 @make_comparable
 class Category(db.Model, CRUDMixin):
     __tablename__ = "categories"
@@ -1253,7 +1252,7 @@ class Category(db.Model, CRUDMixin):
             user_groups = [gr.id for gr in user.groups]
             # filter forums by user groups
             user_forums = Forum.query.\
-                filter(Forum.groups.any(Group.id.in_(user_groups)), Forum.subforum_parent_id == None).\
+                filter(Forum.groups.any(Group.id.in_(user_groups)), Forum.parent_id == None).\
                 subquery()
 
             forum_alias = aliased(Forum, user_forums)
@@ -1272,7 +1271,7 @@ class Category(db.Model, CRUDMixin):
             guest_group = Group.get_guest_group()
             # filter forums by guest groups
             guest_forums = Forum.query.\
-                filter(Forum.groups.any(Group.id == guest_group.id), Forum.subforum_parent_id == None).\
+                filter(Forum.groups.any(Group.id == guest_group.id), Forum.parent_id == None).\
                 subquery()
 
             forum_alias = aliased(Forum, guest_forums)
@@ -1305,7 +1304,7 @@ class Category(db.Model, CRUDMixin):
             user_groups = [gr.id for gr in user.groups]
             # filter forums by user groups
             user_forums = Forum.query.\
-                filter(Forum.groups.any(Group.id.in_(user_groups)), Forum.subforum_parent_id == None).\
+                filter(Forum.groups.any(Group.id.in_(user_groups)), Forum.parent_id == None).\
                 subquery()
 
             forum_alias = aliased(Forum, user_forums)
@@ -1322,7 +1321,7 @@ class Category(db.Model, CRUDMixin):
             guest_group = Group.get_guest_group()
             # filter forums by guest groups
             guest_forums = Forum.query.\
-                filter(Forum.groups.any(Group.id == guest_group.id), Forum.subforum_parent_id == None).\
+                filter(Forum.groups.any(Group.id == guest_group.id), Forum.parent_id == None).\
                 subquery()
 
             forum_alias = aliased(Forum, guest_forums)

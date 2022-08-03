@@ -694,9 +694,7 @@ class EditForum(MethodView):
         forum = Forum.query.filter_by(id=forum_id).first_or_404()
 
         form = self.form(forum)
-        is_subforum = request.args.get("is_subforum", 0, type=int)
-        parent_id = request.args.get("parent_id", 0, type=int)
-
+        
         if forum.moderators:
             form.moderators.data = ','.join(
                 [user.display_name for user in forum.moderators]
@@ -704,12 +702,10 @@ class EditForum(MethodView):
         else:
             form.moderators.data = None
 
-        if is_subforum:
+        if not forum.parent_id == None:
             form.is_subforum.data = True
-
-        if parent_id:
-            parent = Forum.query.filter_by(id=parent_id).first_or_404()
-            form.subforum_parent_id.data = parent
+            parent = Forum.query.filter_by(id=forum.parent_id).first_or_404()
+            form.parent_id.data = parent
 
         return render_template(
             'management/forum_form.html', form=form, title=_('Edit Forum')
@@ -719,8 +715,6 @@ class EditForum(MethodView):
         forum = Forum.query.filter_by(id=forum_id).first_or_404()
 
         form = self.form(forum)
-        is_subforum = request.args.get("is_subforum", 0, type=int)
-        parent_id = request.args.get("parent_id", 0, type=int)
 
         if form.validate_on_submit():
             form.save()
@@ -735,13 +729,11 @@ class EditForum(MethodView):
             else:
                 form.moderators.data = None
 
-            if is_subforum:
-                form.is_subforum.data = True
-
-            if parent_id:
-                parent = Forum.query.filter_by(id=parent_id).first_or_404()
-                form.subforum_parent_id.data = parent
-
+        if not forum.parent_id == None:
+            form.is_subforum.data = True
+            parent = Forum.query.filter_by(id=forum.parent_id).first_or_404()
+            form.parent_id.data = parent
+        
         return render_template(
             'management/forum_form.html', form=form, title=_('Edit Forum')
         )
@@ -762,7 +754,6 @@ class AddForum(MethodView):
 
     def get(self, category_id=None):
         form = self.form()
-        is_subforum = request.args.get("is_subforum", 0, type=int)
         parent_id = request.args.get("parent_id", 0, type=int)
         form.groups.data = Group.query.order_by(Group.id.asc()).all()
 
@@ -770,12 +761,12 @@ class AddForum(MethodView):
             category = Category.query.filter_by(id=category_id).first()
             form.category.data = category
 
-        if is_subforum:
+        if parent_id:
             form.is_subforum.data = True
 
         if parent_id:
             parent = Forum.query.filter_by(id=parent_id).first_or_404()
-            form.subforum_parent_id.data = parent
+            form.parent_id.data = parent
 
         return render_template(
             'management/forum_form.html', form=form, title=_('Add Forum')
@@ -783,8 +774,8 @@ class AddForum(MethodView):
 
     def post(self, category_id=None):
         form = self.form()
-        is_subforum = request.args.get("is_subforum", 0, type=int)
         parent_id = request.args.get("parent_id", 0, type=int)
+        
         if form.validate_on_submit():
             form.save()
             flash(_('Forum added.'), 'success')
@@ -795,12 +786,12 @@ class AddForum(MethodView):
                 category = Category.query.filter_by(id=category_id).first()
                 form.category.data = category
 
-            if is_subforum:
-                form.is_subforum.data = True
-                
-            if parent_id:
-                parent = Forum.query.filter_by(id=parent_id).first_or_404()
-                form.subforum_parent_id.data = parent
+        if parent_id:
+            form.is_subforum.data = True
+
+        if parent_id:
+            parent = Forum.query.filter_by(id=parent_id).first_or_404()
+            form.parent_id.data = parent
 
         return render_template(
             'management/forum_form.html', form=form, title=_('Add Forum')

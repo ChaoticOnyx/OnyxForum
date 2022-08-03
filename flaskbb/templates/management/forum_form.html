@@ -37,11 +37,11 @@
                         {{ render_field(form.title) }}
                         {{ render_field(form.description, div_class="col-sm-10 editor", rows="4", placeholder="", **{'data-provide': 'markdown', 'class': 'flaskbb-editor'}) }}
                         {{ render_boolean_field(form.is_subforum) }}
-                        <div id="category_id_selector" style="display:visible;">
+                        <div id="category_id_selector">
                             {{ render_field(form.category) }}
                         </div>
-                        <div id="subforum_parent_id_selector" style="display:none;">
-                            {{ render_field(form.subforum_parent_id) }}
+                        <div id="parent_id_selector" style="display:none;">
+                            {{ render_field(form.parent_id) }}
                         </div>
                         {{ render_field(form.position) }}
                         {{ render_field(form.external) }}

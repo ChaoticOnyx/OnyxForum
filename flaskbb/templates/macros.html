@@ -477,7 +477,7 @@ For example, on id should continue with 11 on page 2 if per_page is set to 10
     {%- endif -%}
 {%- endmacro -%}
 
-{%- macro render_forum_managment(forum, render_subforums) -%}
+{%- macro render_forum_managment(forum) -%}
 <div class="row category-row hover">
         {% if forum.external %}
         <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
@@ -567,11 +567,11 @@ For example, on id should continue with 11 on page 2 if per_page is set to 10
         <!-- Forum Actions -->
         <div class="col-md-7 col-sm-5 col-xs-4 forum-last-post">
             <div class="forum-actions pull-right">
-                <a class="btn btn-sm btn-success" href="{{ url_for('management.add_forum', category_id=forum.category_id, is_subforum=1, parent_id=forum.id) }}">
-                    <span class="fa fa-plus"></span> {% trans %}Add Suborum{% endtrans %}
+                <a class="btn btn-sm btn-success" href="{{ url_for('management.add_forum', category_id=forum.category_id, parent_id=forum.id) }}">
+                    <span class="fa fa-plus"></span> {% trans %}Add Subforum{% endtrans %}
                 </a>
-                {% if forum.subforum_parent_id %}
-                    <a class="btn btn-sm btn-primary" href="{{ url_for('management.edit_forum', forum_id = forum.id, is_subforum=1, parent_id=forum.subforum_parent_id) }}">
+                {% if forum.parent_id %}
+                    <a class="btn btn-sm btn-primary" href="{{ url_for('management.edit_forum', forum_id = forum.id) }}">
                         <span class="fa fa-pencil"></span> {% trans %}Edit Forum{% endtrans %}
                     </a>
                 {% else %}
@@ -588,138 +588,17 @@ For example, on id should continue with 11 on page 2 if per_page is set to 10
             </div>
         </div>
         <!-- Forum Subforums -->
-        {% if render_subforums %}
-            {% if forum.subforums.all() %}
-            <div class="col-md-12 col-sm-5 col-xs-4 forum-subforums" style="margin-left: 0.5em;">
-                <details>
-                    <summary><b>Subforums</b></summary>
-                    <div style=" border-bottom: 1px solid #cad7e1;"></div>
-                    {% for subforum in forum.subforums %}
-                        {{ render_forum_managment(subforum, True) }}
-                    {% endfor %} {# endfor subforum in forum.subforums #}
-                </details>
-            </div>
-            {% endif %} {# endif forum.subforums #}
-        {% endif %} {# endif render_subforums #}  
+        {% if forum.subforums.all() %}
+        <div class="col-md-12 col-sm-5 col-xs-4 forum-subforums" style="margin-left: 0.5em;">
+            <details>
+                <summary><b>Subforums</b></summary>
+                <div style=" border-bottom: 1px solid #cad7e1;"></div>
+                {% for subforum in forum.subforums %}
+                    {{ render_forum_managment(subforum) }}
+                {% endfor %} {# endfor subforum in forum.subforums #}
+            </details>
+        </div>
+        {% endif %} {# endif forum.subforums #}
 </div> <!-- end category-content -->
 {% endif %} {# endif forum.external #}
-{% endmacro %}
-
-{%- macro render_subforums(forum) -%}
-{% for forum in forum.subforums %}
-            <div class="row category-row hover">
-    
-                {% if forum.external %}
-                <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
-                    <div class="row">
-                        <!-- Icon -->
-                        <div class="col-md-1 col-sm-2 col-xs-2 forum-status">
-                            <span class="fa fa-external-link fa-fw forum-external"></span>
-                        </div>
-    
-                        <div class="col-md-11 col-sm-10 col-xs-10">
-                            <!-- Forum Name -->
-                            <div class="forum-name">
-                                <span class="forum-link">{% trans %}Link to{% endtrans %}:</span> <a href="{{ forum.url }}">{{ forum.title }}</a>
-                            </div>
-    
-                            <!-- Forum Description -->
-                            <div class="forum-description">
-                                {{ forum.description|nonpost_markup }}
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- end forum-info -->
-    
-                <!-- Post Count -->
-                <div class="col-md-2 col-sm-2 hidden-xs forum-posts">
-                    -
-                </div>
-    
-                <!-- Topic Count -->
-                <div class="col-md-2 col-sm-2 hidden-xs forum-topics">
-                    -
-                </div>
-    
-                <!-- Last Post -->
-                <div class="col-md-3 col-sm-3 col-xs-4 forum-last-post">
-                    ---
-                </div>
-                {% else %}
-                <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
-                    <div class="row">
-                        <!-- Icon -->
-                        <div class="col-md-1 col-sm-2 col-xs-2 forum-status">
-                            {% if forum.locked %}
-                                <span class="fa fa-lock fa-fw forum-locked"></span>
-                            {% else %}
-                                <span class="fa fa-comments-o fa-fw forum-read"></span>
-                            {% endif %}
-                        </div>
-    
-                        <div class="col-md-11 col-sm-10 col-xs-10">
-                            <!-- Forum Name -->
-                            <div class="forum-name">
-                                <a href="{{ forum.url }}">{{ forum.title }}</a>
-                            </div>
-    
-                            <!-- Forum Description -->
-                            <div class="forum-description">
-                                {{ forum.description|nonpost_markup }}
-                            </div>
-    
-                            <!-- Forum Moderators -->
-                            {% if forum.show_moderators %}
-                            <div class="forum-moderators">
-                                {% trans %}Moderators{% endtrans %}:
-                                {% for moderator in forum.moderators %}
-                                <a href="{{ url_for('user.profile', userid=moderator.id) }}">{{ moderator.display_name }}</a>{% if not loop.last %}, {% endif %}
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div> <!-- end forum-info -->
-    
-                <!-- Post Count -->
-                <div class="col-md-2 col-sm-2 hidden-xs forum-topics">
-                {{ forum.topic_count }}
-                </div>
-    
-                <!-- Topic Count -->
-                <div class="col-md-2 col-sm-2 hidden-xs forum-posts">
-                {{ forum.post_count }}
-                </div>
-    
-                <!-- Last Post -->
-                <div class="col-md-3 col-sm-3 col-xs-4 forum-last-post">
-                    {% if forum.last_post_id %}
-                    <div class="last-post-title">
-                        <a href="{{ forum.last_post_url }}" title="{{ forum.last_post_title }}">
-                            {{ forum.last_post_title|crop_title }}
-                        </a>
-                    </div>
-    
-                    <div class="last-post-time">
-                        {{ forum.last_post_created|time_since }}
-                    </div>
-    
-                    <div class="last-post-author">
-                        {% trans %}by{% endtrans %}
-                        {% if forum.last_post_user_id %}
-                        <a href="{{ url_for('user.profile', userid=forum.last_post_user_id) }}">{{ forum.last_post_user_display_name }}</a>
-                        {% else %}
-                        {{ forum.last_post_user_display_name }}
-                        {% endif %}
-                    </div>
-    
-                    {% else %}
-                    {% trans %}No posts.{% endtrans %}
-                    {% endif %} {# endif forum.last_post_id #}
-                </div>
-    
-            {% endif %} {# endif forum.external #}
-            </div> <!-- end category-content -->
-    
-            {% endfor %}
 {% endmacro %}
