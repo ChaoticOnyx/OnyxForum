@@ -1117,7 +1117,7 @@ class UploadFile(MethodView):
         ALLOWED_EXTENSIONS = current_app.config["ALLOWED_EXTENSIONS"]
 
         def is_extension_allowed(filename):
-            return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+            return '.' in filename and os.path.splitext(filename)[1][1:] in ALLOWED_EXTENSIONS
 
         if 'file' not in request.files:
             return 'failed-request'
