@@ -232,15 +232,15 @@ class Hub(MethodView):
                     icon="fa fa-group",
                     urlforkwargs={"server": hub_current_server.id},
                 ))
-
-        actions.append(
-                NavigationLink(
-                    endpoint="hub.admins",
-                    name=_("Admins"),
-                    icon="fa fa-group",
-                    urlforkwargs={"server": hub_current_server.id},
+        if "ErroAdmin" in game_models[hub_current_server.id].keys() :
+            actions.append(
+                    NavigationLink(
+                        endpoint="hub.admins",
+                        name=_("Admins"),
+                        icon="fa fa-group",
+                        urlforkwargs={"server": hub_current_server.id},
+                    )
                 )
-            )
         return actions
 
     def get_args(self):
@@ -776,17 +776,24 @@ class ConnectionsView(Hub):
 
         return redirect(url_for("hub.connections", server=hub_current_server.id, search=search))
 
+def get_admins_by_rank():
+    server_admins = game_models[hub_current_server.id]["ErroAdmin"]
+    rank_to_admins = {}
+    for admin in server_admins.query.order_by(server_admins.rank).all():
+
+        if admin.rank not in rank_to_admins:
+            rank_to_admins[admin.rank] = []
+
+        if admin.flags:
+            rank_to_admins[admin.rank].append(admin.ckey)
+
+    return rank_to_admins
+
 class AdminsView(Hub):
-    def get_admins():
-        server_admins = game_models[hub_current_server.id]["ErroAdmin"]
-        admins = [admin for admin in server_admins.query.order_by(server_admins.rank).all()]
-        result = {rank:[admin.ckey for admin in admins if admin.rank == rank] for rank in [admin.rank for admin in admins]}
-        return result
 
     def get(self):
-        is_json = request.endpoint
-        admins = get_admins()
-        if is_json == "hub.admins_json":
+        admins = get_admins_by_rank()
+        if request.endpoint == "hub.admins_json":
             return admins
         
         return render_template(
