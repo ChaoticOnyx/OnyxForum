@@ -1,7 +1,7 @@
 {% set page_title = _("Forums") %}
 
 {% extends theme("management/management_layout.html") %}
-{% from theme("macros.html") import render_forum_managment %}
+{% from theme("management/render_forum_management.html") import render_forum_management %}
 
 {% block breadcrumb %}
 <ol class="breadcrumb flaskbb-breadcrumb">
@@ -65,7 +65,7 @@
                         </div>
                         {% for forum in category.forums %}
                             {% if not forum.parent_id %}
-                                {{ render_forum_managment(forum) }}
+                                {{ render_forum_management(forum) }}
                             {% endif %} {# endif forum.parent_id #}
                         {% endfor %} {# endfor forum in category.forums#}
                     </div>
