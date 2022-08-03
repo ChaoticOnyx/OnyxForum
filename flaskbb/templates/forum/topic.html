@@ -3,8 +3,8 @@
 {% set active_forum_nav=True %}
 
 {% block content %}
-{% from theme('macros.html') import render_pagination, form_field, generate_obj_id, generate_post_url, editor_file_upload  %}
-
+{% from theme('macros.html') import render_pagination, form_field, generate_obj_id, generate_post_url %}
+{% from theme("forum/editor_file_upload.html") import editor_file_upload %}
 <div class="topic-view">
     <ol class="breadcrumb flaskbb-breadcrumb">
         <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>

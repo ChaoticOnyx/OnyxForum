@@ -13,7 +13,7 @@
 
 {% block management_content %}
 {% from theme("macros.html") import horizontal_field, horizontal_select_field, navlink with context %}
-
+{% from theme("forum/editor_file_upload.html") import file_upload_errors %}
 <div class="col-md-3 settings-col">
     <div class="nav-sidebar">
         <ul class="nav">
@@ -61,14 +61,7 @@
                             <span class="btn btn-warning" id="upload-button" onclick="UploadAvatar('{{url_for('forum.upload_file')}}','{{ csrf_token() }}')">Upload</span>
                         </div>
                         <div class = "col-sm-5 control-label" style="padding-top: 7px; margin-bottom: 0; text-align: left;">
-                            <label class="filestatus">
-                                <input id="fileupload" type="file" name="fileupload" style="display:none"/>
-                                <span id="error none"></span>
-                                <span id="error bad-file" style = "display: none;">File type is not supported!</span>
-                                <span id="error empty-file" style = "display: none;">No file selected</span>
-                                <span id="error too-big" style = "display: none;">File size too big</span>
-                                <span id="error failed-request" style = "display: none;">Failed to process file.</span>
-                            </label>
+                                {{ file_upload_errors() }}
                         </div>
                     </div>
                     {{ horizontal_field(form.primary_group) }}

@@ -476,23 +476,3 @@ For example, on id should continue with 11 on page 2 if per_page is set to 10
         {{ page + (obj.page - 1) * per_page }}
     {%- endif -%}
 {%- endmacro -%}
-
-{%- macro editor_file_upload() -%}
-    <label class="filestatus">
-        <input id="fileupload" type="file" name="fileupload" style="display:none" onchange="filestatus_click_handler('{{url_for('forum.upload_file')}}','{{ csrf_token() }}')"/>
-        <span id="error none">
-            Attach files by dragging & dropping or selecting.
-        </span>
-        <span id="error bad-file" style = "display: none;">
-            File type is not supported!</span>
-        <span id="error empty-file" style = "display: none;">
-            No file selected.
-        </span>
-        <span id="error too-big" style = "display: none;">
-            File size too big.
-        </span>
-        <span id="error failed-request" style = "display: none;">
-            Failed to process file.
-        </span>
-    </label>
-{%- endmacro -%}
