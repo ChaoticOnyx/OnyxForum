@@ -702,7 +702,7 @@ class EditForum(MethodView):
         else:
             form.moderators.data = None
 
-        if not forum.parent_id == None:
+        if forum.parent_id:
             form.is_subforum.data = True
             parent = Forum.query.filter_by(id=forum.parent_id).first_or_404()
             form.parent_id.data = parent
@@ -729,7 +729,7 @@ class EditForum(MethodView):
             else:
                 form.moderators.data = None
 
-        if not forum.parent_id == None:
+        if forum.parent_id:
             form.is_subforum.data = True
             parent = Forum.query.filter_by(id=forum.parent_id).first_or_404()
             form.parent_id.data = parent
@@ -763,8 +763,6 @@ class AddForum(MethodView):
 
         if parent_id:
             form.is_subforum.data = True
-
-        if parent_id:
             parent = Forum.query.filter_by(id=parent_id).first_or_404()
             form.parent_id.data = parent
 
@@ -788,8 +786,6 @@ class AddForum(MethodView):
 
         if parent_id:
             form.is_subforum.data = True
-
-        if parent_id:
             parent = Forum.query.filter_by(id=parent_id).first_or_404()
             form.parent_id.data = parent
 

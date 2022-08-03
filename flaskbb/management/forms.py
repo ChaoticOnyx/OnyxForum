@@ -529,7 +529,7 @@ class ForumForm(FlaskForm):
         data.pop('submit', None)
         data.pop('csrf_token', None)
         data.pop('is_subforum', None)
-        if not data['parent_id'] == None:
+        if data['parent_id']:
             data['parent_id'] = data['parent_id'].id
         forum = Forum(**data)
 
@@ -551,7 +551,7 @@ class EditForumForm(ForumForm):
         data.pop('submit', None)
         data.pop('csrf_token', None)
         data.pop('is_subforum', None)
-        if not data['parent_id'] == None:
+        if data['parent_id']:
             data['parent_id'] = data['parent_id'].id
         forum = Forum(**data)
         # flush SQLA info from created instance so that it can be merged
