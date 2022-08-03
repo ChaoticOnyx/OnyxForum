@@ -1,6 +1,7 @@
 {% set page_title = _("Forums") %}
 
 {% extends theme("management/management_layout.html") %}
+{% from theme("management/render_forum_management.html") import render_forum_management %}
 
 {% block breadcrumb %}
 <ol class="breadcrumb flaskbb-breadcrumb">
@@ -63,111 +64,10 @@
                             <div class="col-md-5 col-sm-5 col-xs-4 forum-last-post"></div>
                         </div>
                         {% for forum in category.forums %}
-                        <div class="row category-row hover">
-
-                            {% if forum.external %}
-                            <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
-                                <div class="row">
-                                    <!-- Icon -->
-                                    <div class="col-md-1 col-sm-2 col-xs-2 forum-status">
-                                        <span class="fa fa-external-link forum-external"></span>
-                                    </div>
-
-                                    <div class="col-md-11 col-sm-10 col-xs-10">
-                                        <!-- Forum Name -->
-                                        <div class="forum-name">
-                                            <span class="forum-link">{% trans %}Link to{% endtrans %}:</span> <a href="{{ forum.url }}">{{ forum.title }}</a>
-                                        </div>
-
-                                        <!-- Forum Description -->
-                                        <div class="forum-description">
-                                            {{ forum.description|nonpost_markup }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> <!-- end forum-info -->
-
-                            <!-- Post Count -->
-                            <div class="col-md-2 col-sm-2 hidden-xs forum-posts">
-                                - -
-                            </div>
-
-                            <!-- Forum Actions -->
-                            <div class="col-md-5 col-sm-5 col-xs-4 forum-last-post">
-                                <div class="forum-actions pull-right">
-                                    <a class="btn btn-sm btn-success" href="{{ url_for('management.edit_forum', forum_id = forum.id) }}">
-                                        <span class="fa fa-pencil"></span> {% trans %}Edit Link{% endtrans %}
-                                    </a>
-
-                                    <form class="inline-form" method="post" action="{{ url_for('management.delete_forum', forum_id=forum.id) }}">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-sm btn-danger" name="confirmDialog">
-                                            <span class="fa fa-trash"></span> {% trans %}Delete Link{% endtrans %}
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                            {% else %}
-                            <div class="col-md-5 col-sm-5 col-xs-8 forum-info">
-                                <div class="row">
-                                    <!-- Icon -->
-                                    <div class="col-md-1 col-sm-2 col-xs-2 forum-status">
-                                        {% if forum.locked %}
-                                            <span class="fa fa-lock forum-locked"></span>
-                                        {% else %}
-                                            <span class="fa fa-comments-o forum-read"></span>
-                                        {% endif %}
-                                    </div>
-
-                                    <div class="col-md-11 col-sm-10 col-xs-10">
-                                        <!-- Forum Name -->
-                                        <div class="forum-name">
-                                            <a href="{{ forum.url }}">{{ forum.title }}</a>
-                                        </div>
-
-                                        <!-- Forum Description -->
-                                        <div class="forum-description">
-                                            {{ forum.description|nonpost_markup }}
-                                        </div>
-
-                                        <!-- Forum Moderators -->
-                                        {% if forum.show_moderators %}
-                                        <div class="forum-moderators">
-                                            {% trans %}Moderators{% endtrans %}:
-                                            {% for moderator in forum.moderators %}
-                                            <a href="{{ moderator.url }}">{{ moderator.display_name }}</a>{% if not loop.last %}, {% endif %}
-                                            {% endfor %}
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div> <!-- end forum-info -->
-
-                            <!-- Post Count -->
-                            <div class="col-md-2 col-sm-2 hidden-xs forum-topics">
-                                {{ forum.topic_count }} / {{ forum.post_count }}
-                            </div>
-
-                            <!-- Forum Actions -->
-                            <div class="col-md-5 col-sm-5 col-xs-4 forum-last-post">
-                                <div class="forum-actions pull-right">
-                                    <a class="btn btn-sm btn-primary" href="{{ url_for('management.edit_forum', forum_id = forum.id) }}">
-                                        <span class="fa fa-pencil"></span> {% trans %}Edit Forum{% endtrans %}
-                                    </a>
-
-                                    <form class="inline-form" method="post" action="{{ url_for('management.delete_forum', forum_id=forum.id) }}">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        <button class="btn btn-sm btn-danger" name="confirmDialog">
-                                            <span class="fa fa-trash"></span> {% trans %}Delete Forum{% endtrans %}
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-
-                        {% endif %} {# endif forum.external #}
-                        </div> <!-- end category-content -->
-
-                        {% endfor %}
+                            {% if not forum.parent_id %}
+                                {{ render_forum_management(forum) }}
+                            {% endif %} {# endif forum.parent_id #}
+                        {% endfor %} {# endfor forum in category.forums#}
                     </div>
                 </div>
                 {% endfor %}

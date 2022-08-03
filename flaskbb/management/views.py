@@ -694,13 +694,18 @@ class EditForum(MethodView):
         forum = Forum.query.filter_by(id=forum_id).first_or_404()
 
         form = self.form(forum)
-
+        
         if forum.moderators:
             form.moderators.data = ','.join(
                 [user.display_name for user in forum.moderators]
             )
         else:
             form.moderators.data = None
+
+        if forum.parent_id:
+            form.is_subforum.data = True
+            parent = Forum.query.filter_by(id=forum.parent_id).first_or_404()
+            form.parent_id.data = parent
 
         return render_template(
             'management/forum_form.html', form=form, title=_('Edit Forum')
@@ -710,6 +715,7 @@ class EditForum(MethodView):
         forum = Forum.query.filter_by(id=forum_id).first_or_404()
 
         form = self.form(forum)
+
         if form.validate_on_submit():
             form.save()
             flash(_('Forum updated.'), 'success')
@@ -723,6 +729,11 @@ class EditForum(MethodView):
             else:
                 form.moderators.data = None
 
+        if forum.parent_id:
+            form.is_subforum.data = True
+            parent = Forum.query.filter_by(id=forum.parent_id).first_or_404()
+            form.parent_id.data = parent
+        
         return render_template(
             'management/forum_form.html', form=form, title=_('Edit Forum')
         )
@@ -743,12 +754,17 @@ class AddForum(MethodView):
 
     def get(self, category_id=None):
         form = self.form()
-
+        parent_id = request.args.get("parent_id", 0, type=int)
         form.groups.data = Group.query.order_by(Group.id.asc()).all()
 
         if category_id:
             category = Category.query.filter_by(id=category_id).first()
             form.category.data = category
+
+        if parent_id:
+            form.is_subforum.data = True
+            parent = Forum.query.filter_by(id=parent_id).first_or_404()
+            form.parent_id.data = parent
 
         return render_template(
             'management/forum_form.html', form=form, title=_('Add Forum')
@@ -756,7 +772,8 @@ class AddForum(MethodView):
 
     def post(self, category_id=None):
         form = self.form()
-
+        parent_id = request.args.get("parent_id", 0, type=int)
+        
         if form.validate_on_submit():
             form.save()
             flash(_('Forum added.'), 'success')
@@ -766,6 +783,11 @@ class AddForum(MethodView):
             if category_id:
                 category = Category.query.filter_by(id=category_id).first()
                 form.category.data = category
+
+        if parent_id:
+            form.is_subforum.data = True
+            parent = Forum.query.filter_by(id=parent_id).first_or_404()
+            form.parent_id.data = parent
 
         return render_template(
             'management/forum_form.html', form=form, title=_('Add Forum')

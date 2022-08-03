@@ -436,6 +436,19 @@ class ForumForm(FlaskForm):
                                            "forum."))]
     )
 
+    is_subforum = BooleanField(
+        _("Subforum?"),
+        description=_("Nest forum under another forum")
+    )
+
+    parent_id = QuerySelectField(
+        _("Parent forum"),
+        query_factory=selectable_forums,
+        allow_blank=False,
+        get_label="title",
+        description=_("The forum that contains this forum.")
+    )
+
     category = QuerySelectField(
         _("Category"),
         query_factory=selectable_categories,
@@ -474,7 +487,14 @@ class ForumForm(FlaskForm):
     )
 
     submit = SubmitField(_("Save"))
-
+  
+    def validate_parent_id(self, field):
+        if not self.is_subforum.data:
+            field.data = None
+        else:
+            if field.data == None:
+                raise ValidationError(_("Specify the parent forum!"))
+    
     def validate_external(self, field):
         if hasattr(self, "forum"):
             if self.forum.topics.count() > 0:
@@ -508,7 +528,11 @@ class ForumForm(FlaskForm):
         # delete submit and csrf_token from data
         data.pop('submit', None)
         data.pop('csrf_token', None)
+        data.pop('is_subforum', None)
+        if data['parent_id']:
+            data['parent_id'] = data['parent_id'].id
         forum = Forum(**data)
+
         return forum.save()
 
 
@@ -526,6 +550,9 @@ class EditForumForm(ForumForm):
         # delete submit and csrf_token from data
         data.pop('submit', None)
         data.pop('csrf_token', None)
+        data.pop('is_subforum', None)
+        if data['parent_id']:
+            data['parent_id'] = data['parent_id'].id
         forum = Forum(**data)
         # flush SQLA info from created instance so that it can be merged
         make_transient(forum)
