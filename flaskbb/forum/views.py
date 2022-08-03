@@ -14,7 +14,7 @@ import math
 import os
 
 from flask import (Blueprint, abort, current_app, flash, redirect, request,
-                   url_for, send_from_directory)
+                   url_for, send_from_directory, safe_join)
 from flask.views import MethodView
 from flask_allows import And, Permission
 from flask_babelplus import gettext as _
@@ -1111,36 +1111,36 @@ class MarkdownPreview(MethodView):
         return preview
 
 class UploadFile(MethodView):
-
-    def get(self):
-        filename = request.args.get("file")
-        if filename:
-            return send_from_directory(current_app.config["UPLOAD_FOLDER"], filename, as_attachment=True)
-        return redirect(url_for('forum.index'))
-
+    decorators=[login_required]
+    
     def post(self):
         ALLOWED_EXTENSIONS = current_app.config["ALLOWED_EXTENSIONS"]
 
-        def allowed_file(filename):
+        def is_extension_allowed(filename):
             return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-        # check if the post request has the file part
         if 'file' not in request.files:
             return 'failed-request'
+
         file = request.files['file']
-        # If the user does not select a file, the browser submits an
-        # empty file without a filename.
+
         if file.filename == '':
             return 'empty-file'
-        if file and allowed_file(file.filename):
+        if file and is_extension_allowed(file.filename):
             filename = hash_file(file)
             file.seek(0)
-            path = os.path.join(current_app.config["UPLOAD_FOLDER"],current_user.discord)
+            path = safe_join(current_app.config["UPLOAD_FOLDER"],current_user.discord)
             if not os.path.exists(path):
                 os.mkdir(path)
-            file.save(os.path.join(path,filename))
-            return url_for("forum.upload_file")+"?file="+current_user.discord+"/"+filename
+            file.save(safe_join(path,filename))
+            return url_for("forum.upload_file", file=current_user.discord+"/"+filename)
         return 'bad-file'
+
+class DownloadFile(MethodView):
+
+    def get(self):
+        filename = request.args.get("file")
+        return send_from_directory(current_app.config["UPLOAD_FOLDER"], filename, as_attachment=True)
 
 @impl(tryfirst=True)
 def flaskbb_load_blueprints(app):
@@ -1344,6 +1344,12 @@ def flaskbb_load_blueprints(app):
         forum,
         routes=["/uploads"],
         view_func=UploadFile.as_view("upload_file")
+    )
+
+    register_view(
+        forum,
+        routes=["/uploads"],
+        view_func=DownloadFile.as_view("download_file")
     )
 
     forum.before_request(force_login_if_needed)

@@ -301,6 +301,7 @@ def configure_extensions(app):
                 discordClientThread.cancel()
             atexit.register(interupt)
 
+
 @discordClient.event
 async def on_ready():
     print("Discord bot logged in as: %s, %s" % (discordClient.user.name, discordClient.user.id))

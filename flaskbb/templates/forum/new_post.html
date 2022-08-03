@@ -10,7 +10,7 @@
 {% extends theme("layout.html") %}
 
 {% block content %}
-{% from theme("macros.html") import render_field, render_submit_field, render_quickreply, render_boolean_field %}
+{% from theme("macros.html") import render_field, render_submit_field, render_quickreply, render_boolean_field, editor_file_upload  %}
 
 <div class="page-view">
     <ol class="breadcrumb flaskbb-breadcrumb">
@@ -47,23 +47,7 @@
 
                                 {{ run_hook("flaskbb_tpl_form_new_post_after", form=form) }}
                                 <div class="editor-filestatus">
-                                    <label class="filestatus">
-                                        <input id="fileupload" type="file" name="fileupload" style="display:none" onchange="filestatus_click_handler('{{url_for('forum.upload_file')}}','{{ csrf_token() }}')"/>
-                                        <span id="error none">
-                                            Attach files by dragging & dropping or selecting.
-                                        </span>
-                                        <span id="error bad-file" style = "display: none;">
-                                            We don’t support that file type.</span>
-                                        <span id="error empty-file" style = "display: none;">
-                                            No file selected.
-                                        </span>
-                                        <span id="error too-big" style = "display: none;">
-                                            File size too big.
-                                        </span>
-                                        <span id="error failed-request" style = "display: none;">
-                                            Something went really wrong, and we can’t process that file.
-                                        </span>
-                                    </label>
+                                    {{ editor_file_upload() }}
                                 </div>
                                 <div class="editor-submit">
                                     {{ render_submit_field(form.submit, input_class="btn btn-success pull-right") }}
