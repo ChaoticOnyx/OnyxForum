@@ -288,5 +288,9 @@ DEBUG_TB_INTERCEPT_REDIRECTS = False
 # File uploading Settings
 # ------------------------------ #
 UPLOAD_FOLDER = os.path.join(DefaultConfig.basedir, 'flaskbb/static/user_content')
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
+# Default value for all groups in bytes
+MAX_UPLOAD_SIZE = 5*1024*1024
+USER_UPLOAD_FOLDER_LIMIT = 500*1024*1024
+
+ALLOWED_EXTENSIONS = {'txt','png', 'jpg', 'jpeg', 'gif', 'pdf'}
