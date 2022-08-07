@@ -1,0 +1,16 @@
+.page-panel .page-body .uploads{
+    padding-top: 0em;
+    padding-bottom: 0.5em;
+    overflow-wrap: break-word;
+    border-bottom: 1px solid $panel-meta-border;
+    display: flex;
+    .file-icon{
+        max-width: 80px;
+        max-height: 80px;
+
+        display: flex;
+    }
+    .file-name, .file-size, .file-date, .file-actions{
+        padding-top: 0.5em;
+    }
+}

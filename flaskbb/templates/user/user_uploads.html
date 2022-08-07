@@ -1,0 +1,62 @@
+{% extends theme("user/settings_layout.html") %}
+{% from theme('macros.html') import render_pagination, topic_pages %}
+
+{% block breadcrumb %}
+<ul class="breadcrumb flaskbb-breadcrumb">
+    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
+    <li><a href="{{ user.url }}">{{ user.display_name }}</a></li>
+    <li class="active">{% trans %}Uploads{% endtrans %}</li>
+</ul>
+{% endblock %}
+
+{% block settings_content %}
+<!-- middle column -->
+<div class="panel page-panel">
+    <div class="panel-heading page-head">
+        <div class="row">
+            <div class="col-md-2 col-sm-2 col-xs-2 file-icon">{% trans %}File Icon{% endtrans %}</div>
+            <div class="col-md-3 col-sm-3 col-xs-3 file-name">{% trans %}Name{% endtrans %}</div>
+            <div class="col-md-2 col-sm-2 col-xs-2 file-size">{% trans %}Size{% endtrans %}</div>
+            <div class="col-md-2 col-sm-2 col-xs-2 file-date">{% trans %}Upload date{% endtrans %}</div>
+            <div class="col-md-2 col-sm-2 col-xs-2 file-date">{% trans %}Actions{% endtrans %}</div>
+        </div>
+    </div>
+    {% for file in files %}
+        <div class="panel-body page-body">
+            <div class="uploads">
+                <div class="col-md-2 col-sm-2 col-xs-2">
+                    <div class="page-body file-icon">
+                        <img src="{{url_for('forum.upload_file',file=current_user.discord+'/'+file.current_name)}}" alt="">
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-3 col-xs-3">
+                    <div class="page-body file-name">
+                        <a href="{{url_for('forum.upload_file',file=current_user.discord+'/'+file.current_name)}}"><strong>{{ file.original_name }}</strong></a>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-2 col-xs-2">
+                    <div class="page-body file-size">
+                        {{ file.file_size }}
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-2 col-xs-2">
+                    <div class="page-body file-date">
+                        {{ file.datetime }}
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-2 col-xs-2">
+                    <div class="page-body file-actions pull-right">
+                        <form class="inline-form" method="post" action="{{ url_for('user.delete_file', file_id=file.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <button class="btn btn-sm btn-danger" name="confirmDialog">
+                                <span class="fa fa-trash"></span> {% trans %}Delete File{% endtrans %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% include theme('confirm_dialog.html') %}
+{% endblock %}

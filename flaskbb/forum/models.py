@@ -1336,3 +1336,31 @@ class Category(db.Model, CRUDMixin):
             abort(404)
 
         return get_forums(forums, user)
+
+class UploadedFile(db.Model, CRUDMixin):
+    __tablename__ = "uploaded_files"
+    
+    id = db.Column(db.Integer, primary_key=True)
+
+    datetime = db.Column(UTCDateTime(timezone=True),
+                        db.ForeignKey("users.id", ondelete="CASCADE"),
+                        primary_key=True)
+
+    current_name = db.Column(db.Text, nullable=True)
+
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey("users.id", ondelete="CASCADE"))
+
+    original_name = db.Column(db.Text, nullable=True)
+    
+    file_size = db.Column(db.Integer, nullable=True)
+    def save(self):
+        
+        if not self.original_name:
+            self.original_name = "file"
+        if not self.datetime:
+            self.datetime = time_utcnow()
+
+        db.session.add(self)
+        db.session.commit()
+        return self

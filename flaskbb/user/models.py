@@ -78,6 +78,10 @@ class Group(db.Model, CRUDMixin):
     makehidden = db.Column(db.Boolean, default=False, nullable=False)
     ignorekarma = db.Column(db.Boolean, default=False, nullable=False)
 
+    # Upload file max size
+    uploaded_file_max_length = db.Column(db.Integer, default=0, nullable=False)
+    upload_folder_limit = db.Column(db.Integer, default=0, nullable=False)
+
     # Methods
     def __repr__(self):
         """Set to a unique key specific to the object in the database.

@@ -312,6 +312,19 @@ class GroupForm(FlaskForm):
         description=_("Management access for server's head"),
     )
 
+    uploaded_file_max_length = IntegerField(
+        _("Uploaded file max size"),
+        default=0,
+        validators=[Optional()],
+        description=_("In bytes")
+    )
+    upload_folder_limit = IntegerField(
+        _("Max uploads per day"),
+        default=0,
+        validators=[Optional()],
+        description=_("In bytes")
+    )
+
     submit = SubmitField(_("Save"))
 
     def validate_name(self, field):

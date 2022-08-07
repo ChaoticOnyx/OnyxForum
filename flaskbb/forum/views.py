@@ -27,7 +27,7 @@ from flaskbb.forum.forms import (EditTopicForm, NewTopicForm, QuickreplyForm,
                                  ReplyForm, ReportForm, SearchPageForm,
                                  UserSearchForm)
 from flaskbb.forum.models import (Category, Forum, ForumsRead, Post, Topic,
-                                  TopicsRead)
+                                  TopicsRead, UploadedFile)
 from flaskbb.markup import make_renderer
 from flaskbb.user.models import User
 from flaskbb.utils.helpers import (FlashAndRedirect, do_topic_action,
@@ -1110,9 +1110,27 @@ class MarkdownPreview(MethodView):
         preview = renderer(text)
         return preview
 
+def user_get_file_max_length():
+    user_groups_file_max_length=[current_user.primary_group.uploaded_file_max_length]
+    for group in current_user.secondary_groups:
+        user_groups_file_max_length.append(group.uploaded_file_max_length, )
+    user_groups_file_max_length.append(current_app.config["MAX_UPLOAD_SIZE"])
+
+    if -1 in user_groups_file_max_length:
+        return -1
+    else:
+        return max(user_groups_file_max_length)
+
+def user_get_upload_folder_limit():
+    user_groups_upload_folder_limit=[current_user.primary_group.upload_folder_limit]
+    for group in current_user.secondary_groups:
+        user_groups_upload_folder_limit.append(group.upload_folder_limit, )
+    user_groups_upload_folder_limit.append(current_app.config["USER_UPLOAD_FOLDER_LIMIT"])
+    return max(user_groups_upload_folder_limit)
+
 class UploadFile(MethodView):
     decorators=[login_required]
-    
+
     def post(self):
         ALLOWED_EXTENSIONS = current_app.config["ALLOWED_EXTENSIONS"]
 
@@ -1127,27 +1145,54 @@ class UploadFile(MethodView):
         file.seek(0, os.SEEK_END)
         file_length = file.tell()
 
-        if file_length > current_app.config["MAX_UPLOAD_SIZE"]:
+        file_max_length = user_get_file_max_length()
+        file_upload_limit = user_get_upload_folder_limit()
+
+        if file_length > file_max_length:
             return 'too-big'
 
         file.seek(0)
+        
         if file.filename == '':
             return 'empty-file'
+        
+        path = safe_join(current_app.config["UPLOAD_FOLDER"],current_user.discord)
+              
+        if not os.path.exists(path):
+            os.mkdir(path)
+
+        size = 0
+        for ele in os.scandir(path):
+            size+=os.path.getsize(ele)
+        size+=file_length
+
+        if size>=user_get_upload_folder_limit():
+            return 'upload-limit'
+
         if file and is_extension_allowed(file.filename):
+            upload_file = UploadedFile()
+            upload_file.original_name = secure_filename(file.filename)
+            upload_file.user_id = current_user.id
+            upload_file.file_size = file_length
+            
             filename = hash_file(file)
+            upload_file.current_name = filename
+
             file.seek(0)
-            path = safe_join(current_app.config["UPLOAD_FOLDER"],current_user.discord)
-            if not os.path.exists(path):
-                os.mkdir(path)
+
             file.save(safe_join(path,filename))
+            upload_file.save()
+
             return url_for("forum.upload_file", file=current_user.discord+"/"+filename)
         return 'bad-file'
 
 class DownloadFile(MethodView):
 
     def get(self):
-        filename = request.args.get("file")
-        return send_from_directory(current_app.config["UPLOAD_FOLDER"], filename, as_attachment=True)
+        filename =  request.args.get("file") if request.args.get("file") else ""
+        
+        download_filename = UploadedFile.query.filter_by(current_name=filename.split('/')[1]).first().original_name
+        return send_from_directory(current_app.config["UPLOAD_FOLDER"], filename, as_attachment=True, attachment_filename = download_filename)
 
 @impl(tryfirst=True)
 def flaskbb_load_blueprints(app):
