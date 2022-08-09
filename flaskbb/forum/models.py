@@ -1367,3 +1367,4 @@ class UploadedFile(db.Model, CRUDMixin):
         db.session.add(self)
         db.session.commit()
         return self
+
