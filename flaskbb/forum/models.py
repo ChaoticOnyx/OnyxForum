@@ -1360,6 +1360,9 @@ class UploadedFile(db.Model, CRUDMixin):
             self.original_name = "file"
         if not self.datetime:
             self.datetime = time_utcnow()
+        
+        if(UploadedFile.query.filter_by(user_id=self.user_id, current_name=self.current_name).first()):
+            return self
 
         db.session.add(self)
         db.session.commit()

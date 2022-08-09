@@ -13,7 +13,7 @@ from flask import current_app
 from flask_login import current_user
 
 from .locals import current_forum
-import hashlib
+from hashlib import sha1
 
 
 def force_login_if_needed():
@@ -35,7 +35,7 @@ def hash_file(file):
     """"This function returns the SHA-1 hash
     of the file passed into it"""
 
-    h = hashlib.sha1()
+    h = sha1()
 
     chunk = 0
     while chunk != b'':

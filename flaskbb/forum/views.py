@@ -1111,22 +1111,48 @@ class MarkdownPreview(MethodView):
         return preview
 
 def user_get_file_max_length():
-    user_groups_file_max_length=[current_user.primary_group.uploaded_file_max_length]
-    for group in current_user.secondary_groups:
-        user_groups_file_max_length.append(group.uploaded_file_max_length, )
-    user_groups_file_max_length.append(current_app.config["MAX_UPLOAD_SIZE"])
+    user_groups_file_max_length = current_user.primary_group.uploaded_file_max_length
+    take_default_value = True
 
-    if -1 in user_groups_file_max_length:
+    if user_groups_file_max_length != 0:
+        take_default_value = False
+
+    if user_groups_file_max_length == -1:
         return -1
-    else:
-        return max(user_groups_file_max_length)
+        
+    for group in current_user.secondary_groups:
+
+        if group.uploaded_file_max_length == -1:
+            return -1
+
+        if group.uploaded_file_max_length != 0:
+            take_default_value = False
+
+        user_groups_file_max_length = max(group.uploaded_file_max_length, user_groups_file_max_length)
+
+    if take_default_value:
+        user_groups_file_max_length = current_app.config["MAX_UPLOAD_SIZE"]
+
+    return user_groups_file_max_length
 
 def user_get_upload_folder_limit():
-    user_groups_upload_folder_limit=[current_user.primary_group.upload_folder_limit]
+    user_groups_upload_folder_limit= current_user.primary_group.upload_folder_limit
+    take_default_value = True
+
+    if user_groups_upload_folder_limit != 0:
+        take_default_value = False
+
     for group in current_user.secondary_groups:
-        user_groups_upload_folder_limit.append(group.upload_folder_limit, )
-    user_groups_upload_folder_limit.append(current_app.config["USER_UPLOAD_FOLDER_LIMIT"])
-    return max(user_groups_upload_folder_limit)
+
+        if group.uploaded_file_max_length != 0:
+            take_default_value = False
+
+        user_groups_upload_folder_limit = max(group.upload_folder_limit, user_groups_upload_folder_limit)
+
+    if take_default_value:
+        user_groups_upload_folder_limit = current_app.config["USER_UPLOAD_FOLDER_LIMIT"]
+
+    return user_groups_upload_folder_limit
 
 class UploadFile(MethodView):
     decorators=[login_required]
