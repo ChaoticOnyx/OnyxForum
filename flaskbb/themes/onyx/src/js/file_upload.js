@@ -9,11 +9,10 @@ function UploadFile(endpoint_url, csrf_token, uploaded_file, callback) {
             return
         }
         file = fileElement.files[0]
-        formData.append('file', file);
     }else{
         file = uploaded_file
-        formData.append('file', file);
     }
+    formData.append('file', file);
 
     formData.append('csrf_token', csrf_token)
     var link = [file.type]
