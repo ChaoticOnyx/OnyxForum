@@ -28,4 +28,3 @@ def render_community_rating(user):
         community_rating=community_rating,
         community_rating_color=community_rating_color
         )
-        
