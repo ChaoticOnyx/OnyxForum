@@ -51,3 +51,4 @@ def weekly_community_rating_update():
                 change_user_community_rating(user, -2)
             else:
                 change_user_community_rating(user, 2)
+                
