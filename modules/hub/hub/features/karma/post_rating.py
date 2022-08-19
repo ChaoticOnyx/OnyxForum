@@ -99,4 +99,12 @@ def change_post_rating(user, post, value):
 
     rate.change = value
     rate.save()
+    change_user_community_rating(user, value=value)
     __log_post_rate(user, post, value=value)
+
+def get_all_user_posts_rating(user):
+    posts = Post.query.filter_by(user_id=user.id).all()
+    summary = 0
+    for post in posts:
+        summary += get_post_rating(post)
+    return summary
