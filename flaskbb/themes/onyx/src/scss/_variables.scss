@@ -12,14 +12,14 @@ $gray: #555;
 // main colors
 $background-color: #5e5b57; // old: #e8f1f2
 $font-color: #333;
-$border-color: #cad7e1;
-$head-background: #f5f5f5;
-$meta-background: #eaf1f5;
-$hover: #f8f8f8;
+$border-color: #2b2f39;
+$head-background: #21242c;
+$meta-background: #15171b;
+$hover: hsla(0, 0%, 0%, 0.3);;
 
-$navigation-color: #555;
-$navigation-bg: #f8f8f8;
-$navigation-hover-color: #e7e7e7;
+$navigation-color: #fff;
+$navigation-bg: #21242c;
+$navigation-hover-color: hsla(0, 0%, 0%, 0.3);
 
 // header colors
 $header-title-color: #fff;
@@ -28,7 +28,7 @@ $header-background-primary: #504D48;  // old: #3276b1
 $header-background-secondary: #302D29;
 
 // panel colors
-$panel-bg: #fff;            // panel body background
+$panel-bg: $head-background;            // panel body background
 $panel-head-bg: $head-background;    // panel head background
 $panel-meta-bg: $meta-background;    // panel meta background
 $panel-meta-border: $border-color;   // panel meta (bottom) border
@@ -46,6 +46,6 @@ $post-footer-border: $border-color;
 $post-footer-bg: $panel-bg;
 
 
-$author-box-bg: #e8ecf1;
+$author-box-bg: darken($panel-bg, 2%);
 $author-online: $green;
 $author-offline: $gray;

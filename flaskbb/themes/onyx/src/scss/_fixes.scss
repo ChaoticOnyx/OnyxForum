@@ -27,6 +27,7 @@
 
 // apply the same changes as for "a" for the btn-link
 .dropdown-menu {
+    background: $dropdown-bg;
     & > li .btn-link {
         display: block;
         padding: 3px 20px;
@@ -39,9 +40,9 @@
         white-space: nowrap;
 
         &:hover, &:focus {
-            color: #262626;
+            color: white;
             text-decoration: none;
-            background-color: #f5f5f5;
+            background-color: #21242c;
         }
     }
 

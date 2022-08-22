@@ -1,5 +1,6 @@
 .server-sidebar {
     padding: 7px 0;
+    color: darken($panel-bg, 2%);
 
     ul li {
         &:last-child {
@@ -40,7 +41,7 @@
 }
 
 .server-content {
-    background-color: #fff;
+    background-color: $panel-bg;
     border-left: 1px solid $border-color;
     min-height: 32.25em;
 
@@ -75,22 +76,26 @@
     width: 1%;
     white-space: nowrap;
 }
+.donations-btn{
+    border-radius: 7px;
+    .donations-label {
+        background-color: #F48023;
+        color: #ffffff;
+        font-weight: bold;
+        border-top-right-radius: 0px;
+        border-bottom-right-radius: 0px;
+    }
 
-.donations-label {
-    background-color: #f7ae00;
-    border-color: #f7ae00;
-    color: #ffffff;
-    border-radius: 0;
-    font-weight: bold;
-}
+    .donations-label-points {
+        font-weight: bold;
+        font-family: monospace;
+        background-color: #FF6F06;
+        border: 0px;
+        border-top-left-radius: 0px;
+        border-bottom-left-radius: 0px;
+    }
 
-.donations-label-points {
-    font-weight: bold;
-    font-family: monospace;
-    padding-top: 4px;
-    border-radius: 0;
-}
-
-.donations-label-sum {
-    vertical-align: middle;
+    .donations-label-sum {
+        vertical-align: middle;
+    }
 }
