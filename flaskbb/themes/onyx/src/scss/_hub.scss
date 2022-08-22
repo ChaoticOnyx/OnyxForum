@@ -88,20 +88,18 @@
         font-weight: bold;
         border-top-right-radius: 0px;
         border-bottom-right-radius: 0px;
+        padding-bottom: 0px;
     }
 
     .donations-label-points {
         font-weight: bold;
         font-family: monospace;
-        background-color: transparent;
+        background-color: #e49400;
         border: 0px;
     }
 
     .donations-label-sum {
         vertical-align: middle;
-        background-color: #ebad01;
-        border-radius: 45%;
         display: inline-block;
-        width: 2em;
     }
 }

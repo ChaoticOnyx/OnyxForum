@@ -19,7 +19,7 @@ $hover: hsla(0, 0%, 0%, 0.3);;
 
 $navigation-color: #fff;
 $navigation-bg: #21242c;
-$navigation-hover-color: hsla(0, 0%, 0%, 0.3);
+$navigation-hover-color: #0044ff;
 
 // header colors
 $header-title-color: #fff;
@@ -46,6 +46,6 @@ $post-footer-border: $border-color;
 $post-footer-bg: $panel-bg;
 
 
-$author-box-bg: darken($panel-bg, 2%);
+$author-box-bg: darken($panel-bg, 4%);
 $author-online: $green;
 $author-offline: $gray;
