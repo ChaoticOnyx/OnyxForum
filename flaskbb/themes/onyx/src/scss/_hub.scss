@@ -77,9 +77,13 @@
     white-space: nowrap;
 }
 .donations-btn{
+    border: 2px solid #ebad01;
     border-radius: 7px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+
     .donations-label {
-        background-color: #F48023;
+        background-color: transparent;
         color: #ffffff;
         font-weight: bold;
         border-top-right-radius: 0px;
@@ -89,13 +93,15 @@
     .donations-label-points {
         font-weight: bold;
         font-family: monospace;
-        background-color: #FF6F06;
+        background-color: transparent;
         border: 0px;
-        border-top-left-radius: 0px;
-        border-bottom-left-radius: 0px;
     }
 
     .donations-label-sum {
         vertical-align: middle;
+        background-color: #ebad01;
+        border-radius: 45%;
+        display: inline-block;
+        width: 2em;
     }
 }

@@ -1,12 +1,13 @@
 
 <li>
     <div class="btn-group navbar-btn donations-btn">
+        <i class="fa fa-coins"></i>
         <a class="btn donations-label" href="{{ url_for('donations.info') }}">
             {% trans %}DONATE{% endtrans %}
         </a>
         {% if points_sum %}
         <a class="btn btn-default donations-label-points" href="{{ url_for('donations.points_transactions') }}">
-            <span class="donations-label-sum">{{ points_sum }}</span> <span class="emoji">🔆</span>
+            <span class="donations-label-sum">{{ points_sum }}</span>
         </a>
         {% endif %}
     </div>

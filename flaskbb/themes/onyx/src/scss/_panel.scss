@@ -3,6 +3,7 @@
     @include panel-variant($panel-border, $gray, $panel-head-bg, $panel-border);
     .panel-heading {
         font-weight: bold;
+        color: white;
     }
 
     .page-meta {
