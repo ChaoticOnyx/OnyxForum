@@ -134,3 +134,14 @@
     }
 }
 
+.navbar-default {
+    .navbar-nav {
+        > .active > a {
+          &,
+          &:hover,
+          &:focus {
+            border-bottom: 2px solid #08c;
+          }
+        }
+    }
+}

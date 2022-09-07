@@ -12,10 +12,10 @@ $gray-base:              #000;
 // $gray-darker:            lighten($gray-base, 13.5%) // #222
 $gray-dark:              lighten($gray-base, 20%);   // #333
 // $gray:                   lighten($gray-base, 33.5%) // #555
-// $gray-light:             lighten($gray-base, 46.7%) // #777
-// $gray-lighter:           lighten($gray-base, 93.5%) // #eee
+$gray-light:             lighten($gray-base, 46.7%); // #777
+$gray-lighter:           lighten($gray-base, 93.5%); // #eee
 
-// $brand-primary:         darken(#428bca, 6.5%) // #337ab7
+$brand-primary:         darken(#428bca, 6.5%); // #337ab7
 // $brand-success:         #5cb85c
 // $brand-info:            #5bc0de
 // $brand-warning:         #f0ad4e
@@ -30,14 +30,14 @@ $gray-dark:              lighten($gray-base, 20%);   // #333
 // --- or ---
 //$body-bg:               #e8f1f2;
 // --- or ---
-$body-bg:               #F6F9FC;
+$body-bg:               #16181d;
 //** Global text color on `<body>`.
-$text-color:            $gray-dark;
+$text-color:            #FFFFFF;
 
 //** Global textual link color.
-// $link-color:            $brand-primary
+$link-color:            $brand-primary;
 //** Link hover color set via `darken()` function.
-// $link-hover-color:      darken($link-color, 15%)
+$link-hover-color:      darken($link-color, 15%);
 //** Link hover decoration.
 // $link-hover-decoration: underline
 
@@ -133,9 +133,9 @@ $text-color:            $gray-dark;
 //** Default background color used for all tables.
 // $table-bg:                      transparent
 //** Background color used for `.table-striped`.
-// $table-bg-accent:               #f9f9f9
+$table-bg-accent:               #191b20;
 //** Background color used for `.table-hover`.
-// $table-bg-hover:                #f5f5f5
+// $table-bg-hover:                #21242c
 // $table-bg-active:               $table-bg-hover
 
 //** Border color for table and cell borders.
@@ -147,9 +147,9 @@ $text-color:            $gray-dark;
 
 // $btn-font-weight:                normal
 
-// $btn-default-color:              #333
-// $btn-default-bg:                 #fff
-// $btn-default-border:             #ccc
+$btn-default-color:              white;
+$btn-default-bg:                 #343946;
+$btn-default-border:             #2B2F39;
 
 // $btn-primary-color:              #fff
 // $btn-primary-bg:                 $brand-primary
@@ -233,7 +233,7 @@ $text-color:            $gray-dark;
 //## Dropdown menu container and contents.
 
 //** Background for the dropdown menu.
-// $dropdown-bg:                    #fff
+$dropdown-bg:                    #21242c;
 //** Dropdown menu `border-color`.
 // $dropdown-border:                rgba(0,0,0,.15)
 //** Dropdown menu `border-color` **for IE8**.
@@ -242,11 +242,11 @@ $text-color:            $gray-dark;
 // $dropdown-divider-bg:            #e5e5e5
 
 //** Dropdown link text color.
-// $dropdown-link-color:            $gray-dark
+$dropdown-link-color:            white;
 //** Hover color for dropdown links.
-// $dropdown-link-hover-color:      darken($gray-dark, 5%)
+$dropdown-link-hover-color:      grey;
 //** Hover background for dropdown links.
-// $dropdown-link-hover-bg:         #f5f5f5
+$dropdown-link-hover-bg:         hsla(0%, 0%, 0%, 0.3);
 
 //** Active dropdown menu item text color.
 // $dropdown-link-active-color:     $component-active-color
@@ -360,16 +360,16 @@ $navbar-border-radius:             0; //$border-radius-base
 // $navbar-padding-vertical:          (($navbar-height - $line-height-computed) / 2)
 // $navbar-collapse-max-height:       340px
 
-$navbar-default-color:             #555; //#777
-$navbar-default-bg:                #f8f8f8;
-$navbar-default-border:            #cad7e1; //darken($navbar-default-bg, 6.5%)
+$navbar-default-color:             white; //#777
+$navbar-default-bg:                #21242c;
+$navbar-default-border:            hsla(0, 0%, 0%, 0.3); //darken($navbar-default-bg, 6.5%)
 
 // Navbar links
-$navbar-default-link-color:                #555;
-$navbar-default-link-hover-color:          #555;
-$navbar-default-link-hover-bg:             #e7e7e7;
-$navbar-default-link-active-color:         #555;
-$navbar-default-link-active-bg:            #e7e7e7 ;// darken($navbar-default-bg, 6.5%)
+$navbar-default-link-color:                white;
+$navbar-default-link-hover-color:          white;
+$navbar-default-link-hover-bg:             hsla(0, 0%, 0%, 0.3);
+$navbar-default-link-active-color:         white;
+$navbar-default-link-active-bg:            hsla(0, 0%, 0%, 0.3);// darken($navbar-default-bg, 6.5%)
 $navbar-default-link-disabled-color:       #ccc;
 $navbar-default-link-disabled-bg:          transparent;
 
@@ -414,7 +414,7 @@ $navbar-default-link-disabled-bg:          transparent;
 
 //=== Shared nav styles
 // $nav-link-padding:                          10px 15px
-// $nav-link-hover-bg:                         $gray-lighter
+$nav-link-hover-bg:                         hsla(0%, 0%, 0%, 0.3);
 
 // $nav-disabled-link-color:                   $gray-light
 // $nav-disabled-link-hover-color:             $gray-light
@@ -440,21 +440,21 @@ $nav-pills-border-radius:                    0;//$border-radius-base
 //
 //##
 
-// $pagination-color:                     $link-color
-// $pagination-bg:                        #fff
-// $pagination-border:                    #ddd
+$pagination-color:                     $link-color;
+$pagination-bg:                        #21242c;
+$pagination-border:                    #2b2f39;
 
-// $pagination-hover-color:               $link-hover-color
-// $pagination-hover-bg:                  $gray-lighter
-// $pagination-hover-border:              #ddd
+$pagination-hover-color:               $link-hover-color;
+$pagination-hover-bg:                  $gray-lighter;
+$pagination-hover-border:              darken($pagination-border, 2%);
 
-// $pagination-active-color:              #fff
-// $pagination-active-bg:                 $brand-primary
-// $pagination-active-border:             $brand-primary
+$pagination-active-color:              #fff;
+$pagination-active-bg:                 hsla(0%,0%,0%,0.3);
+$pagination-active-border:             darken($pagination-border, 2%);
 
-// $pagination-disabled-color:            $gray-light
-// $pagination-disabled-bg:               #fff
-// $pagination-disabled-border:           #ddd
+$pagination-disabled-color:            $gray-light;
+$pagination-disabled-bg:               hsla(0%,0%,0%,0.5);
+$pagination-disabled-border:           darken($pagination-border, 4%);
 
 //== Pager
 //
@@ -630,7 +630,7 @@ $nav-pills-border-radius:                    0;//$border-radius-base
 //##
 
 //** Background color of the whole progress component
-// $progress-bg:                 #f5f5f5
+// $progress-bg:                 #21242c
 //** Progress bar text color
 // $progress-bar-color:          #fff
 //** Variable for setting rounded corners on progress bar.
@@ -659,7 +659,7 @@ $nav-pills-border-radius:                    0;//$border-radius-base
 // $list-group-border-radius:      $border-radius-base
 
 //** Background color of single list items on hover
-// $list-group-hover-bg:           #f5f5f5
+// $list-group-hover-bg:           #21242c
 //** Text color of active list items
 // $list-group-active-color:       $component-active-color
 //** Background color of active list items
@@ -684,7 +684,7 @@ $nav-pills-border-radius:                    0;//$border-radius-base
 //
 //##
 
-// $panel-bg:                    #fff
+$panel-bg:                    #21242c;
 
 // $panel-body-padding:          15px
 // $panel-heading-padding:       10px 15px
@@ -693,11 +693,11 @@ $panel-border-radius:         0; //$border-radius-base
 
 //** Border color for elements within panels
 $panel-inner-border:          #cad7e1; // #ddd
-// $panel-footer-bg:             #f5f5f5;
+// $panel-footer-bg:             #21242c;
 
 // $panel-default-text:          $gray-dark
 $panel-default-border:        #cad7e1; //#ddd
-// $panel-default-heading-bg:    #f5f5f5;
+// $panel-default-heading-bg:    #21242c;
 
 // $panel-primary-text:          #fff
 // $panel-primary-border:        $brand-primary
@@ -741,8 +741,8 @@ $panel-default-border:        #cad7e1; //#ddd
 //
 //##
 
-// $well-bg:                     #f5f5f5
-// $well-border:                 darken($well-bg, 7%)
+$well-bg:                     #21242c;
+$well-border:                 darken($well-bg, 7%);
 
 //== Badges
 //
@@ -769,11 +769,11 @@ $panel-default-border:        #cad7e1; //#ddd
 // $breadcrumb-padding-vertical:   8px
 // $breadcrumb-padding-horizontal: 15px
 //** Breadcrumb background color
-// $breadcrumb-bg:                 #f5f5f5
+$breadcrumb-bg:                 #15171d;
 //** Breadcrumb text color
-// $breadcrumb-color:              #ccc
+$breadcrumb-color:              #ccc;
 //** Text color of current page in the breadcrumb
-// $breadcrumb-active-color:       $gray-light
+$breadcrumb-active-color:       $gray-light;
 //** Textual separator for between breadcrumb elements
 // $breadcrumb-separator:          "/"
 
@@ -811,7 +811,7 @@ $panel-default-border:        #cad7e1; //#ddd
 // $kbd-color:                   #fff
 // $kbd-bg:                      #333
 
-// $pre-bg:                      #f5f5f5
+// $pre-bg:                      #21242c
 // $pre-color:                   $gray-dark
 // $pre-border-color:            #ccc
 // $pre-scrollable-max-height:   340px

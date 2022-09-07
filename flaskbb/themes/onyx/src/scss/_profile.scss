@@ -1,6 +1,6 @@
 .profile-sidebar {
     padding: 7px 0;
-
+    background-color: lighten($author-box-bg,2%);
     ul li {
         &:last-child {
             border-bottom: none;
@@ -40,10 +40,10 @@
 
 .page-body.profile-body {
     background-color: $author-box-bg;
+    display: flex;
 }
 
 .profile-content {
-    background-color: #fff;
     border-left: 1px solid $border-color;
     min-height: 40em;
 
@@ -72,7 +72,7 @@
 }
 
 .profile-sidebar-stats {
-    text-shadow: 0 1px 0 #fff;
+    text-shadow: 0 1px 0 #161616;
 }
 
 .profile-username,
