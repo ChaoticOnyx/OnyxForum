@@ -14,7 +14,7 @@ from flaskbb.display.navigation import NavigationLink
 from flaskbb.utils.requirements import IsAdmin
 from flaskbb.utils.helpers import FlashAndRedirect
 from flaskbb.extensions import allows
-from hub.features.donations import money, actions
+from hub.features.donations import money, actions, discord
 from hub.models import PointsTransaction, MoneyTransaction
 from .forms import AddDonationForm, AddMoneyTransactionForm, AddPointsTransactionForm
 from .notifications import *
@@ -259,7 +259,7 @@ class AddPointsTransactionView(DonationsView):
             report_points_transaction(points_transaction)
             notify_user_about_points_transaction(current_user._get_current_object(), points_transaction)
             if points_transaction.player.discord_user_id and form.amount.data > 0:
-                discord.add_opyxholder_role_if_needed(points_transaction.player.discord_user_id)
+                discord.add_opyxholder_role(points_transaction.player.discord_user_id)
             logger.info(
                 "[AddPointsTransaction] "
                 "registered_by: {user} ({user_discord_id}), "

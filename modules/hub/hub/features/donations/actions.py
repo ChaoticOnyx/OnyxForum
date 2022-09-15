@@ -4,7 +4,7 @@ from dateutil import tz
 from typing import Optional
 
 from .hub.notifications import *
-from . import money, discord
+from . import money, discord, subscriptions
 
 
 logger = logging.getLogger('donations')
@@ -25,7 +25,7 @@ def add_donation_and_notify(
     report_points_transaction(points_transaction)
     notify_user_about_points_transaction(None if registered_by is None else registered_by._get_current_object(), points_transaction)
     if points_transaction.player.discord_user_id:
-        discord.add_opyxholder_role_if_needed(points_transaction.player.discord_user_id)
+        discord.add_opyxholder_role(points_transaction.player.discord_user_id)
     registered_by_str = ""
     if registered_by is not None:
         registered_by_str = "registered_by: {user} ({user_discord_id}), ".format(
@@ -44,3 +44,5 @@ def add_donation_and_notify(
             ckey=ckey,
             amount=amount,
             type=type))
+
+    subscriptions.update_subscriptions(points_transaction.player)

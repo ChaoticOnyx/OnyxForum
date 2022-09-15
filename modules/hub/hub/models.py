@@ -3,7 +3,7 @@ import datetime
 from flaskbb.utils.database import UTCDateTime
 from flaskbb.utils.helpers import time_utcnow
 from flaskbb.extensions import db, db_hub
-from sqlalchemy import Column, ForeignKey, String, Integer, Float, DateTime, text, Text, func
+from sqlalchemy import Column, ForeignKey, String, Integer, Float, Date, DateTime, text, Text, func
 from sqlalchemy.dialects.mysql import VARCHAR
 from sqlalchemy.orm import relationship
 
@@ -45,8 +45,10 @@ class PatronType(db_hub.Model):
     __bind_key__ = 'hub'
     __tablename__ = 'patron_types'
 
-    id = Column('id', Integer, primary_key=True)
-    type = Column('type', String(32), nullable=False)
+    id = Column(Integer, primary_key=True, index=True)
+    type = Column(String(32), nullable=False)
+    cost_dollars = Column(Float, nullable=False)
+    discord_role = Column(String(50), nullable=False)
 
 
 class Player(db_hub.Model):
@@ -58,8 +60,8 @@ class Player(db_hub.Model):
     discord_user_id = Column('discord', ForeignKey('discord_users.id'), index=True)
     patron_type_id = Column('patron_type', ForeignKey('patron_types.id'), index=True, server_default=text("0"))
 
-    discord_user = relationship('DiscordUser')
-    patron_type = relationship('PatronType')
+    discord_user = relationship('DiscordUser', lazy='immediate')
+    patron_type = relationship('PatronType', lazy='immediate')
 
 
 class HubLog(db.Model):
@@ -169,8 +171,23 @@ class Token(db_hub.Model):
     discord_user_id = Column('discord', ForeignKey('discord_users.id'), nullable=False, index=True)
 
     discord_user = relationship('DiscordUser')
-    
+
     def delete(self):
         db_hub.session.delete(self)
         db_hub.session.commit()
         return self
+
+
+class PatronSubscription(db_hub.Model):
+    __bind_key__ = 'hub'
+    __tablename__ = 'patron_subscriptions'
+
+    id = Column(Integer, primary_key=True)
+    registered_datetime = Column(DateTime, nullable=False)
+    player_id = Column(ForeignKey('players.id'), index=True)
+    start_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
+    patron_type_id = Column('patron_type', ForeignKey('patron_types.id'), nullable=False, index=True)
+
+    patron_type = relationship('PatronType', lazy='immediate')
+    player = relationship('Player', lazy='immediate')

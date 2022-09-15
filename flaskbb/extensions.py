@@ -52,7 +52,7 @@ metadata_onyx = copy.deepcopy(metadata)
 metadata_eos = copy.deepcopy(metadata)
 metadata_dragon = copy.deepcopy(metadata)
 
-db_hub = SQLAlchemy(metadata=metadata_hub)
+db_hub = SQLAlchemy(metadata=metadata_hub, session_options={"expire_on_commit": False})
 db_onyx = SQLAlchemy(metadata=metadata_onyx)
 db_eos = SQLAlchemy(metadata=metadata_eos)
 db_dragon = SQLAlchemy(metadata=metadata_dragon)
