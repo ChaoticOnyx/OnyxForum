@@ -74,7 +74,7 @@ def __create_or_update_subscription(player: Player, donations_summary_in_dollars
 
     cursor: db_hub.Query = db_hub.session.query(PatronSubscription) \
         .filter(PatronSubscription.player_id == player.id) \
-        .filter(PatronSubscription.start_date + start_date)
+        .filter(PatronSubscription.start_date == start_date)
     subscription: PatronSubscription = cursor.one_or_none()
 
     old_patron_type: PatronType = None

@@ -24,30 +24,34 @@ class QiwiHook(MethodView):
         print("[QIWI Webhooks] Received:")
         print("-- Content: " + str(content))
 
-        if content['payment']['type'] != 'IN' or content['payment']['status'] != 'SUCCESS':
-            print("-- Skip hook: Not suitable hook")
-            return Response(status=200)
+        try:
+            if content['payment']['type'] != 'IN' or content['payment']['status'] != 'SUCCESS':
+                print("-- Skip hook: Not suitable hook")
+                return Response(status=200)
 
-        if content['payment']['sum']['currency'] != 643:  # ruble
-            print("-- Skip hook: Unknown currency")
-            return Response(status=200)
+            if content['payment']['sum']['currency'] != 643:  # ruble
+                print("-- Skip hook: Unknown currency")
+                return Response(status=200)
 
-        dt = parse_datetime(content['payment']['date'])
-        amount = content['payment']['sum']['amount']
-        ckey = content['payment']['comment'].split(' ')[0].lower().strip(string.punctuation)
+            dt = parse_datetime(content['payment']['date'])
+            amount = content['payment']['sum']['amount']
+            ckey = content['payment']['comment'].split(' ')[0].lower().strip(string.punctuation)
 
-        player: Player = get_player_by_ckey(ckey) if ckey else None
-        if player is None:
-            ckey = "".join(filter(str.isalpha, content['payment']['comment'].lower()))
             player: Player = get_player_by_ckey(ckey) if ckey else None
+            if player is None:
+                ckey = "".join(filter(str.isalpha, content['payment']['comment'].lower()))
+                player: Player = get_player_by_ckey(ckey) if ckey else None
 
-        print("-- New donation from " + ckey + ". Amount: " + str(amount) + ". Datetime: " + dt.isoformat())
+            print("-- New donation from " + ckey + ". Amount: " + str(amount) + ". Datetime: " + dt.isoformat())
 
-        if player is None:
-            notify_user_donation_registration_error(dt, amount, content['payment']['comment'])
-            print("-- Failed to process donation automatically (comment: \"{}\")".format(content['payment']['comment']))
-        else:
-            actions.add_donation_and_notify(dt, ckey, float(amount), type="qiwi")
+            if player is None:
+                notify_user_donation_registration_error(dt, amount, content['payment']['comment'])
+                print("-- Failed to process donation automatically (comment: \"{}\")".format(content['payment']['comment']))
+            else:
+                actions.add_donation_and_notify(dt, ckey, float(amount), type="qiwi")
+        except Exception:
+            print("Error: Exception is caught during QIWI hook processing:")
+            traceback.print_exc()
 
         return Response(status=200)
 
