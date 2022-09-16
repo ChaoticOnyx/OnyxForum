@@ -43,19 +43,12 @@ def __sync_player_patron_type(player: Player, subscriptions: List[PatronSubscrip
     db_hub.session.commit()
 
 
-@discord_task
-async def __add_patron_roles(player: Player, subscriptions: List[PatronSubscription]):
-    guild: discord.Guild = await discordClient.fetch_guild(current_app.config["COMMUNITY_GUILD_ID"])
-    member: discord.Member = await guild.fetch_member(int(player.discord_user_id))
-
+def __get_all_patron_roles(guild: discord.Guild) -> List[discord.Role]:
     all_patron_role_ids = []
-    max_patron_type: PatronType = None
-    for subscription in subscriptions:
-        if not max_patron_type or max_patron_type.cost_dollars < subscription.patron_type.cost_dollars:
-            max_patron_type = subscription.patron_type
-        role = max_patron_type.discord_role
-        if role and not role in all_patron_role_ids:
-            all_patron_role_ids.append(role)
+    patron_types: List[PatronType] = db_hub.session.query(PatronType).all()
+    for patron_type in patron_types:
+        if patron_type.discord_role:
+            all_patron_role_ids.append(patron_type.discord_role)
 
     all_patron_roles = []
     for role_id in all_patron_role_ids:
@@ -63,8 +56,22 @@ async def __add_patron_roles(player: Player, subscriptions: List[PatronSubscript
         if role:
             all_patron_roles.append(role)
 
+    return all_patron_roles
+
+
+@discord_task
+async def __add_patron_roles(player: Player, subscriptions: List[PatronSubscription]):
+    guild: discord.Guild = await discordClient.fetch_guild(current_app.config["COMMUNITY_GUILD_ID"])
+    member: discord.Member = await guild.fetch_member(int(player.discord_user_id))
+
+    max_patron_type: PatronType = None
+    for subscription in subscriptions:
+        if not max_patron_type or max_patron_type.cost_dollars < subscription.patron_type.cost_dollars:
+            max_patron_type = subscription.patron_type
+        role = max_patron_type.discord_role
+
     discordRoles: map = current_app.config["DISCORD_ROLES"]
-    await member.remove_roles(*all_patron_roles)
+    await member.remove_roles(*__get_all_patron_roles(guild))
     await member.add_roles(guild.get_role(discordRoles["Patron"]), guild.get_role(int(max_patron_type.discord_role)))
 
 
