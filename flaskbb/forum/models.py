@@ -1353,9 +1353,8 @@ class UploadedFile(db.Model, CRUDMixin):
     
     file_size = db.Column(db.Integer)
     def save(self):
-        
-        if not self.original_name:
-            self.original_name = "file"
+        assert self.original_name, 'Tried to save file with empty original name!'
+
         if not self.datetime:
             self.datetime = time_utcnow()
 

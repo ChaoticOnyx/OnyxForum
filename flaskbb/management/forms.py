@@ -316,13 +316,13 @@ class GroupForm(FlaskForm):
         _("Uploaded file max size"),
         default=0,
         validators=[Optional()],
-        description=_("In bytes")
+        description=_("In bytes. Set to 0 to use default value.")
     )
-    upload_folder_limit = IntegerField(
-        _("Max uploads per day"),
+    uploads_total_size_limit = IntegerField(
+        _("Uploads total size limit"),
         default=0,
         validators=[Optional()],
-        description=_("In bytes")
+        description=_("In bytes. Set to 0 to use default value.")
     )
 
     submit = SubmitField(_("Save"))

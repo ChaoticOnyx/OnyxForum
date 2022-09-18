@@ -80,7 +80,7 @@ class Group(db.Model, CRUDMixin):
 
     # Upload file max size
     upload_size_limit = db.Column(db.Integer, default=0, nullable=False)
-    upload_folder_limit = db.Column(db.Integer, default=0, nullable=False)
+    uploads_total_size_limit = db.Column(db.Integer, default=0, nullable=False)
 
     # Methods
     def __repr__(self):

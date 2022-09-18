@@ -1112,33 +1112,42 @@ class MarkdownPreview(MethodView):
 
 def user_get_file_max_size():
     take_default_value = True
-
-    for group in in [*current_user.secondary_groups, current_user.primary_group]:
-
-        if group.upload_size_limit != 0:
-            take_default_value = False
-
-        user_groups_file_max_length = max(group.upload_size_limit, user_groups_file_max_length)
-
-    if take_default_value:
-        user_groups_file_max_length = current_app.config["MAX_UPLOAD_SIZE"]
-
-    return user_groups_file_max_length
-
-def user_get_upload_folder_limit():
-    take_default_value = True
+    user_groups_file_max_size = 0
 
     for group in [*current_user.secondary_groups, current_user.primary_group]:
 
         if group.upload_size_limit != 0:
             take_default_value = False
 
-        user_upload_folder_limit = max(group.upload_folder_limit, user_upload_folder_limit)
+        user_groups_file_max_size = max(group.upload_size_limit, user_groups_file_max_size)
 
     if take_default_value:
-        user_upload_folder_limit = current_app.config["USER_UPLOAD_FOLDER_LIMIT"]
+        user_groups_file_max_size = current_app.config["MAX_UPLOAD_SIZE"]
 
-    return user_upload_folder_limit
+    return user_groups_file_max_size
+
+def user_get_uploads_total_size_limit():
+    take_default_value = True
+    user_uploads_total_size_limit = 0
+
+    for group in [*current_user.secondary_groups, current_user.primary_group]:
+
+        if group.upload_size_limit != 0:
+            take_default_value = False
+
+        user_uploads_total_size_limit = max(group.uploads_total_size_limit, user_uploads_total_size_limit)
+
+    if take_default_value:
+        user_uploads_total_size_limit = current_app.config["USER_UPLOADS_TOTAL_SIZE_LIMIT"]
+
+    return user_uploads_total_size_limit
+
+def get_user_current_folder_size():
+    path = safe_join(current_app.config["UPLOAD_FOLDER"],current_user.discord)
+    folder_size = 0
+    for ele in os.scandir(path):
+            folder_size+=os.path.getsize(ele)
+    return folder_size
 
 class UploadFile(MethodView):
     decorators=[login_required]
@@ -1154,7 +1163,7 @@ class UploadFile(MethodView):
 
         if current_user.primary_group.banned:
             return 'failed-request'
-            
+
         received_file_object = request.files['file']
         
         received_file_object.seek(0, os.SEEK_END)
@@ -1165,19 +1174,18 @@ class UploadFile(MethodView):
             return 'too-big'   
         
         if received_file_object.filename == '':
-            return 'empty-file'
+            return 'failed-request'
         
         path = safe_join(current_app.config["UPLOAD_FOLDER"],current_user.discord)
               
         if not os.path.exists(path):
             os.mkdir(path)
 
-        size = 0
-        for ele in os.scandir(path):
-            size+=os.path.getsize(ele)
-        size+=file_size
+        folder_size = get_user_current_folder_size()
+        
+        folder_size+=file_size
 
-        if size>=user_get_upload_folder_limit():
+        if folder_size>=user_get_uploads_total_size_limit():
             return 'upload-limit'
 
         if received_file_object and is_extension_allowed(received_file_object.filename):
@@ -1195,7 +1203,7 @@ class UploadFile(MethodView):
                 received_file_object.save(safe_join(path,filename))
                 uploaded_file_record.save()
 
-            return url_for("forum.upload_file", received_file_object=current_user.discord+"/"+filename)
+            return url_for("forum.upload_file", file=current_user.discord+"/"+filename)
         return 'bad-file'
 
 class DownloadFile(MethodView):
