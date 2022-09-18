@@ -312,7 +312,7 @@ class GroupForm(FlaskForm):
         description=_("Management access for server's head"),
     )
 
-    uploaded_file_max_length = IntegerField(
+    upload_size_limit = IntegerField(
         _("Uploaded file max size"),
         default=0,
         validators=[Optional()],

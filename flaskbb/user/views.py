@@ -194,11 +194,18 @@ class DeleteFile(MethodView):
 
     def post(self):
         file_id = request.args.get("file_id",0,type=int)
-        file = UploadedFile.query.filter_by(id=file_id).first_or_404()
-        file_owner = User.query.filter_by(id=file.user_id).first_or_404()
-        path = safe_join(current_app.config["UPLOAD_FOLDER"], file_owner.discord, file.current_name)
+        file_record = UploadedFile.query.filter_by(id=file_id).first_or_404()
+        file_owner = User.query.filter_by(id=file_record.user_id).first_or_404()
+        
+        if not (file_owner.user_id == current_user.id or self.get_permissions()['admin']):
+            logger.warn("File {}(owned by:{}) was tried to be deleted by {}(discord:{})".format(file_record, file_owner, current_user.username, current_user.discord))
+
+        path = safe_join(current_app.config["UPLOAD_FOLDER"], file_owner.discord, file_record.current_name)
+        
+        logger.info("File {}(owned by:{}) was deleted by {}(discord:{})".format(file_record, file_owner, current_user.username, current_user.discord))
+
         os.remove(path)
-        file.delete()
+        file_record.delete()
 
         flash(_("File deleted."), "success")
         return redirect(url_for("user.user_uploads"))

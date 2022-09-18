@@ -1342,27 +1342,22 @@ class UploadedFile(db.Model, CRUDMixin):
     
     id = db.Column(db.Integer, primary_key=True)
 
-    datetime = db.Column(UTCDateTime(timezone=True),
-                        db.ForeignKey("users.id", ondelete="CASCADE"),
-                        primary_key=True)
+    datetime = db.Column(UTCDateTime(timezone=True))
 
-    current_name = db.Column(db.Text, nullable=True)
+    current_name = db.Column(db.Text)
 
     user_id = db.Column(db.Integer,
                         db.ForeignKey("users.id", ondelete="CASCADE"))
 
-    original_name = db.Column(db.Text, nullable=True)
+    original_name = db.Column(db.Text)
     
-    file_size = db.Column(db.Integer, nullable=True)
+    file_size = db.Column(db.Integer)
     def save(self):
         
         if not self.original_name:
             self.original_name = "file"
         if not self.datetime:
             self.datetime = time_utcnow()
-        
-        if(UploadedFile.query.filter_by(user_id=self.user_id, current_name=self.current_name).first()):
-            return self
 
         db.session.add(self)
         db.session.commit()

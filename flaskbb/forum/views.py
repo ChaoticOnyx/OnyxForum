@@ -1110,25 +1110,15 @@ class MarkdownPreview(MethodView):
         preview = renderer(text)
         return preview
 
-def user_get_file_max_length():
-    user_groups_file_max_length = current_user.primary_group.uploaded_file_max_length
+def user_get_file_max_size():
     take_default_value = True
 
-    if user_groups_file_max_length != 0:
-        take_default_value = False
+    for group in in [*current_user.secondary_groups, current_user.primary_group]:
 
-    if user_groups_file_max_length == -1:
-        return -1
-        
-    for group in current_user.secondary_groups:
-
-        if group.uploaded_file_max_length == -1:
-            return -1
-
-        if group.uploaded_file_max_length != 0:
+        if group.upload_size_limit != 0:
             take_default_value = False
 
-        user_groups_file_max_length = max(group.uploaded_file_max_length, user_groups_file_max_length)
+        user_groups_file_max_length = max(group.upload_size_limit, user_groups_file_max_length)
 
     if take_default_value:
         user_groups_file_max_length = current_app.config["MAX_UPLOAD_SIZE"]
@@ -1136,23 +1126,19 @@ def user_get_file_max_length():
     return user_groups_file_max_length
 
 def user_get_upload_folder_limit():
-    user_groups_upload_folder_limit= current_user.primary_group.upload_folder_limit
     take_default_value = True
 
-    if user_groups_upload_folder_limit != 0:
-        take_default_value = False
+    for group in [*current_user.secondary_groups, current_user.primary_group]:
 
-    for group in current_user.secondary_groups:
-
-        if group.uploaded_file_max_length != 0:
+        if group.upload_size_limit != 0:
             take_default_value = False
 
-        user_groups_upload_folder_limit = max(group.upload_folder_limit, user_groups_upload_folder_limit)
+        user_upload_folder_limit = max(group.upload_folder_limit, user_upload_folder_limit)
 
     if take_default_value:
-        user_groups_upload_folder_limit = current_app.config["USER_UPLOAD_FOLDER_LIMIT"]
+        user_upload_folder_limit = current_app.config["USER_UPLOAD_FOLDER_LIMIT"]
 
-    return user_groups_upload_folder_limit
+    return user_upload_folder_limit
 
 class UploadFile(MethodView):
     decorators=[login_required]
@@ -1166,20 +1152,19 @@ class UploadFile(MethodView):
         if 'file' not in request.files:
             return 'failed-request'
 
-        file = request.files['file']
+        if current_user.primary_group.banned:
+            return 'failed-request'
+            
+        received_file_object = request.files['file']
         
-        file.seek(0, os.SEEK_END)
-        file_length = file.tell()
+        received_file_object.seek(0, os.SEEK_END)
+        file_size = received_file_object.tell()
+        received_file_object.seek(0)
 
-        file_max_length = user_get_file_max_length()
-        file_upload_limit = user_get_upload_folder_limit()
-
-        if file_length > file_max_length:
-            return 'too-big'
-
-        file.seek(0)
+        if file_size > user_get_file_max_size():
+            return 'too-big'   
         
-        if file.filename == '':
+        if received_file_object.filename == '':
             return 'empty-file'
         
         path = safe_join(current_app.config["UPLOAD_FOLDER"],current_user.discord)
@@ -1190,26 +1175,27 @@ class UploadFile(MethodView):
         size = 0
         for ele in os.scandir(path):
             size+=os.path.getsize(ele)
-        size+=file_length
+        size+=file_size
 
         if size>=user_get_upload_folder_limit():
             return 'upload-limit'
 
-        if file and is_extension_allowed(file.filename):
-            upload_file = UploadedFile()
-            upload_file.original_name = secure_filename(file.filename)
-            upload_file.user_id = current_user.id
-            upload_file.file_size = file_length
+        if received_file_object and is_extension_allowed(received_file_object.filename):
+            uploaded_file_record = UploadedFile()
+            uploaded_file_record.original_name = secure_filename(received_file_object.filename)
+            uploaded_file_record.user_id = current_user.id
+            uploaded_file_record.file_size = file_size
             
-            filename = hash_file(file)
-            upload_file.current_name = filename
+            filename = hash_file(received_file_object)
+            uploaded_file_record.current_name = filename
 
-            file.seek(0)
+            received_file_object.seek(0)
+            
+            if not (UploadedFile.query.filter_by(user_id=uploaded_file_record.user_id, current_name=uploaded_file_record.current_name).first()):
+                received_file_object.save(safe_join(path,filename))
+                uploaded_file_record.save()
 
-            file.save(safe_join(path,filename))
-            upload_file.save()
-
-            return url_for("forum.upload_file", file=current_user.discord+"/"+filename)
+            return url_for("forum.upload_file", received_file_object=current_user.discord+"/"+filename)
         return 'bad-file'
 
 class DownloadFile(MethodView):

@@ -79,7 +79,7 @@ class Group(db.Model, CRUDMixin):
     ignorekarma = db.Column(db.Boolean, default=False, nullable=False)
 
     # Upload file max size
-    uploaded_file_max_length = db.Column(db.Integer, default=0, nullable=False)
+    upload_size_limit = db.Column(db.Integer, default=0, nullable=False)
     upload_folder_limit = db.Column(db.Integer, default=0, nullable=False)
 
     # Methods
