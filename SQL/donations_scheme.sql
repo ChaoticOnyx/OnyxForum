@@ -223,6 +223,8 @@ CREATE TABLE IF NOT EXISTS `money_transactions` (
 CREATE TABLE IF NOT EXISTS `patron_types` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `type` varchar(32) NOT NULL,
+  `cost_dollars` float NOT NULL,
+  `discord_role` varchar(50) NOT NULL,
   KEY `Primary Key` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
 
