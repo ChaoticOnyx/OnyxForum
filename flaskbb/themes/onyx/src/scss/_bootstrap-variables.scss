@@ -582,9 +582,9 @@ $pagination-disabled-border:           darken($pagination-border, 4%);
 // $modal-title-line-height:     $line-height-base
 
 //** Background color of modal content area
-// $modal-content-bg:                             #fff
+$modal-content-bg:                             #21242c;
 //** Modal content border color
-// $modal-content-border-color:                   rgba(0,0,0,.2)
+$modal-content-border-color:                   rgba(0,0,0,.2);
 //** Modal content border color **for IE8**
 // $modal-content-fallback-border-color:          #999
 
@@ -593,7 +593,7 @@ $pagination-disabled-border:           darken($pagination-border, 4%);
 //** Modal backdrop opacity
 // $modal-backdrop-opacity:      .5
 //** Modal header border color
-// $modal-header-border-color:   #e5e5e5
+$modal-header-border-color:   #2b2f39;
 //** Modal footer border color
 // $modal-footer-border-color:   $modal-header-border-color
 
@@ -692,11 +692,11 @@ $panel-bg:                    #21242c;
 $panel-border-radius:         0; //$border-radius-base
 
 //** Border color for elements within panels
-$panel-inner-border:          #cad7e1; // #ddd
-// $panel-footer-bg:             #21242c;
+$panel-inner-border:          #2b2f39; // #ddd
+$panel-footer-bg:             #21242c;
 
 // $panel-default-text:          $gray-dark
-$panel-default-border:        #cad7e1; //#ddd
+$panel-default-border:        #2b2f39; //#ddd
 // $panel-default-heading-bg:    #21242c;
 
 // $panel-primary-text:          #fff

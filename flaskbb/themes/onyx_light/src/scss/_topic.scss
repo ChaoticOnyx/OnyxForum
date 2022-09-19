@@ -8,6 +8,8 @@
     .topic-body {
         padding-top: 0;
         padding-bottom: 0;
+        display: flex;
+        flex-direction: column;
     }
 }
 
@@ -17,7 +19,7 @@
     margin-bottom: 0;
     padding-top: 0;
     padding-bottom: 0;
-
+    display: flex;
     &:not(:last-child) {
         border-bottom: 1px solid $panel-border;
     }

@@ -46,6 +46,7 @@ def flaskbb_tpl_profile_settings_menu(user):
     if user.password:
         results.append(("user.change_password", "Change Password"))
 
+    results.append(("user.user_uploads", "My uploads"))
     outcome = yield
     outcome.force_result(chain(results, *outcome.get_result()))
 

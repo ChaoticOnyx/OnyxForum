@@ -4,7 +4,7 @@
 
 {% block content %}
 {% from theme('macros.html') import render_pagination, form_field, generate_obj_id, generate_post_url %}
-
+{% from theme("forum/file_upload_macros.html") import editor_file_upload %}
 <div class="topic-view">
     <ol class="breadcrumb flaskbb-breadcrumb">
         <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
@@ -182,14 +182,18 @@
         {{ form.hidden_tag() }}
         <div class="row">
             <div class="col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9 col-xs-12">
-                <div class="editor-box">
+                <div class="editor-box" ondrop="dropHandler(event,'{{url_for('forum.upload_file')}}','{{ csrf_token() }}')" ondragover="dragOverHandler(event)">
                     <div class="editor quickreply">
                             {{ render_quickreply(form.content, div_class="new-message", rows=7, cols=75, placeholder="", **{'data-provide': 'markdown', 'data-autofocus': 'false', 'class': 'flaskbb-editor'}) }}
+                    </div>
+                    <div class="editor-filestatus">
+                        {{ editor_file_upload() }}
                     </div>
                     <div class="editor-submit">
                         {{ render_submit_field(form.submit, input_class="btn btn-success pull-right") }}
                     </div>
                 </div>
+                
             </div>
         </div>
     </form>
