@@ -12,6 +12,7 @@ from flaskbb.utils.helpers import render_template
 from flaskbb.extensions import db
 from flaskbb.utils.requirements import has_permission
 from hub.features.karma.models import PostRate
+from hub.features.community_rating.models import CommunityRating
 from .karma import is_user_has_karma, get_user_karma
 
 logger = logging.getLogger('onyx')
@@ -95,9 +96,11 @@ def change_post_rating(user, post, value):
             return
     else:
         assert value != 0
-        rate = PostRate(user=user, post=post)
+        community_rating_record = CommunityRating(user=user, change=value)
+        rate = PostRate(user=user, post=post, community_rating_record=community_rating_record)
 
     rate.change = value
+    community_rating_record.save()
     rate.save()
     __log_post_rate(user, post, value=value)
 

@@ -35,9 +35,11 @@ class PostRate(db.Model):
     user_id = Column('user', ForeignKey('users.id'), nullable=False, index=True)
     change = Column(Integer, nullable=False)
     datetime = Column(UTCDateTime(timezone=True), default=time_utcnow, nullable=False)
+    community_rating_record_id = Column('community_rating_record', ForeignKey('community_rating.id' , ondelete="CASCADE"), index=True)
 
     post = relationship("Post")
     user = relationship("User")
+    community_rating_record = relationship("CommunityRating", cascade="all, delete")
 
     def save(self):
         db.session.add(self)

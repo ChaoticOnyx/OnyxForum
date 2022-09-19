@@ -3,8 +3,7 @@ from flaskbb.user.models import User
 from flaskbb.forum.models import Post
 from hub.features.karma.post_rating import get_post_rating, get_all_user_posts_rating
 from .models import CommunityRating
-
-from flaskbb.app import create_app
+from flaskbb.extensions import scheduler
 
 logger = logging.getLogger('onyx')
 def __log_community_rating(user, value):
@@ -36,18 +35,22 @@ def get_user_community_rating(user):
     assert user
 
     CommunityRating_changes = CommunityRating.query.filter_by(user_id=user.id).all()
-    summary = get_all_user_posts_rating(user)
+    summary = 0
 
     for CommunityRating_change in CommunityRating_changes:
         summary += CommunityRating_change.change
 
     return summary
 
+@scheduler.task('interval', id='weekly_community_rating_updatge', weeks=1)
 def weekly_community_rating_update():
-    app = create_app(config='flaskbb.cfg')
-    with app.app_context():
+    with scheduler.app.app_context():
         for user in User.query.all():
-            if get_user_community_rating(user) >=0:
-                change_user_community_rating(user, -2)
-            else:
-                change_user_community_rating(user, 2)
+            user_community_rating = get_user_community_rating(user)
+
+            if ((user_community_rating == -1) or (user_community_rating == 1)):
+                change_user_community_rating(user, 0-user_community_rating)
+            elif (user_community_rating >=2):
+                    change_user_community_rating(user, -2)
+            elif (user_community_rating <=-2):
+                    change_user_community_rating(user, 2)

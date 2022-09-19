@@ -7,10 +7,11 @@ from sqlalchemy.orm import relationship
 class CommunityRating(db.Model):
     __tablename__ = 'community_rating'
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True)
+    user_id = Column('user_id', ForeignKey('users.id'), nullable=False, index=True)
     change = Column(Integer, nullable=False)
     datetime = Column(UTCDateTime(timezone=True), default=time_utcnow, nullable=False)
 
+    user = relationship("User")
     def save(self):
         db.session.add(self)
         db.session.commit()

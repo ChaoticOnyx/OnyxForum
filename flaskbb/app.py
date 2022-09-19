@@ -34,7 +34,7 @@ from flaskbb._compat import iteritems, string_types
 from flaskbb.extensions import (alembic, allows, babel, cache, celery, csrf,
                                 db, db_hub, db_eos, db_onyx, db_dragon,
                                 debugtoolbar, limiter, login_manager, mail,
-                                redis_store, themes, whooshee, discordClient)
+                                redis_store, themes, whooshee, discordClient, scheduler)
 from flaskbb.plugins import spec
 from flaskbb.plugins.manager import FlaskBBPluginManager
 from flaskbb.plugins.models import PluginRegistry
@@ -181,6 +181,7 @@ def configure_app(app, config):
     app.pluggy = FlaskBBPluginManager("flaskbb")
 
     app.config["BYOND_SERVERS"] = servers_config
+    app.config["SCHEDULER_API_ENABLED"] = True
 
 
 def configure_celery_app(app, celery):
@@ -217,6 +218,10 @@ def configure_extensions(app):
     db_eos.init_app(app)
     db_dragon.init_app(app)
     db.init_app(app)
+
+    #APScheduler
+    scheduler.init_app(app)
+    scheduler.start()
 
     # Flask-Alembic
     alembic.init_app(app, command_name="db")
