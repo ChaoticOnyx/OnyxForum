@@ -41,6 +41,6 @@ def hash_file(file):
     while chunk != b'':
         chunk = file.read(1024)
         h.update(chunk)
-
+    file.seek(0)
     return h.hexdigest()
     

@@ -1149,14 +1149,17 @@ def get_user_current_folder_size():
             folder_size+=os.path.getsize(ele)
     return folder_size
 
+def get_file_size(file_object):
+    file_object.seek(0, os.SEEK_END)
+    file_size = file_object.tell()
+    file_object.seek(0)
+    return file_size
+
 class UploadFile(MethodView):
     decorators=[login_required]
 
     def post(self):
         ALLOWED_EXTENSIONS = current_app.config["ALLOWED_EXTENSIONS"]
-
-        def is_extension_allowed(filename):
-            return '.' in filename and os.path.splitext(filename)[1][1:] in ALLOWED_EXTENSIONS
 
         if 'file' not in request.files:
             return 'failed-request'
@@ -1166,9 +1169,7 @@ class UploadFile(MethodView):
 
         received_file_object = request.files['file']
         
-        received_file_object.seek(0, os.SEEK_END)
-        file_size = received_file_object.tell()
-        received_file_object.seek(0)
+        file_size = get_file_size(received_file_object)
 
         if file_size > user_get_file_max_size():
             return 'too-big'   
@@ -1188,6 +1189,9 @@ class UploadFile(MethodView):
         if folder_size>=user_get_uploads_total_size_limit():
             return 'upload-limit'
 
+        def is_extension_allowed(filename):
+            return '.' in filename and os.path.splitext(filename)[1][1:] in ALLOWED_EXTENSIONS
+
         if received_file_object and is_extension_allowed(received_file_object.filename):
             uploaded_file_record = UploadedFile()
             uploaded_file_record.original_name = secure_filename(received_file_object.filename)
@@ -1196,8 +1200,6 @@ class UploadFile(MethodView):
             
             filename = hash_file(received_file_object)
             uploaded_file_record.current_name = filename
-
-            received_file_object.seek(0)
             
             if not (UploadedFile.query.filter_by(user_id=uploaded_file_record.user_id, current_name=uploaded_file_record.current_name).first()):
                 received_file_object.save(safe_join(path,filename))

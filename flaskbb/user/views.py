@@ -25,6 +25,7 @@ import secrets
 from flaskbb.user.models import User
 from flaskbb.forum.models import UploadedFile
 from flaskbb.utils.helpers import register_view, render_template
+from flaskbb.utils.requirements import has_permission
 
 import os
 
@@ -197,12 +198,13 @@ class DeleteFile(MethodView):
         file_record = UploadedFile.query.filter_by(id=file_id).first_or_404()
         file_owner = User.query.filter_by(id=file_record.user_id).first_or_404()
         
-        if not (file_owner.user_id == current_user.id or self.get_permissions()['admin']):
-            logger.warn("File {}(owned by:{}) was tried to be deleted by {}(discord:{})".format(file_record, file_owner, current_user.username, current_user.discord))
+        if not (file_owner.id == current_user.id or has_permission(current_user, "admin")):
+            logger.warn("File {}(owned by:{}, discord:{}) was tried to be deleted by {}(discord:{})".format(file_record, file_owner, file_owner.discord, current_user.username, current_user.discord))
+            return redirect(url_for("user.user_uploads"))
 
         path = safe_join(current_app.config["UPLOAD_FOLDER"], file_owner.discord, file_record.current_name)
         
-        logger.info("File {}(owned by:{}) was deleted by {}(discord:{})".format(file_record, file_owner, current_user.username, current_user.discord))
+        logger.info("File {}(owned by:{}, discord:{})) was deleted by {}(discord:{})".format(file_record, file_owner, file_owner.discord, current_user.username, current_user.discord))
 
         os.remove(path)
         file_record.delete()
