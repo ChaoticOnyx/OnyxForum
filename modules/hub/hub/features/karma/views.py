@@ -58,8 +58,8 @@ class PostRateView(MethodView):
         else:
             return render_template(
                 "features/karma/post_rating_dialog.html",
-                likes={"The post isn't rated yet":""},
-                dislikes={"The post isn't rated yet":""},
+                likes={},
+                dislikes={},
             )
 
     def post(self):

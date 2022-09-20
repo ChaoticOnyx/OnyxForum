@@ -47,7 +47,7 @@ def get_user_community_rating(user):
     return cursor.first()[0] or 0
 
 
-@scheduler.task('interval', id='weekly_community_rating_update', week=1)
+@scheduler.task('interval', id='weekly_community_rating_update', weeks=1)
 def weekly_community_rating_update():
     with scheduler.app.app_context():
         for user in User.query.all():
