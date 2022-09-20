@@ -70,14 +70,20 @@
                         </div>
 
                         <!-- Forum Subforums -->
-                        {% if forum.subforums.all() %}
+                        {% if forum.get_forums() %}
                             <div class="forum-subforums">
                                 <span>&#9679;</span>
-                                {%for subforum in forum.subforums%}
+                                {% for subforum, subforumsread in forum.get_forums() %}
                                     {% if not loop.last %}
-                                        <a href="{{ subforum.url }}" title="{{ subforum.description }}">{{ subforum.title }}</a>,
+                                        <a href="{{ subforum.url }}" title="{{ subforum.description }}"
+                                            {% if subforum|forum_is_unread(subforumsread, current_user) %}style="font-weight: bold;"{% endif %}>
+                                            {{ subforum.title }}
+                                        </a>,
                                     {% else %}
-                                        <a href="{{ subforum.url }}" title="{{ subforum.description }}">{{ subforum.title }}</a>
+                                        <a href="{{ subforum.url }}" title="{{ subforum.description }}"
+                                            {% if subforum|forum_is_unread(subforumsread, current_user) %}style="font-weight: bold;"{% endif %}>
+                                            {{ subforum.title }}
+                                        </a>
                                     {% endif %}
                                 {% endfor %}
                             </div>

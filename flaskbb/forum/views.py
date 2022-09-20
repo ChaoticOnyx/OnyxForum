@@ -123,11 +123,16 @@ class ViewForum(MethodView):
             per_page=flaskbb_config["TOPICS_PER_PAGE"]
         )
 
+        forums_and_readforum = forum_instance.get_forums(
+            user=real(current_user)
+        )
+
         return render_template(
             "forum/forum.html",
             forum=forum_instance,
             topics=topics,
             forumsread=forumsread,
+            forums=forums_and_readforum
         )
 
 
@@ -1168,22 +1173,22 @@ class UploadFile(MethodView):
             return 'failed-request'
 
         received_file_object = request.files['file']
-        
+
         file_size = get_file_size(received_file_object)
 
         if file_size > user_get_file_max_size():
-            return 'too-big'   
-        
+            return 'too-big'
+
         if received_file_object.filename == '':
             return 'failed-request'
-        
+
         path = safe_join(current_app.config["UPLOAD_FOLDER"],current_user.discord)
-              
+
         if not os.path.exists(path):
             os.mkdir(path)
 
         folder_size = get_user_current_folder_size()
-        
+
         folder_size+=file_size
 
         if folder_size>=user_get_uploads_total_size_limit():
@@ -1197,10 +1202,10 @@ class UploadFile(MethodView):
             uploaded_file_record.original_name = secure_filename(received_file_object.filename)
             uploaded_file_record.user_id = current_user.id
             uploaded_file_record.file_size = file_size
-            
+
             filename = hash_file(received_file_object)
             uploaded_file_record.current_name = filename
-            
+
             if not (UploadedFile.query.filter_by(user_id=uploaded_file_record.user_id, current_name=uploaded_file_record.current_name).first()):
                 received_file_object.save(safe_join(path,filename))
                 uploaded_file_record.save()
@@ -1212,7 +1217,7 @@ class DownloadFile(MethodView):
 
     def get(self):
         filename =  request.args.get("file") if request.args.get("file") else ""
-        
+
         download_filename = UploadedFile.query.filter_by(current_name=filename.split('/')[1]).first().original_name
         return send_from_directory(current_app.config["UPLOAD_FOLDER"], filename, as_attachment=True, attachment_filename = download_filename)
 

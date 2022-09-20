@@ -12,6 +12,7 @@ import logging
 from datetime import timedelta
 
 from flask import abort, current_app, url_for
+from flask_login import current_user
 from sqlalchemy.orm import aliased
 
 from flaskbb.extensions import db
@@ -1175,7 +1176,43 @@ class Forum(db.Model, CRUDMixin):
                             for topic, last_post, in topics.items]
 
         return topics
-    
+
+    def get_forums(self, user=None):
+        """Get the subforums for the forum.
+        It returns a tuple with the forum and the subforums with their
+        forumsread object are stored in a list.
+
+        A return value can look like this for a forum with two subforums::
+
+            (<Forum 1>, [(<Subforum 1>, None), (<Subforum 2>, None)])
+
+        :param forum_id: The forum id
+        :param user: The user object is needed to check if we also need their
+                     forumsread object.
+        """
+        if not user:
+            user = current_user
+        from flaskbb.user.models import Group
+        if user.is_authenticated:
+            user_groups = [gr.id for gr in user.groups]
+            forums = Forum.query.\
+                filter(Forum.groups.any(Group.id.in_(user_groups)), Forum.parent_id == self.id).\
+                outerjoin(ForumsRead,
+                          db.and_(ForumsRead.forum_id == Forum.id,
+                                  ForumsRead.user_id == user.id)).\
+                add_entity(ForumsRead).\
+                order_by(Forum.position).\
+                all()
+        else:
+            guest_group = Group.get_guest_group()
+            forums = Forum.query.\
+                filter(Forum.groups.any(Group.id == guest_group.id), Forum.parent_id == self.id).\
+                order_by(Forum.position).\
+                all()
+            forums = [(forum, None) for forum in forums]
+
+        return forums
+
 
 @make_comparable
 class Category(db.Model, CRUDMixin):
@@ -1339,7 +1376,7 @@ class Category(db.Model, CRUDMixin):
 
 class UploadedFile(db.Model, CRUDMixin):
     __tablename__ = "uploaded_files"
-    
+
     id = db.Column(db.Integer, primary_key=True)
 
     datetime = db.Column(UTCDateTime(timezone=True))
@@ -1350,7 +1387,7 @@ class UploadedFile(db.Model, CRUDMixin):
                         db.ForeignKey("users.id", ondelete="CASCADE"))
 
     original_name = db.Column(db.Text)
-    
+
     file_size = db.Column(db.Integer)
     def save(self):
         assert self.original_name, 'Tried to save file with empty original name!'
