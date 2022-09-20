@@ -20,18 +20,9 @@ logger = logging.getLogger('onyx')
 
 def get_post_rating(post):
     assert post
-
-    cursor: db.Query = db.session.query(PostRate)\
-        .join(PostRate.post)\
-        .join(PostRate.user)\
-        .filter(PostRate.post == post)\
-        .with_entities(PostRate.change, User.rate_weight)
-
-    summary = 0
-    for change, rate_weight in cursor.all():
-        summary += change * rate_weight if rate_weight > 0 else change
-
-    return summary
+    return db.session.query(0 + func.sum(PostRate.change))\
+        .filter(PostRate.post_id == post.id)\
+        .scalar() or 0
 
 
 def get_all_post_rates_by_user(user, begin_from: datetime = None) -> Tuple[PostRate]:
@@ -89,7 +80,7 @@ def __log_post_rate(user, post, value):
             summary=summary))
 
 
-def change_post_rating(user, post, value):
+def change_post_rating(user: User, post: Post, value: int):
     assert user
     assert post
 
@@ -101,9 +92,16 @@ def change_post_rating(user, post, value):
             return
     else:
         assert value != 0
-        community_rating_record = CommunityRating(user=user, change=value)
-        rate = PostRate(user=user, post=post, community_rating_record=community_rating_record)
+        rate = PostRate(user=user, post=post)
+
+    if not rate.community_rating_record:
+        rate.community_rating_record = CommunityRating()
+
+    if user.rate_weight:
+        value *= user.rate_weight
 
     rate.change = value
+    rate.community_rating_record.user_id = post.user_id
+    rate.community_rating_record.change = value
     rate.save()
     __log_post_rate(user, post, value=value)

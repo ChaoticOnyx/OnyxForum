@@ -41,10 +41,9 @@ def change_user_community_rating(user, value):
 
 def get_user_community_rating(user):
     assert user
-
-    cursor: db.Query = db.session.query(0 + func.sum(CommunityRating.change))\
-        .filter(CommunityRating.user_id == user.id)
-    return cursor.first()[0] or 0
+    return db.session.query(0 + func.sum(CommunityRating.change))\
+        .filter(CommunityRating.user_id == user.id)\
+        .scalar() or 0
 
 
 @scheduler.task('interval', id='weekly_community_rating_update', weeks=1)
