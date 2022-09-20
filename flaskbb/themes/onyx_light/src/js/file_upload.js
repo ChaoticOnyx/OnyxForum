@@ -149,17 +149,37 @@ function dropHandler(ev, endpoint_url, csrf_token) {
         // If dropped items aren't files, reject them
         if (ev.dataTransfer.items[i].kind === 'file') {
           var file = ev.dataTransfer.items[i].getAsFile();
-         UploadFile(endpoint_url, csrf_token, file,file_link_append)
+         UploadFile(endpoint_url, csrf_token, file, file_link_append)
         }
       }
     } else {
       // Use DataTransfer interface to access the file(s)
       for (var i = 0; i < ev.dataTransfer.files.length; i++) {
-        UploadFile(endpoint_url, csrf_token, ev.dataTransfer.files[i],file_link_append)
+        UploadFile(endpoint_url, csrf_token, ev.dataTransfer.files[i], file_link_append)
       }
     }
 }
 
+function pasteHandler(ev, endpoint_url, csrf_token) {
+    // Prevent default behavior (Prevent file from being opened)
+    ev.preventDefault();
+    var pasted_Data=(ev.clipboardData || window.clipboardData)
+    if (pasted_Data.items) {
+      // Use DataTransferItemList interface to access the file(s)
+      for (var i = 0; i < pasted_Data.items.length; i++) {
+        // If dropped items aren't files, reject them
+        if (pasted_Data.items[i].kind === 'file') {
+          var file = pasted_Data.items[i].getAsFile();
+         UploadFile(endpoint_url, csrf_token, file, file_link_append)
+        }
+      }
+    } else {
+      // Use DataTransfer interface to access the file(s)
+      for (var i = 0; i < pasted_Data.files.length; i++) {
+        UploadFile(endpoint_url, csrf_token, pasted_Data.files[i], file_link_append)
+      }
+    }
+}
 function dragOverHandler(ev) {
     ev.preventDefault();
 }
@@ -183,3 +203,7 @@ function file_link_append(file_type, file_link){
             document.querySelector('textarea').value += '\n[enter link description here]('+file_link+')'
         }
 }
+
+
+var filestatus_div = document.querySelector(".editor-filestatus")
+document.querySelector(".md-editor").appendChild(filestatus_div)
