@@ -1,0 +1,49 @@
+
+{%- macro editor_file_upload() -%}
+<label class="filestatus">    
+    <input id="fileupload" type="file" name="fileupload" style="display:none" onchange="filestatus_click_handler('{{url_for('forum.upload_file')}}','{{ csrf_token() }}')"/>
+    {{ editor_file_upload_errors() }}
+</label>
+{%- endmacro -%}
+
+{%- macro editor_file_upload_errors() -%}
+
+        <span id="error none">
+            Attach files by dragging & dropping or selecting.
+        </span>
+        <span id="error bad-file" style = "display: none;">
+            File type is not supported!</span>
+        <span id="error empty-file" style = "display: none;">
+            No file selected.
+        </span>
+        <span id="error too-big" style = "display: none;">
+            File size too big.
+        </span>
+        <span id="error failed-request" style = "display: none;">
+            Failed to process file.
+        </span>
+        <span id="error upload-limit" style = "display: none;">
+            You have reached file upload limit, clear your upload folder through the settings.
+        </span>
+
+{%- endmacro -%}
+
+{%- macro file_upload_errors() -%}
+    <label class="filestatus">
+        <span id="error none"></span>
+        <span id="error bad-file" style = "display: none;">
+            File type is not supported!</span>
+        <span id="error empty-file" style = "display: none;">
+            No file selected.
+        </span>
+        <span id="error too-big" style = "display: none;">
+            File size too big.
+        </span>
+        <span id="error failed-request" style = "display: none;">
+            Failed to process file.
+        </span>
+        <span id="error upload-limit" style = "display: none;">
+            You have reached file upload limit, clear your upload folder through the settings.
+        </span>
+    </label>
+{%- endmacro -%}

@@ -284,3 +284,13 @@ DISCORD_CLIENT_SECRET = "[Place_Client_Secret_Here]"
 DISCORD_REDIRECT_URI = "http://example.test:5000/auth/discord-callback" #Site need to be equal SERVER_NAME
 DISCORD_BOT_TOKEN = "[Place_Bot_Token_Here]"
 DEBUG_TB_INTERCEPT_REDIRECTS = False
+
+# File uploading Settings
+# ------------------------------ #
+UPLOAD_FOLDER = os.path.join(DefaultConfig.basedir, 'flaskbb/static/user_content')
+
+# Default value for all groups in bytes
+MAX_UPLOAD_SIZE = 5*1024*1024
+USER_UPLOADS_TOTAL_SIZE_LIMIT = 500*1024*1024
+
+ALLOWED_EXTENSIONS = {'txt','png', 'jpg', 'jpeg', 'gif', 'pdf'}

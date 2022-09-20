@@ -12,7 +12,7 @@
 import logging
 
 import attr
-from flask import Blueprint, flash, redirect, request, url_for
+from flask import Blueprint, flash, redirect, request, url_for, safe_join, current_app
 from flask.views import MethodView
 from flask_babelplus import gettext as _
 from flask_login import current_user, login_required
@@ -23,7 +23,11 @@ from hub.utils import get_byond_ckey
 import secrets
 
 from flaskbb.user.models import User
+from flaskbb.forum.models import UploadedFile
 from flaskbb.utils.helpers import register_view, render_template
+from flaskbb.utils.requirements import has_permission
+
+import os
 
 from ..core.exceptions import PersistenceError, StopValidation
 from .services.factories import (
@@ -179,7 +183,35 @@ class ChangeUserDetails(MethodView):
     def redirect(self):
         return redirect(url_for("user.change_user_details"))
 
+class UserUploads(MethodView):
+    decorators = [login_required]
 
+    def get(self):
+        files = UploadedFile.query.filter_by(user_id=current_user.id).all()
+        return render_template("user/user_uploads.html",files=files)
+
+class DeleteFile(MethodView):
+    decorators = [login_required]
+
+    def post(self):
+        file_id = request.args.get("file_id",0,type=int)
+        file_record = UploadedFile.query.filter_by(id=file_id).first_or_404()
+        file_owner = User.query.filter_by(id=file_record.user_id).first_or_404()
+        
+        if not (file_owner.id == current_user.id or has_permission(current_user, "admin")):
+            logger.warn("File {}(owned by:{}, discord:{}) was tried to be deleted by {}(discord:{})".format(file_record, file_owner, file_owner.discord, current_user.username, current_user.discord))
+            return redirect(url_for("user.user_uploads"))
+
+        path = safe_join(current_app.config["UPLOAD_FOLDER"], file_owner.discord, file_record.current_name)
+        
+        logger.info("File {}(owned by:{}, discord:{})) was deleted by {}(discord:{})".format(file_record, file_owner, file_owner.discord, current_user.username, current_user.discord))
+
+        os.remove(path)
+        file_record.delete()
+
+        flash(_("File deleted."), "success")
+        return redirect(url_for("user.user_uploads"))
+        
 class AllUserTopics(MethodView):  # pragma: no cover
     decorators = [login_required]
 
@@ -251,6 +283,13 @@ def flaskbb_load_blueprints(app):
         routes=["/settings/user-details"],
         view_func=ChangeUserDetails.as_view("change_user_details"),
     )
+    register_view(
+        user, routes=["/settings/uploads"], view_func=UserUploads.as_view("user_uploads")
+    )
+    register_view(
+        user, routes=["/settings/uploads/delete"], view_func=DeleteFile.as_view("delete_file")
+    )
+
     register_view(
         user,
         routes=["/user<userid>/posts"],

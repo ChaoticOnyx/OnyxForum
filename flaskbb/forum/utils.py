@@ -13,6 +13,7 @@ from flask import current_app
 from flask_login import current_user
 
 from .locals import current_forum
+from hashlib import sha1
 
 
 def force_login_if_needed():
@@ -29,3 +30,17 @@ def should_force_login(user, forum):
     return not user.is_authenticated and not (
         {g.id for g in forum.groups} & {g.id for g in user.groups}
     )
+
+def hash_file(file):
+    """"This function returns the SHA-1 hash
+    of the file passed into it"""
+
+    h = sha1()
+
+    chunk = 0
+    while chunk != b'':
+        chunk = file.read(1024)
+        h.update(chunk)
+    file.seek(0)
+    return h.hexdigest()
+    

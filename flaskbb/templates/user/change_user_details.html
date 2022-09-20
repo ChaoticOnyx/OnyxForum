@@ -1,8 +1,7 @@
 {% extends theme("user/settings_layout.html") %}
-
 {% block settings_content %}
 {% from theme("macros.html") import horizontal_field, horizontal_select_field %}
-
+{% from theme("forum/file_upload_macros.html") import file_upload_errors %}
 <div class="panel page-panel">
     <div class="panel-heading page-head">
         {% trans %}Change User Details{% endtrans %}
@@ -16,7 +15,25 @@
             {{ horizontal_field(form.gender) }}
             {{ horizontal_field(form.location) }}
             {{ horizontal_field(form.website) }}
+            {% if form.avatar %}
+            <div class = "form-group row">
+                <div class = "col-md-5 control-label">
+                    <div class="author-box">
+                        <div class="author-avatar hidden-xs"><img name="avatar" alt="avatar" width="150" max-height="150"></div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
             {{ horizontal_field(form.avatar) }}
+            <div class = "form-group row">
+                <div class = "col-sm-4 control-label" style="width: 56.5%">
+                    <input id="fileupload" type="file" name="fileupload" style="display:inline-block"/>
+                    <span class="btn btn-warning" id="upload-button" onclick="UploadAvatar('{{url_for('forum.upload_file')}}','{{ csrf_token() }}')">Upload</span>
+                </div>
+                <div class = "col-sm-5 control-label" style="padding-top: 7px; margin-bottom: 0; text-align: left;">
+                        {{ file_upload_errors() }}
+                </div>
+            </div>
             {{ horizontal_field(form.signature, div_class="col-sm-8 editor", rows="5", placeholder="", **{'data-provide': 'markdown', 'class': 'flaskbb-editor'}) }}
             {{ horizontal_field(form.notes, div_class="col-sm-8 editor", rows="12", placeholder="", **{'data-provide': 'markdown', 'class': 'flaskbb-editor'}) }}
             {{ run_hook('flaskbb_tpl_form_user_details_after', form=form) }}
@@ -26,4 +43,10 @@
         </form>
     </div>
 </div>
+<script>
+    document.querySelector('img[name="avatar"]').src = document.querySelector('input[name="avatar"]').value
+    document.querySelector('input[name="avatar"]').addEventListener('focusout', function(event){
+        document.querySelector('img[name="avatar"]').src = document.querySelector('input[name="avatar"]').value
+    });
+</script>
 {% endblock %}
