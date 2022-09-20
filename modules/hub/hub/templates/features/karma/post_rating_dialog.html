@@ -1,0 +1,58 @@
+<div class="users_rated_post">
+    <div class="modal fade post_rating_Dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="ModalDialogLabel">{% trans %}Users who rated post:{% endtrans %}</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div class="sidebar">
+                                <ul class="nav sidenav">
+                                    <li name="likes" class="active">
+                                        <a>Likes<img src="{{ url_for('static', filename='img/repup.png') }}" /></a>
+                                    </li>
+                                    <li name="dislikes">
+                                        <a>Dislikes<img src="{{ url_for('static', filename='img/repdown.png') }}" /></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-sm-9">
+                            <div class="panel page-panel">
+                                <div class="panel-body page-body" style="height:500px; overflow-x: hidden; overflow-y: scroll;">  
+                                    <div name="likes">
+                                        {% if likes %}
+                                            {% for user, value in likes.items() %}
+                                                <div class="row page-row hover clearfix">
+                                                    <div class="col-md-7 col-sm-7 col-xs-7"><a href="{{ user.url }}">{{ user.display_name }}</a></div>
+                                                    <div class="col-md-2 col-sm-2 col-xs-2">{{ value }}</div>
+                                                </div>
+                                            {% endfor %}  
+                                        {% endif %}
+                                    </div>
+                                    <div name="dislikes" style="display:none">
+                                        {% if dislikes %}
+                                            {% for user, value in dislikes.items() %}
+                                                <div class="row page-row hover clearfix">
+                                                    <div class="col-md-7 col-sm-7 col-xs-7"><a href="{{ user.url }}">{{ user.display_name }}</a></div>
+                                                    <div class="col-md-2 col-sm-2 col-xs-2">{{ value }}</div>
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans %}Close{% endtrans %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

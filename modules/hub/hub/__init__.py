@@ -13,6 +13,7 @@ from flask_login import current_user
 from .blueprint import hub
 from .permissions import can_access_hub
 from hub.features.karma.render import render_karma, render_post_rating
+from hub.features.community_rating.render import render_community_rating
 from .features.donations.utils import render_donations_label
 from .features.donations.blueprint import donations
 from .features.donations.qiwi_hook import register_webhooks_service
@@ -113,12 +114,12 @@ def flaskbb_tpl_post_menu_before(post):
 
 @hookimpl
 def flaskbb_tpl_post_author_info_after(user, post):
-    return render_karma(user, post.id)
+    return (render_karma(user) + render_community_rating(user))
 
 
 @hookimpl
 def flaskbb_tpl_profile_sidebar_stats(user):
-    return render_karma(user)
+    return (render_karma(user) + render_community_rating(user))
 
 
 @hookimpl

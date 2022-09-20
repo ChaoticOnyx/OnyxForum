@@ -28,6 +28,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_themes2 import Themes
 from flask_whooshee import Whooshee
 from flask_wtf.csrf import CSRFProtect
+from flask_apscheduler import APScheduler
 
 from flaskbb.exceptions import AuthorizationRequired
 
@@ -93,6 +94,9 @@ limiter = Limiter(auto_check=False, key_func=get_remote_address)
 
 # Celery
 celery = Celery("flaskbb")
+
+# APScheduler
+scheduler = APScheduler()
 
 asyncio.set_event_loop(asyncio.SelectorEventLoop())
 discordClient: discord.Client = discord.Client()

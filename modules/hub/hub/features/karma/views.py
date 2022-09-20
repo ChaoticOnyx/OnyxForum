@@ -4,9 +4,10 @@ from flask_login import current_user
 
 from flaskbb.user.models import User
 from flaskbb.forum.models import Post
+from flaskbb.utils.helpers import render_template
 
 from .karma import change_user_karma
-from .post_rating import change_post_rating
+from .post_rating import change_post_rating, get_all_post_rates_by_post
 from .render import is_user_can_change_karma, is_user_can_rate_post
 
 
@@ -36,6 +37,24 @@ class KarmaView(MethodView):
 
 
 class PostRateView(MethodView):
+    def get(self):
+        post_id = request.args.get("post_id", 0)
+        post: Post = post_id and Post.query.filter_by(id=post_id).first_or_404()
+        post_rate_records = get_all_post_rates_by_post(post)
+        likes = {}
+        dislikes= {}
+        if post_rate_records:
+            for post_rate_record in post_rate_records:
+                if post_rate_record.change>0:
+                    likes[post_rate_record.user]=post_rate_record.change
+                else:
+                    dislikes[post_rate_record.user]=post_rate_record.change
+        return render_template(
+                "features/karma/post_rating_dialog.html",
+                likes=likes,
+                dislikes=dislikes,
+            )
+
     def post(self):
         post_id = request.args.get("post_id", 0)
         post: Post = post_id and Post.query.filter_by(id=post_id).first_or_404()

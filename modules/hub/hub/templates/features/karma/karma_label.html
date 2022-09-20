@@ -1,4 +1,5 @@
 <div class="karma-label">
+    <span class="karma-label">Karma:</span>
     <form class="inline-form" method="post" action="{{ url_for('hub.karma', user_id=user.id, post_id=post_id) }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 

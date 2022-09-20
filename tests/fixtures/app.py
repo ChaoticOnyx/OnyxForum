@@ -9,7 +9,7 @@ from flaskbb.utils.populate import create_default_groups, create_default_setting
 @pytest.yield_fixture(autouse=True)
 def application():
     """application with context."""
-    app = create_app(Config)
+     create_app(Config)
 
     ctx = app.app_context()
     ctx.push()
