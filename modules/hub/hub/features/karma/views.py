@@ -4,9 +4,10 @@ from flask_login import current_user
 
 from flaskbb.user.models import User
 from flaskbb.forum.models import Post
+from flaskbb.utils.helpers import render_template
 
 from .karma import change_user_karma
-from .post_rating import change_post_rating
+from .post_rating import change_post_rating, get_all_users_and_change_rated_post
 from .render import is_user_can_change_karma, is_user_can_rate_post
 
 
@@ -41,6 +42,24 @@ class PostRateView(MethodView):
         post: Post = post_id and Post.query.filter_by(id=post_id).first_or_404()
 
         available, reason = is_user_can_rate_post(current_user, post)
+        if "Users" in request.form:
+            users = get_all_users_and_change_rated_post(post)
+            if users:
+                likes = {}
+                dislikes= {}
+                for user in users.keys():
+                    if users[user]>0:
+                        likes[user]=users[user]
+                    else:
+                        dislikes[user]=users[user]
+                
+                return render_template(
+                    "features/karma/post_rating_dialog.html",
+                    likes=likes,
+                    dislikes=dislikes,
+                )
+            else:
+                return 'No one don\'t rate this post yet!'
 
         if available:
             if "Like" in request.form:

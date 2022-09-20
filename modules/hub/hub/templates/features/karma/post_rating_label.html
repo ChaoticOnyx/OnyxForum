@@ -1,9 +1,9 @@
 <div class="post-rating-label pull-left">
     <form class="inline-form" method="post" action="{{ url_for('hub.post_rate', post_id=post_id) }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-        <span class="btn btn-sm btn-default post-rating-counter {{ rating_color }}">
+        <button class="btn btn-sm btn-default post-rating-counter {{ rating_color }}" name="post_rating_Dialog">
             {{ post_rating }}
-        </span>
+        </button>
 
         {% if available %}
             {% if not user_cant_change_reason %}

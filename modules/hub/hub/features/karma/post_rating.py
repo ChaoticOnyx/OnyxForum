@@ -110,3 +110,10 @@ def get_all_user_posts_rating(user):
     for post in posts:
         summary += get_post_rating(post)
     return summary
+
+def get_all_users_and_change_rated_post(post):
+    post_rate_records = PostRate.query.filter_by(post_id=post.id).order_by(PostRate.change).all()
+    users_and_change=dict()
+    for post_rate_record in post_rate_records:
+        users_and_change[post_rate_record.user]=post_rate_record.change
+    return users_and_change

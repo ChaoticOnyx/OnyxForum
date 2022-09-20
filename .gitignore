@@ -146,3 +146,7 @@ modules/hub/hub/configs/*
 !modules/hub/hub/configs/example/
 /flaskbb.cfg
 flaskbb/static/user_content/
+flaskbb/themes/onyx/static/css/styles.css
+flaskbb/themes/onyx/static/js/scripts.min.js
+flaskbb/themes/onyx_light/static/js/scripts.min.js
+flaskbb/themes/onyx_light/static/css/styles.css
