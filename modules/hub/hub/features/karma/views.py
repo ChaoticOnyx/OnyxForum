@@ -41,25 +41,18 @@ class PostRateView(MethodView):
         post_id = request.args.get("post_id", 0)
         post: Post = post_id and Post.query.filter_by(id=post_id).first_or_404()
         post_rate_records = get_all_post_rates_by_post(post)
+        likes = {}
+        dislikes= {}
         if post_rate_records:
-            likes = {}
-            dislikes= {}
             for post_rate_record in post_rate_records:
                 if post_rate_record.change>0:
                     likes[post_rate_record.user]=post_rate_record.change
                 else:
                     dislikes[post_rate_record.user]=post_rate_record.change
-            
-            return render_template(
+        return render_template(
                 "features/karma/post_rating_dialog.html",
                 likes=likes,
                 dislikes=dislikes,
-            )
-        else:
-            return render_template(
-                "features/karma/post_rating_dialog.html",
-                likes={},
-                dislikes={},
             )
 
     def post(self):
