@@ -34,7 +34,7 @@
 
                     <div class="form-group">
                         <div class="col-md-12 col-sm-12 col-xs-12">
-                            <div class="editor-box" ondrop="dropHandler(event,'{{url_for('forum.upload_file')}}','{{ csrf_token() }}')" ondragover="dragOverHandler(event)">
+                            <div class="editor-box"ondrop="dropHandler(event,'{{url_for('forum.upload_file')}}','{{ csrf_token() }}')" ondragover="dragOverHandler(event)" onpaste="pasteHandler(event,'{{url_for('forum.upload_file')}}','{{ csrf_token() }}')" >
 
                                 {{ run_hook("flaskbb_tpl_form_new_topic_before", form=form) }}
 
