@@ -161,8 +161,6 @@ function dropHandler(ev, endpoint_url, csrf_token) {
 }
 
 function pasteHandler(ev, endpoint_url, csrf_token) {
-    // Prevent default behavior (Prevent file from being opened)
-    ev.preventDefault();
     var pasted_Data=(ev.clipboardData || window.clipboardData)
     if (pasted_Data.items) {
       // Use DataTransferItemList interface to access the file(s)
