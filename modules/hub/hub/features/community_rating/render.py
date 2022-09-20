@@ -1,9 +1,13 @@
 from .community_rating import get_user_community_rating
 from flaskbb.utils.helpers import render_template, time_utcnow
+
+
 def render_community_rating(user):
     community_rating = get_user_community_rating(user)
+    
     if community_rating is None:
         return
+
     community_rating_color = ""
     if community_rating:
         community_rating_color = "community_rating-"

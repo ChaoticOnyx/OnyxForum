@@ -2,12 +2,11 @@ $('button[name="post_rating_Dialog"]').on('click', function(e) {
     var $form = $(this).closest('form');
     var csrf_token = document.querySelector('input[name="csrf_token"]').value
     var formData = new FormData();
-    formData.append('Users','');
     formData.append('csrf_token', csrf_token)
     e.preventDefault();
     $.ajax({
         url: $form.attr("action"),
-        type: "POST",
+        type: "GET",
         data:formData,
         contentType: false,
         processData: false,

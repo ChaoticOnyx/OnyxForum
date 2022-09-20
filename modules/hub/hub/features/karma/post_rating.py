@@ -47,6 +47,11 @@ def get_all_post_rates_by_user(user, begin_from: datetime = None) -> Tuple[PostR
     return cursor.all()
 
 
+def get_all_post_rates_by_post(post):
+    post_rate_records = PostRate.query.filter_by(post_id=post.id).order_by(PostRate.change).all()
+    return post_rate_records
+
+
 def __fetch_post_rate(user, post):
     assert user
     assert post
@@ -100,20 +105,5 @@ def change_post_rating(user, post, value):
         rate = PostRate(user=user, post=post, community_rating_record=community_rating_record)
 
     rate.change = value
-    community_rating_record.save()
     rate.save()
     __log_post_rate(user, post, value=value)
-
-def get_all_user_posts_rating(user):
-    posts = Post.query.filter_by(user_id=user.id).all()
-    summary = 0
-    for post in posts:
-        summary += get_post_rating(post)
-    return summary
-
-def get_all_users_and_change_rated_post(post):
-    post_rate_records = PostRate.query.filter_by(post_id=post.id).order_by(PostRate.change).all()
-    users_and_change=dict()
-    for post_rate_record in post_rate_records:
-        users_and_change[post_rate_record.user]=post_rate_record.change
-    return users_and_change

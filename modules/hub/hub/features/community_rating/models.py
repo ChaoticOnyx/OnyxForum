@@ -1,8 +1,10 @@
-from flaskbb.extensions import db, db_hub
+from flaskbb.extensions import db
 from flaskbb.utils.database import UTCDateTime
 from flaskbb.utils.helpers import time_utcnow
+
 from sqlalchemy import Column, ForeignKey, String, Integer, Float, DateTime, text, Text, func
 from sqlalchemy.orm import relationship
+
 
 class CommunityRating(db.Model):
     __tablename__ = 'community_rating'
