@@ -69,6 +69,20 @@
                             <a href="{{ forum.url }}">{{ forum.title }}</a>
                         </div>
 
+                        <!-- Forum Subforums -->
+                        {% if forum.subforums.all() %}
+                            <div class="forum-subforums">
+                                <span>&#9679;</span>
+                                {%for subforum in forum.subforums%}
+                                    {% if not loop.last %}
+                                        <a href="{{ subforum.url }}" title="{{ subforum.description }}">{{ subforum.title }}</a>,
+                                    {% else %}
+                                        <a href="{{ subforum.url }}" title="{{ subforum.description }}">{{ subforum.title }}</a>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
                         <!-- Forum Description -->
                         <div class="forum-description">
                             {{ forum.description|nonpost_markup }}
