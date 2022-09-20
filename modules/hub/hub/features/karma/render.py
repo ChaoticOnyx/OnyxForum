@@ -68,7 +68,7 @@ def is_user_can_rate_post(user: User, post: Post) -> [bool, str]:
 def render_karma(user, post_id=None):
     karma = get_user_karma(user.discord)
     if karma is None:
-        return
+        return ""
 
     available = False
     user_cant_change_reason = ""
