@@ -29,8 +29,8 @@ function UploadFile(endpoint_url, csrf_token, uploaded_file, callback) {
             }
         }
     })
-    
-    
+
+
 };
 
 function HandleResult(data) {
@@ -78,7 +78,7 @@ function UploadAvatar(endpoint_url, csrf_token) {
             }
         }
         });
-    
+
     })
     };
 
@@ -87,7 +87,7 @@ function resize(item, item_type, width){
     var resize_width=width||150;
     //create a FileReader
     var reader = new FileReader();
-  
+
     //image turned to base64-encoded Data URI.
     reader.readAsDataURL(item);
     reader.name = item.name;//get the image's name
@@ -100,7 +100,7 @@ function resize(item, item_type, width){
             img.size = event.target.size;//set size (optional)
             img.onload = function(el) {
               var elem = document.createElement('canvas');//create a canvas
-            
+
               elem.width = el.target.width
               elem.height = el.target.height
               //scale the image to 150 (width) and keep aspect ratio
@@ -109,18 +109,18 @@ function resize(item, item_type, width){
               elem.width = resize_width;
               elem.height = el.target.height * scaleFactor;
             }
-        
+
               //draw in canvas
               var ctx = elem.getContext('2d');
               ctx.drawImage(el.target, 0, 0, elem.width, elem.height);
-        
+
               //get the base64-encoded Data URI from the resize image
               var srcEncoded = ctx.canvas.toDataURL(item_type, 1);
               resolve([srcEncoded, el.target.name])
               /*Now you can send "srcEncoded" to the server and
               convert it to a png o jpg. Also can send
               "el.target.name" that is the file's name.*/
-        
+
             }
           }
     })
@@ -129,14 +129,14 @@ function resize(item, item_type, width){
 function dataURLtoFile(dataurl, filename) {
     var arr = dataurl.split(','),
         mime = arr[0].match(/:(.*?);/)[1],
-        bstr = atob(arr[1]), 
-        n = bstr.length, 
+        bstr = atob(arr[1]),
+        n = bstr.length,
         u8arr = new Uint8Array(n);
-        
+
     while(n--){
         u8arr[n] = bstr.charCodeAt(n);
     }
-    
+
     return new File([u8arr], filename, {type:mime});
 }
 
@@ -178,8 +178,8 @@ function filestatus_click_handler(endpoint_url, csrf_token) {
 function file_link_append(file_type, file_link){
     if(file_link)
         if(file_type.includes("image")){
-            document.querySelector('textarea').value += '\n![enter image description here]('+file_link+' "enter image title here")'
+            document.querySelector('textarea').value += '\n![image]('+file_link+')'
         }else{
-            document.querySelector('textarea').value += '\n[enter link description here]('+file_link+')'
+            document.querySelector('textarea').value += '\n[link]('+file_link+')'
         }
 }
