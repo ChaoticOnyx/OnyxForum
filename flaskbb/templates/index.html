@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="{{ url_for('static', filename='js/index/marked.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index/normalize.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='fa6/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index/style.css') }}">
+    <title>Space Station 13</title>
+</head>
+
+<body data-json='{}'>
+    <div id="Background">
+        <div id="Clown"></div>
+        <div id="Assistant"></div>
+        <div id="Extinguisher"></div>
+    </div>
+    <div class="Main">
+        <header class="Block">
+            <h2 class="Title">SS13</h2>
+            <div class="Menu">
+                <a class="MenuItem" target="_blank" href="https://community.ss13.ru/">Форум</a>
+                |
+                <a class="MenuItem" target="_blank" href="https://wiki.ss13.ru/">Вики</a>
+                |
+                <a class="MenuItem" target="_blank"
+                    href="https://wiki.ss13.ru/index.php?title=Getting_Started">Играть!</a>
+                |
+                <a class="MenuItem" target="_blank" href="https://community.ss13.ru/donations/info">Донат</a>
+            </div>
+        </header>
+        <div id="Content">
+            <div id="News">
+                {% for topic in news %}
+                    <article class="NewsItem Block">
+                        <h2 class="NewsTitle">
+                            <a href="{{ topic.url }}">{{ topic.title }}</a>
+                        </h2>
+                        <p class="Date">
+                            <b>{{ topic.date_created|format_date('%b %d %Y') }}</b>
+                        </p>
+                        <p class="Text">
+                            {{ topic.first_post.content | markup | safe }}<br />
+                        </p>
+                    </article>
+                {% endfor %}
+            </div>
+            <div id="Servers">
+                {% for server in servers %}
+                    <div class="Server Block">
+                        <div class="ServerTitle">
+                            <span class="Title">
+                              <img class="ServerIcon" src="{{ server.icon }}">{{server.name}}
+                            </span>
+                            <span class="Population">
+                                {% if server.is_online %}
+                                    <span class="StatusOnline">ONLINE</span>
+                                {% else %}
+                                    <span class="StatusOffline">OFFLINE</span>
+                                {% endif %}
+                                {{ server.players_count }}
+                            </span>
+                        </div>
+                        <details class="ServerDescription">
+                            <summary>Описание</summary>
+                            <p>{{ server.description }}</p>
+                            <div class="ServerLinks">
+                                {% for link in server.links %}
+                                <a target="_blank" class="ServerLink {{ link.what }}" href="{{ link.href }}">
+                                    {% if link.what == 'discord' %}
+                                        <i class="fa-brands fa-discord"></i>
+                                    {% elif link.what == 'github' %}
+                                        <i class="fa-brands fa-github"></i>
+                                    {% elif link.what == 'wiki' %}
+                                        <i class="fa-brands fa-wikipedia-w"></i>
+                                    {% else %}
+                                        <i class="fa-solid fa-link"></i>
+                                    {% endif %}
+                                    {{ link.text }}
+                                  </a>
+                                {% endfor %}
+                            </div>
+                        </details>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

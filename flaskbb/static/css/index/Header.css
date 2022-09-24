@@ -1,0 +1,56 @@
+header {
+  display: flex;
+  padding: var(--medium-gap);
+
+  font-family: var(--fancy-font), sans-serif;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: var(--background-color-primary);
+  backdrop-filter: blur(8px);
+  border-radius: 4px;
+  padding: var(--small-gap);
+  align-items: center;
+
+  z-index: 10;
+}
+
+.MainLogo {
+  height: 3rem;
+}
+
+.SS13Logo {
+  height: 1rem;
+}
+
+.Logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+@media screen and (max-width: 700px) {
+  header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .Tite {
+    margin: auto;
+  }
+
+  .Menu {
+    margin: auto;
+  }
+}
+
+.Title {
+  margin: 0;
+}
+
+.Menu {
+  display: flex;
+  margin-left: auto;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}

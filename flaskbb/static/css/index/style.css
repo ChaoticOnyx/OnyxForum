@@ -1,0 +1,69 @@
+/* Inter font */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
+
+@import url("./constants.css");
+@import url("./Server.css");
+@import url("./News.css");
+@import url("./Background.css");
+@import url("./Header.css");
+
+html,
+body {
+  font-family: var(--fancy-font), sans-serif;
+  color: white;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0.5rem;
+}
+
+@media screen and (max-width: 700px) {
+  body {
+    margin: 0;
+  }
+}
+
+.Main {
+  max-width: 70em;
+  margin: auto;
+}
+
+@media screen and (max-width: 700px) {
+  #Content {
+    flex-direction: column-reverse;
+  }
+}
+
+#Content {
+  display: flex;
+  margin-top: var(--medium-gap);
+  gap: var(--medium-gap);
+}
+
+a {
+  font-weight: bold;
+  color: #b62036;
+  text-decoration: none;
+}
+
+a:hover {
+  color: white;
+}
+
+a:hover::before,
+a:hover::after {
+  color: white;
+}
+
+a:focus {
+  color: white;
+  background-color: #b62036;
+}
+
+a:focus::before,
+a:focus::after {
+  color: white;
+}

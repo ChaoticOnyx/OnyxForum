@@ -53,10 +53,10 @@ def LogAction(user, message):
 def datetime_tag():
     return datetime.datetime.now().strftime("[%d.%m.%Y %H:%M:%S]\t")
 
-
 @celery.task
 def run_console_script_async(script, task_name=None, output_file_path=""):
-    proc = subprocess.Popen(script, shell=True, stdout=PIPE, stderr=STDOUT, text=True, bufsize=1)
+    stdout = PIPE if task_name and output_file_path else None
+    proc = subprocess.Popen(script, shell=True, stdout=stdout, stderr=STDOUT, text=True, bufsize=1)
 
     if not task_name or not output_file_path:
         return
@@ -795,7 +795,7 @@ class AdminsView(Hub):
         admins = get_admins_by_rank()
         if request.endpoint == "hub.admins_json":
             return admins
-        
+
         return render_template(
             "hub/server/admins.html",
             **self.get_args(),

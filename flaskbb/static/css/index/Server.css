@@ -1,0 +1,138 @@
+#Servers {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: var(--medium-gap);
+  width: 100%;
+}
+
+.Server {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: var(--medium-gap);
+  gap: var(--medium-gap);
+  background-color: var(--background-color-primary);
+  backdrop-filter: blur(8px);
+  border-radius: 4px;
+}
+
+.ServerTitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--fancy-font), sans-serif;
+  font-weight: bold;
+  gap: var(--small-gap);
+}
+
+.Title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+summary {
+  font-size: 0.9em;
+  font-weight: bold;
+}
+
+.ServerDescription {
+  background-color: rgba(0, 0, 0, 0.134);
+  border-radius: 4px;
+  user-select: none;
+  cursor: pointer;
+
+  padding: var(--small-gap);
+}
+
+.ServerDescription p {
+  font-size: 0.8em;
+  font-style: italic;
+  user-select: text;
+  cursor: text;
+}
+
+.PlayButton {
+  padding: 10px;
+  text-align: center;
+  color: white;
+  background-color: #cf374d;
+  border-radius: 4px;
+  white-space: nowrap;
+
+  transition: all 0.25s;
+}
+
+.PlayButton:hover,
+.PlayButton:focus {
+  background-color: #f5445f;
+  color: white;
+}
+
+.StatusOnline {
+  font-weight: bold;
+  color: #00aa00;
+}
+
+.StatusOffline {
+  font-weight: bold;
+  color: #d00000;
+}
+
+.ServerLinks {
+  display: flex;
+  gap: var(--small-gap);
+  justify-content: center;
+}
+
+.ServerLink {
+  font-size: 0.8em;
+  flex-grow: 1;
+  font-weight: bold;
+  border-radius: 4px;
+  text-align: center;
+  background-color: #009cff;
+  text-decoration: none;
+  color: inherit;
+  white-space: nowrap;
+
+  padding: 6px;
+
+  transition: all 250ms;
+}
+
+.ServerLink:hover,
+.ServerLink:focus {
+  background-color: #ffffff;
+  color: black;
+}
+
+.ServerLink.discord {
+  color: white;
+  background-color: #5662f6;
+}
+
+.ServerLink.discord:hover {
+  background-color: #6872ff;
+}
+
+.ServerLink.github {
+  color: black;
+  background-color: white;
+}
+
+.ServerLink.github:hover {
+  background-color: rgb(220, 220, 220);
+}
+
+.ServerLink.wiki {
+  color: white;
+  background-color: #ff3541;
+}
+
+.ServerLink.wiki:hover {
+  background-color: #b8242e;
+}

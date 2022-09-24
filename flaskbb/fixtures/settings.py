@@ -8,6 +8,7 @@
     :copyright: (c) 2014 by the FlaskBB Team.
     :license: BSD, see LICENSE for more details.
 """
+from flaskbb.forum.models import Forum
 from flaskbb.utils.forms import SettingValueType
 from flaskbb.utils.helpers import get_available_languages as available_languages
 from flaskbb.utils.helpers import get_available_themes as available_themes
@@ -15,6 +16,11 @@ from flaskbb.utils.helpers import get_available_themes as available_themes
 
 def available_avatar_types():
     return [("PNG", "PNG"), ("JPEG", "JPG"), ("GIF", "GIF")]
+
+
+def available_forums():
+    forums = Forum.query.order_by(Forum.id.asc()).all()
+    return [(forum.id, forum.title) for forum in forums]
 
 
 fixture = (
@@ -338,4 +344,36 @@ fixture = (
             ),
         },
     ),
+    (
+        "index",
+        {
+            "name": "Index Page Settings",
+            "description": "Settings of Index page of the site",
+            "settings": (
+                (
+                    "forum_ids",
+                    {
+                        "value": [1],
+                        "value_type": SettingValueType.selectmultiple,
+                        "name": "Forum IDs",
+                        "description": (
+                            "The forum ids from which forums the posts "
+                            "should be displayed on the portal."
+                        ),
+                        "extra": {"choices": available_forums, "coerce": int},
+                    }
+                ),
+                (
+                    "recent_topics",
+                    {
+                        "value": 10,
+                        "value_type": SettingValueType.integer,
+                        "name": "Number of Recent Topics",
+                        "description": "The number of topics in Recent Topics.",
+                        "extra": {"min": 1},
+                    }
+                )
+            )
+        }
+    )
 )

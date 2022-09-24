@@ -1,0 +1,83 @@
+#Background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  background-image: url("/static/img/index/background.png");
+  background-position-y: 25%;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  z-index: -5;
+}
+
+#Clown {
+  width: 256px;
+  height: 256px;
+
+  z-index: 5;
+
+  background-image: url("/static/img/index/clown.png");
+  background-size: 100%;
+  background-repeat: no-repeat;
+
+  animation: clown-flying 180s linear infinite alternate;
+}
+
+@keyframes clown-flying {
+  from {
+    transform: translateY(180px) translateX(-50vw) rotateZ(10deg);
+  }
+
+  to {
+    transform: translateY(300px) translateX(300vw) rotateZ(360deg);
+  }
+}
+
+#Assistant {
+  width: 256px;
+  height: 256px;
+
+  z-index: 5;
+
+  background-image: url("/static/img/index/assistant.png");
+  background-size: 100%;
+  background-repeat: no-repeat;
+
+  animation: assistant-flying 140s linear infinite alternate;
+}
+
+@keyframes assistant-flying {
+  from {
+    transform: translateY(60vh) translateX(-100vw) rotateZ(360deg);
+  }
+
+  to {
+    transform: translateY(60vh) translateX(300vw) rotateZ(0deg);
+  }
+}
+
+#Extinguisher {
+  width: 256px;
+  height: 256px;
+
+  z-index: 5;
+
+  background-image: url("/static/img/index/extinguisher.png");
+  background-size: 100%;
+  background-repeat: no-repeat;
+
+  animation: extinguisher-flying 60s linear infinite alternate;
+}
+
+@keyframes extinguisher-flying {
+  from {
+    transform: translateY(45vh) translateX(150vw) rotateZ(360deg);
+  }
+
+  to {
+    transform: translateY(300px) translateX(-350px) rotateZ(0deg);
+  }
+}

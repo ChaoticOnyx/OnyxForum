@@ -146,3 +146,4 @@ modules/hub/hub/configs/*
 !modules/hub/hub/configs/example/
 /flaskbb.cfg
 flaskbb/static/user_content/
+flaskbb/static/img/server_logos/
