@@ -879,3 +879,7 @@ def discord_task(func):
     def wrapper(*args, **kwargs):
         return current_app.add_discord_task(func(*args, **kwargs))
     return wrapper
+
+
+def get_static_folder_path():
+    return "flaskbb/static"

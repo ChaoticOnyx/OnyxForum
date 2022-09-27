@@ -24,7 +24,7 @@ import secrets
 
 from flaskbb.user.models import User
 from flaskbb.forum.models import UploadedFile
-from flaskbb.utils.helpers import register_view, render_template
+from flaskbb.utils.helpers import register_view, render_template, get_static_folder_path
 from flaskbb.utils.requirements import has_permission
 
 import os
@@ -188,7 +188,7 @@ class UserUploads(MethodView):
 
     def get(self):
         files = UploadedFile.query.filter_by(user_id=current_user.id).all()
-        return render_template("user/user_uploads.html",files=files)
+        return render_template("user/user_uploads.html", files=files, upload_folder=current_app.config["UPLOAD_FOLDER"])
 
 class DeleteFile(MethodView):
     decorators = [login_required]
@@ -197,13 +197,13 @@ class DeleteFile(MethodView):
         file_id = request.args.get("file_id",0,type=int)
         file_record = UploadedFile.query.filter_by(id=file_id).first_or_404()
         file_owner = User.query.filter_by(id=file_record.user_id).first_or_404()
-        
+
         if not (file_owner.id == current_user.id or has_permission(current_user, "admin")):
             logger.warn("File {}(owned by:{}, discord:{}) was tried to be deleted by {}(discord:{})".format(file_record, file_owner, file_owner.discord, current_user.username, current_user.discord))
             return redirect(url_for("user.user_uploads"))
 
-        path = safe_join(current_app.config["UPLOAD_FOLDER"], file_owner.discord, file_record.current_name)
-        
+        path = safe_join(get_static_folder_path(), current_app.config["UPLOAD_FOLDER"], file_owner.discord, file_record.current_name)
+
         logger.info("File {}(owned by:{}, discord:{})) was deleted by {}(discord:{})".format(file_record, file_owner, file_owner.discord, current_user.username, current_user.discord))
 
         os.remove(path)
@@ -211,7 +211,7 @@ class DeleteFile(MethodView):
 
         flash(_("File deleted."), "success")
         return redirect(url_for("user.user_uploads"))
-        
+
 class AllUserTopics(MethodView):  # pragma: no cover
     decorators = [login_required]
 
@@ -243,7 +243,7 @@ class GenerateToken(MethodView):  # pragma: no cover
     decorators = [login_required]
 
     def get(self, userid):
-        
+
         if(get_byond_ckey(current_user)):
             flash("Ваш дискорд уже привязан к аккаунту {}".format(get_byond_ckey(current_user)))
             return redirect(url_for("user.profile", userid=current_user.id))

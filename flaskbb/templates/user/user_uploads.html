@@ -26,7 +26,7 @@
             <div class="uploads">
                 <div class="col-md-2 col-sm-2 col-xs-2">
                     <div class="page-body file-icon">
-                        <img src="{{url_for('forum.upload_file',file=current_user.discord+'/'+file.current_name)}}" alt="">
+                        <img src="{{url_for('static', filename=upload_folder + '/' + current_user.discord + '/' + file.current_name)}}" alt="">
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-3 col-xs-3">

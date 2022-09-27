@@ -14,7 +14,7 @@ import math
 import os
 
 from flask import (Blueprint, abort, current_app, flash, redirect, request,
-                   url_for, send_from_directory, safe_join)
+                   url_for, send_from_directory, safe_join, jsonify)
 from flask.views import MethodView
 from flask_allows import And, Permission
 from flask_babelplus import gettext as _
@@ -33,7 +33,7 @@ from flaskbb.user.models import User
 from flaskbb.utils.helpers import (FlashAndRedirect, do_topic_action,
                                    format_quote, get_online_users, real,
                                    register_view, render_template, time_diff,
-                                   time_utcnow)
+                                   time_utcnow, get_static_folder_path)
 from flaskbb.utils.requirements import (CanAccessForum, CanDeletePost,
                                         CanDeleteTopic, CanEditPost,
                                         CanPostReply, CanPostTopic, Has,
@@ -1148,7 +1148,7 @@ def user_get_uploads_total_size_limit():
     return user_uploads_total_size_limit
 
 def get_user_current_folder_size():
-    path = safe_join(current_app.config["UPLOAD_FOLDER"],current_user.discord)
+    path = safe_join(get_static_folder_path(), current_app.config["UPLOAD_FOLDER"],current_user.discord)
     folder_size = 0
     for ele in os.scandir(path):
             folder_size+=os.path.getsize(ele)
@@ -1182,7 +1182,7 @@ class UploadFile(MethodView):
         if received_file_object.filename == '':
             return 'failed-request'
 
-        path = safe_join(current_app.config["UPLOAD_FOLDER"],current_user.discord)
+        path = safe_join(get_static_folder_path(), current_app.config["UPLOAD_FOLDER"], current_user.discord)
 
         if not os.path.exists(path):
             os.mkdir(path)
@@ -1206,11 +1206,13 @@ class UploadFile(MethodView):
             filename = hash_file(received_file_object)
             uploaded_file_record.current_name = filename
 
+            path = safe_join(path, filename)
             if not (UploadedFile.query.filter_by(user_id=uploaded_file_record.user_id, current_name=uploaded_file_record.current_name).first()):
-                received_file_object.save(safe_join(path,filename))
+                received_file_object.save(path)
                 uploaded_file_record.save()
 
-            return url_for("forum.upload_file", file=current_user.discord+"/"+filename)
+            static_path = safe_join(current_app.config["UPLOAD_FOLDER"], current_user.discord, filename)
+            return jsonify(url_for('static', filename=static_path), url_for('forum.download_file', file=current_user.discord + "/" + filename))
         return 'bad-file'
 
 class DownloadFile(MethodView):
@@ -1219,7 +1221,11 @@ class DownloadFile(MethodView):
         filename =  request.args.get("file") if request.args.get("file") else ""
 
         download_filename = UploadedFile.query.filter_by(current_name=filename.split('/')[1]).first().original_name
-        return send_from_directory(current_app.config["UPLOAD_FOLDER"], filename, as_attachment=True, attachment_filename = download_filename)
+        return send_from_directory(
+            safe_join(safe_join(os.getcwd(), get_static_folder_path()), current_app.config["UPLOAD_FOLDER"]),
+            filename,
+            as_attachment=True,
+            attachment_filename = download_filename)
 
 @impl(tryfirst=True)
 def flaskbb_load_blueprints(app):
@@ -1427,7 +1433,7 @@ def flaskbb_load_blueprints(app):
 
     register_view(
         forum,
-        routes=["/uploads"],
+        routes=["/download"],
         view_func=DownloadFile.as_view("download_file")
     )
 

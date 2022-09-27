@@ -15,17 +15,20 @@ function UploadFile(endpoint_url, csrf_token, uploaded_file, callback) {
     formData.append('file', file);
 
     formData.append('csrf_token', csrf_token)
-    var link = [file.type]
+    var file_type = file.type
     $.ajax({
         url: endpoint_url,
         type: "POST",
         data:formData,
         contentType: false,
         processData: false,
-        success: function(data){
-            if(HandleResult(data)){
-                link.push(document.location.origin+data)
-                callback(link[0],link[1])
+        success: function(data) {
+            var static_link = data[0]
+            var download_link = data[1]
+            if(HandleResult(static_link, download_link)) {
+                static_link = document.location.origin + static_link;
+                download_link = document.location.origin + download_link;
+                callback(file_type, static_link, download_link);
             }
         }
     })
@@ -33,18 +36,18 @@ function UploadFile(endpoint_url, csrf_token, uploaded_file, callback) {
 
 };
 
-function HandleResult(data) {
+function HandleResult(static_link, download_link) {
     var defaultbar = document.querySelector('label.filestatus span[id="error none"]')
     var errorbars = document.querySelectorAll('label.filestatus span')
     errorbars.forEach(function(errorbar) {
         errorbar.style.display = "none";
     });
-    if(data.includes("/uploads?file=")){
+    if(static_link.includes("/static")){
         defaultbar.style.display = "inline-block";
         return true
     }else{
         defaultbar.style.display = "none";
-        document.getElementById("error "+data).style.display = "inline-block";
+        document.getElementById("error " + static_link).style.display = "inline-block";
         return false
     }
 };
@@ -193,13 +196,12 @@ function filestatus_click_handler(endpoint_url, csrf_token) {
     UploadFile(endpoint_url, csrf_token, file, file_link_append)
 }
 
-function file_link_append(file_type, file_link){
-    if(file_link)
-        if(file_type.includes("image")){
-            document.querySelector('textarea').value += '\n![image]('+file_link+')'
-        }else{
-            document.querySelector('textarea').value += '\n[link]('+file_link+')'
-        }
+function file_link_append(file_type, static_link, download_link) {
+    if(file_type.includes("image")) {
+        document.querySelector('textarea').value += '\n![image](' + static_link + ')'
+    } else {
+        document.querySelector('textarea').value += '\n[link](' + download_link + ')'
+    }
 }
 
 
