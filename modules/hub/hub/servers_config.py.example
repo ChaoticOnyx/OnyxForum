@@ -3,10 +3,21 @@ from typing import List, Dict
 
 
 @attr.s(auto_attribs=True)
+class ServerAdditionalLink:
+    what: str
+    text: str
+    href: str
+
+
+@attr.s(auto_attribs=True)
 class ServerDescriptor:
     id: str
     name: str
+    icon: str
+    description: str
+    links: List[ServerAdditionalLink]
     service_name: str
+    port: int
     path: str
     branch_name: str
     dream_maker_binary: str
