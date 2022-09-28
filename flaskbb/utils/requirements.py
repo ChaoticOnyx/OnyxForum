@@ -105,35 +105,29 @@ class TopicNotLocked(Requirement):
         self._post_id = post_id
 
     def fulfill(self, user):
-        return not any(self._determine_locked())
+        return not self._determine_locked()
 
-    def _determine_locked(self):
+    def _determine_locked(self) -> bool:
         """
-        Returns a pair of booleans:
-            * Is the topic locked?
-            * Is the forum the topic belongs to locked?
+        Is the topic locked?
 
         Except in the case of a topic instance being provided to the
         constructor, all of these tuples are SQLA KeyedTuples.
         """
         if self._topic is not None:
-            return self._topic.locked, self._topic.forum.locked
+            return self._topic.locked
         elif self._post is not None:
-            return self._post.topic.locked, self._post.topic.forum.locked
+            return self._post.topic.locked
         elif self._topic_id is not None:
-            return (
-                Topic.query.join(Forum, Forum.id == Topic.forum_id).filter(
+            return Topic.query(Topic.locked).filter(
                     Topic.id == self._topic_id
-                ).with_entities(
-                    Topic.locked, Forum.locked
-                ).first()
-            )
+                ).scalar()
         else:
             return self._get_topic_from_request()
 
     def _get_topic_from_request(self):
         if current_topic:
-            return current_topic.locked, current_forum.locked
+            return current_topic.locked
         else:
             raise FlaskBBError("How did you get this to happen?")
 
@@ -168,10 +162,10 @@ class ForumNotLocked(Requirement):
 def can_user_access_forum(user, forum):
     user_groups = {g.id for g in user.groups}
     forum_groups = {g.id for g in forum.groups}
-    
+
     if forum.parent_id and not can_user_access_forum(user, Forum.query.filter_by(id=forum.parent_id).first()):
         return False
-    
+
     return bool(forum_groups & user_groups)
 
 

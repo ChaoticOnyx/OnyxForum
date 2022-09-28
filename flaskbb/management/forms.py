@@ -489,7 +489,7 @@ class ForumForm(FlaskForm):
 
     locked = BooleanField(
         _("Locked?"),
-        description=_("Disable new posts and topics in this forum.")
+        description=_("Disable new topics in this forum.")
     )
 
     groups = QuerySelectMultipleField(
