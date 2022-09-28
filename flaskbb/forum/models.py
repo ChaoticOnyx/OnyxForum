@@ -1349,6 +1349,7 @@ class Category(db.Model, CRUDMixin):
 
             forum_alias = aliased(Forum, user_forums)
             forums = cls.query.\
+                filter(cls.id == category_id).\
                 join(forum_alias, cls.id == forum_alias.category_id).\
                 outerjoin(ForumsRead,
                           db.and_(ForumsRead.forum_id == forum_alias.id,
