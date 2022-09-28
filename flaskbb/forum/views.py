@@ -127,10 +127,14 @@ class ViewForum(MethodView):
             user=real(current_user)
         )
 
+        parent_list = forum_instance.get_parent_list()
+        category = forum_instance.category or parent_list[-1].category
+
         return render_template(
             "forum/forum.html",
             forum=forum_instance,
-            parent_list=forum_instance.get_parent_list(),
+            category=category,
+            parent_list=parent_list,
             topics=topics,
             forumsread=forumsread,
             forums=forums_and_readforum
@@ -212,9 +216,14 @@ class ViewTopic(MethodView):
         if len(posts.items) == 0:
             abort(404)
 
+        forum_list = [topic.forum] + topic.forum.get_parent_list()
+        category = forum_list[-1].category
+
         return render_template(
             "forum/topic.html",
             topic=topic,
+            category=category,
+            forum_list=forum_list,
             posts=posts,
             last_seen=time_diff(),
             form=self.form()

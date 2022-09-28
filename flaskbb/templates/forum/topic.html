@@ -8,8 +8,12 @@
 <div class="topic-view">
     <ol class="breadcrumb flaskbb-breadcrumb">
         <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-        <li><a href="{{ topic.forum.category.url }}">{{ topic.forum.category.title }}</a></li>
-        <li><a href="{{ topic.forum.url }}">{{ topic.forum.title }}</a></li>
+        {% if category %}
+            <li><a href="{{ category.url }}">{{ category.title }}</a></li>
+        {% endif %}
+        {% for forum in forum_list %}
+            <li><a href="{{ forum.url }}">{{ forum.title }}</a></li>
+        {% endfor %}
         <li class="active">{{ topic.title }}</li>
     </ol>
 
