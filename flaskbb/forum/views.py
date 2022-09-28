@@ -128,7 +128,7 @@ class ViewForum(MethodView):
         )
 
         parent_list = forum_instance.get_parent_list()
-        category = forum_instance.category or parent_list[-1].category
+        category = forum_instance.category or parent_list[0].category
 
         return render_template(
             "forum/forum.html",
@@ -216,8 +216,8 @@ class ViewTopic(MethodView):
         if len(posts.items) == 0:
             abort(404)
 
-        forum_list = [topic.forum] + topic.forum.get_parent_list()
-        category = forum_list[-1].category
+        forum_list = topic.forum.get_parent_list() + [topic.forum]
+        category = forum_list[0].category
 
         return render_template(
             "forum/topic.html",

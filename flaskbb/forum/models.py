@@ -1220,8 +1220,8 @@ class Forum(db.Model, CRUDMixin):
         while current.parent:
             current = current.parent
             parent_list.append(current)
+        parent_list.reverse()
         return parent_list
-
 
 
 @make_comparable
