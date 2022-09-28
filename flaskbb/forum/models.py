@@ -845,10 +845,16 @@ class Forum(db.Model, CRUDMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     category_id = db.Column(db.Integer,
-                            db.ForeignKey("categories.id", ondelete="CASCADE"),
-                            nullable=False)
+                            db.ForeignKey("categories.id", ondelete="CASCADE"))
     parent_id = db.Column(db.Integer,
                           db.ForeignKey("forums.id", ondelete="CASCADE"))
+    parent = db.relationship(
+        'Forum',
+        remote_side=[id],
+        backref=db.backref(
+            'subforums',
+            primaryjoin='Forum.id == Forum.parent_id',
+            order_by='asc(Forum.position)'))
 
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=True)
@@ -883,13 +889,8 @@ class Forum(db.Model, CRUDMixin):
                                   default=time_utcnow, nullable=True)
 
     # One-to-many
-    topics = db.relationship("Topic", backref="forum", lazy="dynamic",
-                             cascade="all, delete-orphan")
+    topics = db.relationship("Topic", backref="forum", lazy="dynamic")
 
-    subforums = db.relationship("Forum", lazy="dynamic",
-                             primaryjoin='Forum.id == Forum.parent_id',
-                             order_by='asc(Forum.position)',
-                             cascade="all, delete-orphan")
     # Many-to-many
     moderators = db.relationship(
         "User",
@@ -1213,6 +1214,15 @@ class Forum(db.Model, CRUDMixin):
 
         return forums
 
+    def get_parent_list(self):
+        parent_list = []
+        current = self
+        while current.parent:
+            current = current.parent
+            parent_list.append(current)
+        return parent_list
+
+
 
 @make_comparable
 class Category(db.Model, CRUDMixin):
@@ -1226,8 +1236,7 @@ class Category(db.Model, CRUDMixin):
     # One-to-many
     forums = db.relationship("Forum", backref="category", lazy="dynamic",
                              primaryjoin='Forum.category_id == Category.id',
-                             order_by='asc(Forum.position)',
-                             cascade="all, delete-orphan")
+                             order_by='asc(Forum.position)')
 
     # Properties
     @property
@@ -1258,12 +1267,6 @@ class Category(db.Model, CRUDMixin):
         # and finally delete the category itself
         db.session.delete(self)
         db.session.commit()
-
-        # Update the users post count
-        if users:
-            for user in users:
-                user.post_count = Post.query.filter_by(user_id=user.id).count()
-                db.session.commit()
 
         return self
 

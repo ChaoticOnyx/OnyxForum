@@ -206,4 +206,5 @@ function file_link_append(file_type, static_link, download_link) {
 
 
 var filestatus_div = document.querySelector(".editor-filestatus")
-document.querySelector(".md-editor").appendChild(filestatus_div)
+if (filestatus_div)
+    document.querySelector(".md-editor").appendChild(filestatus_div);

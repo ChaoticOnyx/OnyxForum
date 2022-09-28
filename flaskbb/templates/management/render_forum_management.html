@@ -75,9 +75,9 @@
                         {% endfor %}
                     </div>
                     {% endif %}
-                    
+
                 </div>
-                
+
             </div>
         </div> <!-- end forum-info -->
 
@@ -110,7 +110,7 @@
             </div>
         </div>
         <!-- Forum Subforums -->
-        {% if forum.subforums.all() %}
+        {% if forum.subforums|length %}
         <div class="col-md-12 col-sm-5 col-xs-4 forum-subforums" style="margin-left: 0.5em;">
             <details>
                 <summary><b>Subforums</b></summary>

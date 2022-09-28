@@ -130,6 +130,7 @@ class ViewForum(MethodView):
         return render_template(
             "forum/forum.html",
             forum=forum_instance,
+            parent_list=forum_instance.get_parent_list(),
             topics=topics,
             forumsread=forumsread,
             forums=forums_and_readforum

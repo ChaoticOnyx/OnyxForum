@@ -500,14 +500,14 @@ class ForumForm(FlaskForm):
     )
 
     submit = SubmitField(_("Save"))
-  
+
     def validate_parent_id(self, field):
         if not self.is_subforum.data:
             field.data = None
         else:
             if field.data == None:
                 raise ValidationError(_("Specify the parent forum!"))
-    
+
     def validate_external(self, field):
         if hasattr(self, "forum"):
             if self.forum.topics.count() > 0:
@@ -566,6 +566,7 @@ class EditForumForm(ForumForm):
         data.pop('is_subforum', None)
         if data['parent_id']:
             data['parent_id'] = data['parent_id'].id
+            data['category'] = None
         forum = Forum(**data)
         # flush SQLA info from created instance so that it can be merged
         make_transient(forum)
