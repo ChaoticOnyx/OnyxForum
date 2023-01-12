@@ -113,11 +113,10 @@ def prompt_save_user(username, group, only_update=False):
             click.style("Username", fg="magenta"), type=str,
             default=os.environ.get("USER", "")
         )
-    if not password:
-        password = click.prompt(
-            click.style("Password", fg="magenta"), hide_input=True,
-            confirmation_prompt=True
-        )
+    password = click.prompt(
+        click.style("Password", fg="magenta"), hide_input=True,
+        confirmation_prompt=True
+    )
     if not group:
         group = click.prompt(
             click.style("Group", fg="magenta"),
@@ -125,9 +124,11 @@ def prompt_save_user(username, group, only_update=False):
             default="admin"
         )
 
+    email = ""
+
     if only_update:
-        return update_user(username, username, password, group)
-    return create_user(username, username, password, group)
+        return update_user(username, username, password, email, group)
+    return create_user(username, username, password, email, group)
 
 
 def prompt_config_path(config_path):

@@ -99,4 +99,4 @@ celery = Celery("flaskbb")
 scheduler = APScheduler()
 
 asyncio.set_event_loop(asyncio.SelectorEventLoop())
-discordClient: discord.Client = discord.Client()
+discordClient: discord.Client = discord.Client(intents=discord.Intents.default())

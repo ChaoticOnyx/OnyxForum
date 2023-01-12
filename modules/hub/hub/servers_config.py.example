@@ -36,7 +36,16 @@ servers_config = [
     ServerDescriptor(
         id="chaotic",
         name="Local Server",
+        icon="/static/img/server_logos/chaotic.png",
+        description="Настоящий ролевой сервер про чрезвычайные ситуации с упором в отыгрыш интересных и запоминающихся персонажей.",
+        links=
+        [
+            ServerAdditionalLink("discord", "Discord", "https://discord.gg/5BRMMFg"),
+            ServerAdditionalLink("github", "Github", "https://github.com/ChaoticOnyx/OnyxBay"),
+            ServerAdditionalLink("wiki", "Wiki", "https://wiki.ss13.ru/index.php?title=Chaotic_Onyx"),
+        ],
         service_name="onyx.service",
+        port=2505,
         path="/home/OnyxBay",
         branch_name="release/chaotic",
         dream_maker_binary="DreamMaker",

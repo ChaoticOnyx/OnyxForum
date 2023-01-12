@@ -14,7 +14,7 @@ import collections
 from flaskbb.management.models import Setting
 
 
-class FlaskBBConfig(collections.MutableMapping):
+class FlaskBBConfig(collections.abc.MutableMapping):
     """Provides a dictionary like interface for interacting with FlaskBB's
     Settings cache.
     """
