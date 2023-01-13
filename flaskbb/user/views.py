@@ -18,7 +18,7 @@ from flask_babelplus import gettext as _
 from flask_login import current_user, login_required
 from pluggy import HookimplMarker
 from flaskbb.extensions import db_hub
-from hub.models import Token
+from hub.models import Token, DiscordUser
 from hub.utils import get_byond_ckey
 import secrets
 
@@ -243,16 +243,21 @@ class GenerateToken(MethodView):  # pragma: no cover
     decorators = [login_required]
 
     def get(self, userid):
-
         if(get_byond_ckey(current_user)):
             flash("Ваш дискорд уже привязан к аккаунту {}".format(get_byond_ckey(current_user)))
             return redirect(url_for("user.profile", userid=current_user.id))
+        
+        discord_user = DiscordUser.query.filter(DiscordUser.id == current_user.discord).first()
+        if not discord_user:
+            discord_user = DiscordUser()
+            discord_user.id = current_user.discord
+            discord_user.nickname = current_user.display_name
+            discord_user.save()
 
         Token.query.filter(Token.discord_user_id == current_user.discord).delete()
         new_token = Token()
         new_token.token = secrets.token_hex(16)
         new_token.discord_user_id = current_user.discord
-
 
         db_hub.session.add(new_token)
         db_hub.session.commit()
@@ -260,7 +265,9 @@ class GenerateToken(MethodView):  # pragma: no cover
         db_hub.session.refresh(new_token)
         db_hub.session.expunge_all()
 
-        flash("Ваш токен {}. Чтобы выполнить привязку BYOND аккаунта, введите его, с помощью консольной команды `.chaotic-token` на одном из наших серверов.".format(new_token.token))
+        flash(
+            "Ваш токен \"{}\". Чтобы выполнить привязку BYOND аккаунта, введите его, "
+            "с помощью консольной команды `.chaotic-token` на одном из наших серверов.".format(new_token.token))
         return redirect(url_for("user.profile", userid=current_user.id))
 
 

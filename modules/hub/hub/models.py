@@ -28,6 +28,11 @@ class DiscordUser(db_hub.Model):
     def pure_name(self):
         return self.nickname[:-5]
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
+
 
 class DiscordUserRole(db_hub.Model):
     __bind_key__ = 'hub'
