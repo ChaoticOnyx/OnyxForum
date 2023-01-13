@@ -45,6 +45,8 @@
                         </div>
                         {{ render_field(form.position) }}
                         {{ render_field(form.external) }}
+                        {{ render_field(form.discord_report_channel) }}
+                        {{ render_boolean_field(form.discord_report_posts) }}
                         {{ render_field(form.moderators) }}
                         {{ render_boolean_field(form.show_moderators) }}
                         {{ render_boolean_field(form.locked) }}

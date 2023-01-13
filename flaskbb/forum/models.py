@@ -160,6 +160,8 @@ class Post(HideableCRUDMixin, db.Model):
     modified_by = db.Column(db.String(200), nullable=True)
     modified_by_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
 
+    discord_message_id = db.Column(db.String(200), nullable=True)
+
     # Properties
     @property
     def url(self):
@@ -862,6 +864,8 @@ class Forum(db.Model, CRUDMixin):
     locked = db.Column(db.Boolean, default=False, nullable=False)
     show_moderators = db.Column(db.Boolean, default=False, nullable=False)
     external = db.Column(db.String(200), nullable=True)
+    discord_report_channel = db.Column(db.String(200), nullable=True)
+    discord_report_posts = db.Column(db.Boolean, default=False, nullable=False)
 
     post_count = db.Column(db.Integer, default=0, nullable=False)
     topic_count = db.Column(db.Integer, default=0, nullable=False)

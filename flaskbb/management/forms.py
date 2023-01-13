@@ -457,7 +457,7 @@ class ForumForm(FlaskForm):
     parent_id = QuerySelectField(
         _("Parent forum"),
         query_factory=selectable_forums,
-        allow_blank=False,
+        allow_blank=True,
         get_label="title",
         description=_("The forum that contains this forum.")
     )
@@ -474,6 +474,17 @@ class ForumForm(FlaskForm):
         _("External link"),
         validators=[Optional(), URL()],
         description=_("A link to a website i.e. 'http://flaskbb.org'.")
+    )
+
+    discord_report_channel = StringField(
+        _("Discord Reports Channel"),
+        validators=[Optional()],
+        description=_("Discord channel for new message reports")
+    )
+
+    discord_report_posts = BooleanField(
+        _("Report Posts?"),
+        description=_("Report newly created posts too")
     )
 
     moderators = StringField(
