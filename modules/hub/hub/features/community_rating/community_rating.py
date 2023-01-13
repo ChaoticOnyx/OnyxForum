@@ -52,5 +52,5 @@ def weekly_community_rating_update():
         for user in User.query.all():
             user_community_rating = get_user_community_rating(user)
             if not user_community_rating:
-                return
+                continue
             change_user_community_rating(user, -copysign(min(2, abs(user_community_rating)), user_community_rating))

@@ -224,6 +224,8 @@ def configure_extensions(app):
     scheduler.init_app(app)
     scheduler.start()
 
+    scheduler.scheduler.print_jobs()
+
     # Flask-Alembic
     alembic.init_app(app, command_name="db")
 
