@@ -275,37 +275,42 @@ def configure_extensions(app):
 
     login_manager.init_app(app)
 
+    command_line = ' '.join(sys.argv)
+    is_running_server = ('run' in command_line) or ('gunicorn' in command_line)
+
+    if not is_running_server:
+        return
+
     if "DISCORD_CLIENT_ID" in app.config:
         app.discordAuth = DiscordOAuth2Session(app)
 
     if "DISCORD_BOT_TOKEN" in app.config:
-        if not app.debug or werkzeug.serving.is_running_from_reloader():
-            loop = asyncio.get_event_loop()
+        loop = asyncio.get_event_loop()
 
-            def exception_handler(loop, context):
-                print("Error: Exception is caught during execution of coro: " + str(context.get('future')))
-                try:
-                    raise context.get('exception')
-                except Exception:
-                    traceback.print_exc()
-            loop.set_exception_handler(exception_handler)
+        def exception_handler(loop, context):
+            print("Error: Exception is caught during execution of coro: " + str(context.get('future')))
+            try:
+                raise context.get('exception')
+            except Exception:
+                traceback.print_exc()
+        loop.set_exception_handler(exception_handler)
 
-            loop.create_task(discordClient.start(app.config["DISCORD_BOT_TOKEN"]))
-            discordClientThread = threading.Thread(target=loop.run_forever)
-            discordClientThread.start()
+        loop.create_task(discordClient.start(app.config["DISCORD_BOT_TOKEN"]))
+        discordClientThread = threading.Thread(target=loop.run_forever)
+        discordClientThread.start()
 
-            def add_discord_task(async_task):
-                async def context_task(app):
-                    with app.app_context():
-                        return await async_task
-                return loop.create_task(context_task(app))
+        def add_discord_task(async_task):
+            async def context_task(app):
+                with app.app_context():
+                    return await async_task
+            return loop.create_task(context_task(app))
 
-            app.add_discord_task = add_discord_task
+        app.add_discord_task = add_discord_task
 
-            def interupt():
-                discordClient.logout()
-                discordClientThread.cancel()
-            atexit.register(interupt)
+        def interupt():
+            discordClient.logout()
+            discordClientThread.cancel()
+        atexit.register(interupt)
 
 
 @discordClient.event
