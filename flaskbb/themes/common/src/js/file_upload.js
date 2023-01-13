@@ -75,9 +75,11 @@ function UploadAvatar(endpoint_url, csrf_token) {
         contentType: false,
         processData: false,
         success: function(data){
-            if(HandleResult(data)){
-                document.querySelector('input[name="avatar"]').value = document.location.origin+data;
-                document.querySelector('img[name="avatar"]').src = document.location.origin+data;
+            var static_link = data[0]
+            var download_link = data[1]
+            if(HandleResult(static_link, download_link)){
+                document.querySelector('input[name="avatar"]').value = document.location.origin + static_link;
+                document.querySelector('img[name="avatar"]').src = document.location.origin + static_link;
             }
         }
         });
