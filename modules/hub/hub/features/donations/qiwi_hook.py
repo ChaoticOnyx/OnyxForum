@@ -48,7 +48,7 @@ class QiwiHook(MethodView):
                 notify_user_donation_registration_error(dt, amount, content['payment']['comment'])
                 print("-- Failed to process donation automatically (comment: \"{}\")".format(content['payment']['comment']))
             else:
-                actions.add_donation_and_notify(dt, ckey, float(amount), type="qiwi")
+                actions.add_donation_and_notify(dt, player, float(amount), type="qiwi")
         except Exception:
             print("Error: Exception is caught during QIWI hook processing:")
             traceback.print_exc()

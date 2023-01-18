@@ -61,12 +61,17 @@ class Player(db_hub.Model):
     __tablename__ = 'players'
 
     id = Column(Integer, primary_key=True)
-    ckey = Column(String(50), nullable=False, unique=True)
+    ckey = Column(String(50), unique=True)
     discord_user_id = Column('discord', ForeignKey('discord_users.id'), index=True)
     patron_type_id = Column('patron_type', ForeignKey('patron_types.id'), index=True, server_default=text("0"))
 
     discord_user = relationship('DiscordUser', lazy='immediate')
     patron_type = relationship('PatronType', lazy='immediate')
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
 
 
 class HubLog(db.Model):

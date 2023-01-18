@@ -16,6 +16,7 @@ from flaskbb.utils.helpers import FlashAndRedirect
 from flaskbb.extensions import allows
 from hub.features.donations import discord_tasks, money, actions
 from hub.models import PointsTransaction, MoneyTransaction
+from hub.utils import get_player_by_discord
 from .forms import AddDonationForm, AddMoneyTransactionForm, AddPointsTransactionForm
 from .notifications import *
 
@@ -94,7 +95,8 @@ class AddDonationView(DonationsView):
         form = AddDonationForm()
 
         if form.validate_on_submit():
-            actions.add_donation_and_notify(form.datetime.data, form.ckey.data, form.amount.data, form.type.data, form.issue.data, current_user)
+            player = get_player_by_discord(form.discord.data, create_if_not_exists=True)
+            actions.add_donation_and_notify(form.datetime.data, player, form.amount.data, form.type.data, form.issue.data, current_user)
             flash("Donation is added", "success")
 
         return render_template(
@@ -132,9 +134,12 @@ class PointsTransactionsView(DonationsView):
 
         data = []
         for transaction in transactions:
+            player_str = ""
+            if transaction.player:
+                player_str = transaction.player.ckey or f"{transaction.player.discord_user.nickname} ({transaction.player.discord_user_id})"
             data.append(TransactionData(
                 datetime=transaction.datetime,
-                player=transaction.player.ckey,
+                player=player_str,
                 change="{:+2}".format(transaction.change).rstrip('0').rstrip('.') + " 🔆",
                 comment=transaction.comment
             ))
@@ -174,10 +179,13 @@ class MoneyTransactionsView(DonationsView):
 
         data = []
         for transaction in transactions:
-            data.append(TransactionData(
+            player_str = ""
+            if transaction.player:
+                player_str = transaction.player.ckey or f"{transaction.player.discord_user.nickname} ({transaction.player.discord_user_id})"
+            data.append(TransactionData( 
                 datetime=transaction.datetime,
                 change="{:+2}".format(transaction.change).rstrip('0').rstrip('.') + " ₽",
-                reason=transaction.reason + (" (" + transaction.player.ckey + ")" if transaction.player else "")
+                reason=transaction.reason + f"({player_str})"
             ))
 
         return render_template(
@@ -255,7 +263,8 @@ class AddPointsTransactionView(DonationsView):
         form = AddPointsTransactionForm()
 
         if form.validate_on_submit():
-            points_transaction = money.add_points_transaction(form.ckey.data, form.amount.data, form.reason.data)
+            player = get_player_by_discord(form.discord.data, create_if_not_exists=True)
+            points_transaction = money.add_points_transaction(player, form.amount.data, form.reason.data)
             report_points_transaction(points_transaction)
             notify_user_about_points_transaction(current_user._get_current_object(), points_transaction)
             if points_transaction.player.discord_user_id and form.amount.data > 0:
@@ -263,12 +272,14 @@ class AddPointsTransactionView(DonationsView):
             logger.info(
                 "[AddPointsTransaction] "
                 "registered_by: {user} ({user_discord_id}), "
-                "ckey: {ckey}, "
+                "player: {ckey} ({discord} - {discord_id}), "
                 "amount: {amount}, "
                 "reason: {reason}".format(
                     user=current_user.display_name,
                     user_discord_id=current_user.discord,
-                    ckey=form.ckey.data,
+                    ckey=player.ckey,
+                    discord=player.discord_user.nickname,
+                    discord_id=player.discord_user_id,
                     amount=form.amount.data,
                     reason=form.reason.data))
 

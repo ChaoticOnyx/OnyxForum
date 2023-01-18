@@ -24,7 +24,6 @@ async def __try_send_to_user_and_host(user: discord.User, ckey, host, embed, hos
     assert user
     assert embed
     assert host
-    assert ckey
     assert host_title
     assert user_title
 
@@ -39,12 +38,12 @@ async def __try_send_to_user_and_host(user: discord.User, ckey, host, embed, hos
     try:
         await user.send(embed=embed)
     except discord.errors.Forbidden:
-        await host.send("**Ошибка:** Discord запретил отправку сообщения {ckey} ({discord})"
-            .format(ckey=ckey, discord=user.id))
+        await host.send("**Ошибка:** Discord запретил отправку сообщения {ckey} ({discord} - {discord_id})"
+            .format(ckey=ckey, discord="{}#{}".format(user.name, user.discriminator), discord_id=user.id))
         raise
     except Exception:
-        await host.send("**Ошибка:** Произошла неизвестная ошибка при отправке сообщения {ckey} ({discord})"
-            .format(ckey=ckey, discord=user.id))
+        await host.send("**Ошибка:** Произошла неизвестная ошибка при отправке сообщения {ckey} ({discord} - {discord_id})"
+            .format(ckey=ckey, discord="{}#{}".format(user.name, user.discriminator), discord_id=user.id))
         raise
 
 

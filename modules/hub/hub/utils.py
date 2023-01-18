@@ -21,9 +21,16 @@ def byond_key_to_ckey(key) -> str:
     return "".join([c for c in key if c.isalnum()])
 
 
-def get_player_by_discord(discord_id) -> Player:
+def get_player_by_discord(discord_id, create_if_not_exists = False) -> Player:
     assert discord_id
-    return db_hub.session.query(Player).filter(Player.discord_user_id == discord_id).one_or_none()
+    player = db_hub.session.query(Player).filter(Player.discord_user_id == discord_id).one_or_none()
+    if player or not create_if_not_exists:
+        return player
+
+    player = Player()
+    player.discord_user_id = discord_id
+    player.save()
+    return player
 
 
 def get_player_by_ckey(ckey) -> Player:

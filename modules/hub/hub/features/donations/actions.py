@@ -3,6 +3,8 @@ import logging
 from dateutil import tz
 from typing import Optional
 
+from hub.models import Player
+
 from .hub.notifications import *
 from . import discord_tasks, money, subscriptions
 
@@ -12,14 +14,14 @@ logger = logging.getLogger('donations')
 
 def add_donation_and_notify(
     dt: datetime,
-    ckey: str,
+    player: Player,
     amount: float,
     type: str,
     issue: Optional[int] = None,
     registered_by: Optional[User] = None
 ):
     utc_datetime = dt.astimezone(tz.tzutc())
-    money_transaction, points_transaction = money.add_donation(utc_datetime, ckey, amount, type, issue)
+    money_transaction, points_transaction = money.add_donation(utc_datetime, player, amount, type, issue)
     if type != "patreon":
         report_money_transaction(money.get_current_balance(), money_transaction)
     report_points_transaction(points_transaction)
@@ -36,12 +38,14 @@ def add_donation_and_notify(
         "[AddDonation] "
         "{registered_by_str}"
         "datetime: {datetime}, "
-        "ckey: {ckey}, "
+        "player: {ckey} ({discord} - {discord_id}), "
         "amount: {amount}, "
         "type: {type}".format(
             registered_by_str=registered_by_str,
             datetime=dt.strftime("%d.%m.%Y %H:%M"),
-            ckey=ckey,
+            ckey=player.ckey,
+            discord=player.discord_user.nickname,
+            discord_id=player.discord_user_id,
             amount=amount,
             type=type))
 

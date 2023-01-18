@@ -2,7 +2,7 @@ from wtforms import ValidationError
 from flask_babelplus import gettext as _
 from flaskbb.extensions import db_hub
 from .utils import get_player_by_ckey
-from .models import Player, Issue
+from .models import Player, Issue, DiscordUser
 
 
 class CkeyLinkedToDiscordValidator:
@@ -36,3 +36,17 @@ class IssueIsKnownValidator:
                     "Issue #%(issue)s is unknown",
                     issue=field.data,
                 ))
+
+
+class DiscordIdValidator:
+    def __init__(self):
+        pass
+
+    def __call__(self, form, field):
+        if not field.data:
+            return
+
+        discord_user = db_hub.session.query(DiscordUser).filter(DiscordUser.id == field.data).one_or_none()
+        if discord_user is None:
+            raise ValidationError(_(
+                    f"User with Discord ID {field.data} is not found"))

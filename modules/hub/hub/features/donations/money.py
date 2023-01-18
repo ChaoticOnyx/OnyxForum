@@ -6,7 +6,7 @@ from sqlalchemy import func
 
 from flaskbb.extensions import db_hub
 
-from hub.models import Issue, MoneyTransaction, MoneyCurrency, DonationType, PointsTransaction, PointsTransactionType
+from hub.models import Player, Issue, MoneyTransaction, MoneyCurrency, DonationType, PointsTransaction, PointsTransactionType
 from hub.utils import get_player_by_ckey
 
 
@@ -30,16 +30,16 @@ def get_donation_types():
     return [str(donation_type.type) for donation_type in donation_types]
 
 
-def add_donation(dt: datetime.datetime, ckey: str, donation: float, donation_type: str, issue_id: Optional[int] = None) \
+def add_donation(dt: datetime.datetime, player: Player, donation: float, donation_type: str, issue_id: Optional[int] = None) \
         -> Tuple[MoneyTransaction, PointsTransaction]:
     assert dt
-    assert ckey
+    assert player
     assert donation
     assert donation_type
 
     money_transaction = MoneyTransaction()
     money_transaction.datetime = dt
-    money_transaction.player = get_player_by_ckey(ckey)
+    money_transaction.player = player
 
     money_transaction.currency = \
         db_hub.session.query(MoneyCurrency).filter(MoneyCurrency.name == "ruble").one_or_none()
@@ -70,13 +70,13 @@ def add_donation(dt: datetime.datetime, ckey: str, donation: float, donation_typ
     return money_transaction, points_transaction
 
 
-def add_money_transaction(change: float, reason: str, ckey: Optional[str]):
+def add_money_transaction(change: float, reason: str, player: Optional[Player]):
     assert change
     assert reason
 
     money_transaction = MoneyTransaction()
-    if ckey:
-        money_transaction.player = get_player_by_ckey(ckey)
+    if player:
+        money_transaction.player = player
 
     money_transaction.currency = \
         db_hub.session.query(MoneyCurrency).filter(MoneyCurrency.name == "ruble").one_or_none()
@@ -92,14 +92,14 @@ def add_money_transaction(change: float, reason: str, ckey: Optional[str]):
     return money_transaction
 
 
-def add_points_transaction(ckey: str, change: float, reason: str):
-    assert ckey
+def add_points_transaction(player: Player, change: float, reason: str):
+    assert player
     assert change
     assert reason
 
     points_transaction = PointsTransaction()
-    if ckey:
-        points_transaction.player = get_player_by_ckey(ckey)
+    if player:
+        points_transaction.player = player
     points_transaction.change = change
     points_transaction.comment = reason
     points_transaction.type = \
