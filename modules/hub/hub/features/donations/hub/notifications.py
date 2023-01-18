@@ -150,15 +150,19 @@ async def report_money_transaction(balance, transaction: MoneyTransaction):
 async def report_points_transaction(transaction: PointsTransaction):
     reports_channel = discordClient.get_channel(current_app.config["DONATIONS_POINTS_REPORT_CHANNEL_ID"])
 
+    player_str = ""
+    if transaction.player:
+        player_str = transaction.player.ckey or f"{transaction.player.discord_user.nickname} ({transaction.player.discord_user_id})"
+
     message = None
     if transaction.change > 0:
         message = "\n_**{}** добавили **{:+.0f}** опиксов: \"{}\"_".format(
-                transaction.player.ckey,
+                player_str,
                 transaction.change,
                 transaction.comment)
     else:
         message = "\n_**{}** сняли **{:+.0f}** опиксов: \"{}\"_".format(
-                transaction.player.ckey,
+                player_str,
                 transaction.change,
                 transaction.comment)
 
@@ -172,6 +176,10 @@ async def report_subscription_update(subscriptions: List[PatronSubscription]):
     assert subscriptions
     assert len(subscriptions)
 
+    player_str = ""
+    if subscriptions[0].player:
+        player_str = subscriptions[0].player.ckey or f"{subscriptions[0].player.discord_user.nickname} ({subscriptions[0].player.discord_user_id})"
+
     reports_channel = discordClient.get_channel(current_app.config["DONATIONS_POINTS_REPORT_CHANNEL_ID"])
 
     message = ""
@@ -182,6 +190,6 @@ async def report_subscription_update(subscriptions: List[PatronSubscription]):
             start=subscription.start_date.strftime("%d.%m.%y"),
             end=subscription.end_date.strftime("%d.%m.%y"))
 
-    message = "Подписка **{}** обновлена:".format(subscriptions[0].player.ckey) + message
+    message = f"Подписка **{player_str}** обновлена:" + message
     message = "_" + message + "_"
     await reports_channel.send(message)
