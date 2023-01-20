@@ -264,25 +264,7 @@ class AddPointsTransactionView(DonationsView):
 
         if form.validate_on_submit():
             player = get_player_by_discord(form.discord.data, create_if_not_exists=True)
-            points_transaction = money.add_points_transaction(player, form.amount.data, form.reason.data)
-            report_points_transaction(points_transaction)
-            notify_user_about_points_transaction(current_user._get_current_object(), points_transaction)
-            if points_transaction.player.discord_user_id and form.amount.data > 0:
-                discord_tasks.add_opyxholder_role(points_transaction.player.discord_user_id)
-            logger.info(
-                "[AddPointsTransaction] "
-                "registered_by: {user} ({user_discord_id}), "
-                "player: {ckey} ({discord} - {discord_id}), "
-                "amount: {amount}, "
-                "reason: {reason}".format(
-                    user=current_user.display_name,
-                    user_discord_id=current_user.discord,
-                    ckey=player.ckey,
-                    discord=player.discord_user.nickname,
-                    discord_id=player.discord_user_id,
-                    amount=form.amount.data,
-                    reason=form.reason.data))
-
+            assert actions.add_points_transaction_and_notify(player, form.amount.data, form.reason.data, current_user)
             flash("Points Transaction is added", "success")
 
         return render_template(

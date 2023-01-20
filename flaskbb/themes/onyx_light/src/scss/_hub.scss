@@ -94,3 +94,57 @@
 .donations-label-sum {
     vertical-align: middle;
 }
+
+.patron_tier {
+    display: flex;
+    align-items: flex-start;
+
+    .description {
+        display: block;
+    }
+
+    img.picture {
+        display: block;
+        max-width: 150px;
+    }
+}
+
+.patron_tier_control
+{
+    .next_charge {
+        border-left: 5px solid #fcba03;
+        padding: 5px;
+        margin: 5px 0px 5px 0px;
+    }
+    margin-top: 10px;
+}
+
+.btn-donate {
+    font-weight: bold;
+    font-family: monospace;
+    background-color: transparent;
+    border: 2px solid #ebad01;
+}
+
+.btn-donate:hover {
+    opacity: 0.8;
+}
+
+.btn-inactive {
+    font-weight: bold;
+    font-family: monospace;
+    background-color: transparent;
+    border: 2px solid #a7a7a7;
+    opacity: 0.8;
+}
+
+.btn-cancel {
+    font-weight: bold;
+    font-family: monospace;
+    background-color: transparent;
+    border: 2px solid #ff5252;
+}
+
+.btn-cancel:hover {
+    opacity: 0.8;
+}

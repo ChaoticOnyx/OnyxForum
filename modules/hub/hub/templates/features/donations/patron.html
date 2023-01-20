@@ -1,0 +1,47 @@
+{% extends theme("features/donations/index.html") %}
+
+{% block donations_content %}
+
+{% if tier %}
+    <div class="patron_tier">
+        <img src="{{ tier.image }}" class="picture">
+        <div class="description">
+            <h3>{{ tier.title }}</h3>
+            <div>{{ tier.description|markup }}</div>
+        </div>
+    </div>
+{% endif %}
+
+<div class="patron_tier_control">
+    {% if tier %}
+        <div class="next_charge">
+            {% if until_date %}
+                {{ tier.price_opyxes }} {% trans %}🔆 to be charged on {% endtrans %} {{ until_date|format_date }}
+            {% else %}
+                {{ tier.price_opyxes }} {% trans %}🔆 to be charged for next supporting period {% endtrans %}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <form class="inline-form" method="get" action="{{ url_for('donations.choose_tier') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <button class="btn btn-donate">
+            {% if tier %}
+                {% trans %}Change Tier{% endtrans %}
+            {% else %}
+                {% trans %}Choose Tier{% endtrans %}
+            {% endif %}
+        </button>
+    </form>
+
+    {% if tier %}
+        <form class="inline-form" method="post" action="{{ url_for('donations.revoke_tier') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <button class="btn btn-cancel">
+                {% trans %}Revoke Subscription{% endtrans %}
+            </button>
+        </form>
+    {% endif %}
+</div>
+
+{% endblock %}

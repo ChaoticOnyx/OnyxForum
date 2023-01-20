@@ -32,6 +32,24 @@ register_view(
 
 register_view(
     donations,
+    routes=["/patron"],
+    view_func=PatronView.as_view("patron")
+)
+
+register_view(
+    donations,
+    routes=["/choose_tier"],
+    view_func=PatronChooseTierView.as_view("choose_tier")
+)
+
+register_view(
+    donations,
+    routes=["/revoke_tier"],
+    view_func=PatronRevokeTierView.as_view("revoke_tier")
+)
+
+register_view(
+    donations,
     routes=['/qiwi_hook'],
     view_func=QiwiHook.as_view('qiwi_hook')
 )

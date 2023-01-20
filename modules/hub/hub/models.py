@@ -64,14 +64,15 @@ class Player(db_hub.Model):
     ckey = Column(String(50), unique=True)
     discord_user_id = Column('discord', ForeignKey('discord_users.id'), index=True)
     patron_type_id = Column('patron_type', ForeignKey('patron_types.id'), index=True, server_default=text("0"))
+    patron_type_charged_id = Column('patron_type_charged', ForeignKey('patron_types.id'))
+    patron_until_date = Column(Date, nullable=True)
 
-    discord_user = relationship('DiscordUser', lazy='immediate')
-    patron_type = relationship('PatronType', lazy='immediate')
+    discord_user: DiscordUser = relationship('DiscordUser', lazy='immediate')
+    patron_type: PatronType = relationship('PatronType', lazy='immediate', primaryjoin='Player.patron_type_id == PatronType.id')
+    patron_type_charged: PatronType = relationship('PatronType', lazy='immediate', primaryjoin='Player.patron_type_charged_id == PatronType.id')
 
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-        return self
+    def get_str(self):
+        return self.ckey or f"{self.discord_user.nickname} ({self.discord_user_id})"
 
 
 class HubLog(db.Model):
@@ -186,18 +187,3 @@ class Token(db_hub.Model):
         db_hub.session.delete(self)
         db_hub.session.commit()
         return self
-
-
-class PatronSubscription(db_hub.Model):
-    __bind_key__ = 'hub'
-    __tablename__ = 'patron_subscriptions'
-
-    id = Column(Integer, primary_key=True)
-    registered_datetime = Column(DateTime, nullable=False)
-    player_id = Column(ForeignKey('players.id'), index=True)
-    start_date = Column(Date, nullable=False)
-    end_date = Column(Date, nullable=False)
-    patron_type_id = Column('patron_type', ForeignKey('patron_types.id'), nullable=False, index=True)
-
-    patron_type = relationship('PatronType', lazy='immediate')
-    player = relationship('Player', lazy='immediate')

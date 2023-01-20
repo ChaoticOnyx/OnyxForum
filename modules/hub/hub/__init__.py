@@ -29,6 +29,7 @@ hookimpl = HookimplMarker("flaskbb")
 @hookimpl
 def flaskbb_extensions(app):
     app.config.from_pyfile(configs_path + "/hub.cfg")
+    app.config.from_pyfile(configs_path + "/patron_tiers.cfg")
 
 
 @hookimpl
