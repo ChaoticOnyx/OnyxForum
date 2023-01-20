@@ -48,3 +48,5 @@ async def update_patron_role(player: Player):
 
     if role:
         await member.add_roles(guild.get_role(discordRoles["Patron"]), guild.get_role(int(role)))
+    else:
+        await member.remove_roles(guild.get_role(discordRoles["Patron"]))

@@ -7,9 +7,10 @@ from flaskbb.extensions import db_hub, scheduler
 
 from hub.models import Player
 from hub.features.donations import actions
-from hub.features.donations.hub.notifications import report_patron_tier_update, notify_user_about_patron_tier_update
+from .hub.notifications import report_patron_tier_update, notify_user_about_patron_tier_update
+from .discord_tasks import update_patron_role
 
-@scheduler.task('interval', id='daily_patron_tiers_update', minutes=1)
+@scheduler.task('interval', id='daily_patron_tiers_update', days=1)
 def daily_patron_tiers_update():
     with scheduler.app.app_context():
         tiers = current_app.config["PATRON_TIERS"]
@@ -29,6 +30,7 @@ def daily_patron_tiers_update():
                 db_hub.session.commit()
                 db_hub.session.expunge(player)
 
+                update_patron_role(player)
                 report_patron_tier_update(player)
                 notify_user_about_patron_tier_update(player)
             else:
@@ -36,4 +38,3 @@ def daily_patron_tiers_update():
                 player.patron_until_date = datetime.datetime.utcnow().date() + relativedelta.relativedelta(months=1)
                 db_hub.session.add(player)
                 db_hub.session.commit()
-            

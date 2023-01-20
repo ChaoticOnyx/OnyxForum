@@ -261,6 +261,7 @@ class PatronRevokeTierView(UserDonationsView):
         player = get_player_by_discord(current_user.discord)
         player.patron_type = None
         db_hub.session.commit()
+        db_hub.session.expunge(player)
 
         notify_user_about_patron_tier_update(player)
         report_patron_tier_update(player)
