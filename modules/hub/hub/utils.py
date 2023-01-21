@@ -29,7 +29,8 @@ def get_player_by_discord(discord_id, create_if_not_exists = False) -> Player:
 
     player = Player()
     player.discord_user_id = discord_id
-    player.save()
+    db_hub.session.add(player)
+    db_hub.session.commit()
     
     return db_hub.session.query(Player).filter(Player.discord_user_id == discord_id).one_or_none()
 
