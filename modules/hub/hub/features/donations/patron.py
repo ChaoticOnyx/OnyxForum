@@ -17,7 +17,7 @@ def daily_patron_tiers_update():
         player: Player
         for player in db_hub.session.query(Player).filter(Player.patron_until_date <= datetime.datetime.utcnow().date()).all():
             points_transaction = None
-            if player.patron_type:
+            if player.patron_type_id:
                 tier = tiers[player.patron_type.id - 1]
                 reason = f"Подписка патрона уровня {tier['title']}"      
                 points_transaction = actions.try_charge_points_transaction_and_notify(player, tier["price_opyxes"], reason)
