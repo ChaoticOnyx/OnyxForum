@@ -14,10 +14,13 @@ from .blueprint import hub
 from .permissions import can_access_hub
 from hub.features.karma.render import render_karma, render_post_rating
 from hub.features.community_rating.render import render_community_rating
+from hub.github import create_github_api
 from .features.donations.utils import render_donations_label
 from .features.donations.blueprint import donations
 from .features.donations.qiwi_hook import register_webhooks_service
 from .utils import get_byond_ckey, configs_path
+
+from hub.features.development import status_monitor
 
 __version__ = "1.0.0"
 SETTINGS = None
@@ -30,6 +33,7 @@ hookimpl = HookimplMarker("flaskbb")
 def flaskbb_extensions(app):
     app.config.from_pyfile(configs_path + "/hub.cfg")
     app.config.from_pyfile(configs_path + "/patron_tiers.cfg")
+    app.githubApi = create_github_api()
 
 
 @hookimpl

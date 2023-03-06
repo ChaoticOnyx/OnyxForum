@@ -1,6 +1,6 @@
 alembic==1.4.2
 amqp==2.6.0
-attrs==19.3.0
+attrs
 Babel==2.8.0
 billiard==3.6.3.0
 blinker==1.4
@@ -44,6 +44,7 @@ mistune==0.8.4
 olefile==0.46
 Pillow
 pluggy==0.13.1
+PyGithub
 Pygments==2.6.1
 python-dateutil==2.8.1
 python-editor==1.0.4
