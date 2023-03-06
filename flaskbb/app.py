@@ -306,8 +306,15 @@ def configure_extensions(app):
                 with app.app_context():
                     return await async_task
             return loop.create_task(context_task(app))
+        
+        def add_discord_callback(async_task):
+            async def context_task(*args):
+                with app.app_context():
+                    return await async_task(*args)
+            return context_task
 
         app.add_discord_task = add_discord_task
+        app.add_discord_callback = add_discord_callback
 
         def interupt():
             discordClient.logout()

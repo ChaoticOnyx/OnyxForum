@@ -13,6 +13,7 @@ import asyncio
 from celery import Celery
 from sqlalchemy import MetaData
 import discord
+from discord import app_commands
 
 from flask_alembic import Alembic
 from flask_allows import Allows
@@ -100,3 +101,4 @@ scheduler = APScheduler()
 
 asyncio.set_event_loop(asyncio.SelectorEventLoop())
 discordClient: discord.Client = discord.Client(intents=discord.Intents.default())
+discordCommandsTree: app_commands.CommandTree = app_commands.CommandTree(discordClient)

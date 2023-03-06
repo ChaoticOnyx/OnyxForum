@@ -7,6 +7,7 @@ repositories: typing.Dict[str, Repository] = {
         labels = Labels(
             bug = Label(name = "🐞 баг"),
             feature = Label(name = "🔩 улучшение"),
+            sprite = Label(name = "🎨 спрайты"),
             owners_approved = Label(name = "🔵 одобрено"),
             verification_required = Label(name = "🔵 требуется проверка"),
             design_elaboration_required = Label(name = ":red_circle: требуется проработка"),
@@ -35,6 +36,8 @@ repositories: typing.Dict[str, Repository] = {
                     owners = 697914765304922132,
                     designers = 697914765304922132,
                     watchers = 860569736638365746,
+                    spriters = 846685890549514280,
+                    beginners = 698083783072546857,
                 )
             )
         ]

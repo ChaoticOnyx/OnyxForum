@@ -20,7 +20,7 @@ from .features.donations.blueprint import donations
 from .features.donations.qiwi_hook import register_webhooks_service
 from .utils import get_byond_ckey, configs_path
 
-from hub.features.development import status_monitor
+from hub.features.development import commands
 
 __version__ = "1.0.0"
 SETTINGS = None
@@ -34,6 +34,7 @@ def flaskbb_extensions(app):
     app.config.from_pyfile(configs_path + "/hub.cfg")
     app.config.from_pyfile(configs_path + "/patron_tiers.cfg")
     app.githubApi = create_github_api()
+    commands.register_commands()
 
 
 @hookimpl

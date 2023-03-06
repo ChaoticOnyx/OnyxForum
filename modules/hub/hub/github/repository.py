@@ -27,6 +27,7 @@ class Label:
 class Labels:
     bug: Label
     feature: Label
+    sprite: Label
     owners_approved: Label
     verification_required: Label
     design_elaboration_required: Label
@@ -54,6 +55,8 @@ class DiscordChannels:
     owners: int = None
     designers: int = None
     watchers: int = None
+    spriters: int = None
+    beginners: int = None
 
 
 @define
