@@ -3,7 +3,7 @@ from discord import app_commands
 
 from flask import current_app
 
-from flaskbb.extensions import discordClient, discordCommandsTree
+from flaskbb.extensions import discordCommandsTree
 from flaskbb.utils.helpers import discord_task
 
 from hub.configs.github_repositories import repositories

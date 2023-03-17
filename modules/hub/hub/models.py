@@ -3,7 +3,7 @@ import datetime
 from flaskbb.utils.database import UTCDateTime
 from flaskbb.utils.helpers import time_utcnow
 from flaskbb.extensions import db, db_hub
-from sqlalchemy import Column, ForeignKey, String, Integer, Float, Date, DateTime, text, Text, func
+from sqlalchemy import Column, ForeignKey, String, Integer, Float, Date, text, Text, ForeignKeyConstraint
 from sqlalchemy.dialects.mysql import VARCHAR
 from sqlalchemy.orm import relationship
 
@@ -187,3 +187,32 @@ class Token(db_hub.Model):
         db_hub.session.delete(self)
         db_hub.session.commit()
         return self
+
+class IssueFull(db_hub.Model):
+    __bind_key__ = 'hub'
+    __tablename__ = 'issues_full'
+
+    repository = Column(String(50), primary_key=True, nullable=False)
+    number = Column(Integer, primary_key=True, nullable=False)
+    title = Column(String, nullable=False)
+    body = Column(Text, nullable=False)
+    author = Column(String(50), nullable=False)
+    type = Column(String(50), nullable=False)
+    created_datetime = Column(UTCDateTime(timezone=True), nullable=False)
+    updated_datetime = Column(UTCDateTime(timezone=True), nullable=False)
+    state = Column(String(50), nullable=False)
+
+    labels = relationship("IssueLabel", back_populates="issue_full", cascade="all, delete-orphan")
+
+class IssueLabel(db_hub.Model):
+    __bind_key__ = 'hub'
+    __tablename__ = 'issue_labels'
+    __table_args__ = (
+        ForeignKeyConstraint(['repository', 'issue_number'], ['issues_full.repository', 'issues_full.number']),
+    )
+
+    repository = Column(String(50), primary_key=True, nullable=False)
+    issue_number = Column(Integer, primary_key=True, nullable=False)
+    label = Column(String(50), primary_key=True, nullable=False)
+
+    issue_full = relationship('IssueFull', back_populates="labels")

@@ -1,6 +1,6 @@
 import attrs
 from attrs import define
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import github
 import github.Issue
 import github.Repository
@@ -57,6 +57,7 @@ class DiscordChannels:
     watchers: int = None
     spriters: int = None
     beginners: int = None
+    webhook: int = None
 
 
 @define
@@ -83,3 +84,9 @@ class Repository:
     @property
     def instance(self):
         assert self._instance
+
+def get_repository(repositories, full_name) -> Tuple[str, Repository]:
+    for key, repository in repositories.items():
+        if full_name == repository.name:
+            return key, repository
+    assert "Unknown repository!"
