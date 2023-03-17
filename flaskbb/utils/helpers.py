@@ -16,6 +16,7 @@ import os
 import random
 import re
 import time
+import traceback
 import warnings
 from datetime import datetime, timedelta
 from email import message_from_string
@@ -883,3 +884,12 @@ def discord_task(func):
 
 def get_static_folder_path():
     return "flaskbb/static"
+
+def catch_exceptions(func):
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args,**kwargs)
+        except:
+            print("[return_on_failure] exception is caught")
+            traceback.print_exc()
+    return wrapper

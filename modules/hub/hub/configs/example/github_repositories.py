@@ -38,6 +38,7 @@ repositories: typing.Dict[str, Repository] = {
                     watchers = 860569736638365746,
                     spriters = 846685890549514280,
                     beginners = 698083783072546857,
+                    webhook = 423205687133470721,
                 )
             )
         ]

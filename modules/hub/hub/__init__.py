@@ -20,7 +20,8 @@ from .features.donations.blueprint import donations
 from .features.donations.qiwi_hook import register_webhooks_service
 from .utils import get_byond_ckey, configs_path
 
-from hub.features.development import commands
+from hub.features.development import commands, github_hook
+from hub.features.development.blueprint import development
 
 __version__ = "1.0.0"
 SETTINGS = None
@@ -51,6 +52,7 @@ def flaskbb_load_translations():
 def flaskbb_load_blueprints(app):
     app.register_blueprint(hub, url_prefix="/hub")
     app.register_blueprint(donations, url_prefix="/donations")
+    app.register_blueprint(development, url_prefix="/development")
 
     app.before_first_request(lambda: register_webhooks_service(app))
 
@@ -91,3 +93,9 @@ def flaskbb_tpl_profile_contacts(user):
 @hookimpl
 def flaskbb_tpl_user_nav_loggedin_before():
     return render_donations_label(current_user)
+
+@hookimpl
+def flaskbb_additional_setup(app, pluggy):
+    with app.app_context():
+        github_hook.register_github_webhooks()
+        pass

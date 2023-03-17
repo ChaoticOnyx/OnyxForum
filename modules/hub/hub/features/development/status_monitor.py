@@ -1,7 +1,6 @@
 import asyncio
 import discord
 import urllib.parse
-from typing import List
 
 from flask import current_app
 from flaskbb.utils.helpers import discord_task
@@ -11,6 +10,8 @@ from hub.github.repository import Repository
 from hub.configs.github_repositories import repositories
 
 from flaskbb.extensions import scheduler, discordClient
+
+from .discord_utils import send_embed
 
 def create_owners_status_embed():
     repo = repositories["onyxbay"]
@@ -102,13 +103,6 @@ def create_beginners_status_embed():
     
     return embed
 
-@discord_task
-async def send_status_embed(repo: Repository, embed, channel_keys: List[str]):
-    for guild_descriptor in repo.discord_guilds:
-        guild: discord.Guild = await discordClient.fetch_guild(guild_descriptor.id)
-        for channel_key in channel_keys:
-            channel: discord.TextChannel = await guild.fetch_channel(getattr(guild_descriptor.channels, channel_key))
-        await channel.send(embed=embed)
 
 @discord_task
 async def send_status(repo: Repository, title: str, description: str, query: str, color: int, channel_key: str):
@@ -132,29 +126,29 @@ def development_status_monitor():
     with scheduler.app.app_context():
         repo = repositories["onyxbay"]
         
-        send_status_embed(
+        send_embed(
             repo,
             create_owners_status_embed(),
             channel_keys=["owners"])
         
-        send_status_embed(
+        send_embed(
             repo,
             create_developers_status_embed(),
             channel_keys=["developers"])
 
-        send_status_embed(
+        send_embed(
             repo,
             create_spriters_status_embed(),
             channel_keys=["spriters"]
         )
 
-        send_status_embed(
+        send_embed(
             repo,
             create_beginners_status_embed(),
             channel_keys=["beginners"]
         )
 
-        send_status_embed(
+        send_embed(
             repo,
             create_bounty_embed(),
             channel_keys=["developers"]
