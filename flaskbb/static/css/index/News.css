@@ -37,3 +37,7 @@
 #News * p {
   margin-bottom: 0;
 }
+
+.p img{
+max-width:100%;
+}
