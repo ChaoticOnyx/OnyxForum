@@ -27,6 +27,7 @@
 
 .Text img {
   max-width: 100%;
+  height: auto;
 }
 
 .NewsTitle > img {
