@@ -19,6 +19,11 @@
   border-radius: 4px;
 }
 
+.ServerIcon {
+  wight: 32px;
+  height: 32px;
+}
+
 .ServerTitle {
   display: flex;
   justify-content: space-between;
