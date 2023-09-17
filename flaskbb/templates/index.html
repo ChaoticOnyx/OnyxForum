@@ -43,7 +43,7 @@
                             <b>{{ topic.date_created|format_date('%b %d %Y') }}</b>
                         </p>
                         <p class="Text">
-                            {{ topic.first_post.content | markup | safe }}<br />
+                            {{ topic.first_post.content | markup }}
                         </p>
                     </article>
                 {% endfor %}
