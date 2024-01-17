@@ -1,0 +1,96 @@
+.server-sidebar {
+    padding: 7px 0;
+
+    ul li {
+        &:last-child {
+            border-bottom: none;
+        }
+
+        a {
+            color: $navigation-color;
+            font-size: 14px;
+            font-weight: 400;
+            border-left: 2px solid transparent;
+
+            &:hover, &:visited {
+                background-color: $author-box-bg;
+                border-right: 2px solid $fresh-blue;
+                border-left: 2px solid $fresh-blue;
+            }
+
+            i {
+                margin-right: 8px;
+                font-size: 14px;
+            }
+        }
+
+        &.active {
+            a {
+                background-color: $author-box-bg;
+                border-right: 2px solid $fresh-blue;
+                border-left: 2px solid $fresh-blue;
+            }
+        }
+    }
+}
+
+.server-online {
+    text-align: center;
+    margin-top: 0.2em;
+}
+
+.server-content {
+    background-color: #fff;
+    border-left: 1px solid $border-color;
+    min-height: 32.25em;
+
+    .topic-head {
+        font-weight: normal;
+    }
+
+    .topic-created {
+        font-size: 0.75em;
+        padding-bottom: 0.75em;
+    }
+}
+
+.server-name {
+    text-align: center;
+    margin-top: 0.75em;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.ban-label-container {
+    vertical-align: top;
+}
+
+.ban-label {
+    vertical-align: top;
+    padding-left: 4px;
+}
+
+.ban-label-header {
+    vertical-align: top;
+    width: 1%;
+    white-space: nowrap;
+}
+
+.donations-label {
+    background-color: #f7ae00;
+    border-color: #f7ae00;
+    color: #ffffff;
+    border-radius: 0;
+    font-weight: bold;
+}
+
+.donations-label-points {
+    font-weight: bold;
+    font-family: monospace;
+    padding-top: 4px;
+    border-radius: 0;
+}
+
+.donations-label-sum {
+    vertical-align: middle;
+}

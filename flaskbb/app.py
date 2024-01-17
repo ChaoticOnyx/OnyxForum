@@ -32,7 +32,7 @@ from flask_discord import DiscordOAuth2Session
 from flaskbb._compat import iteritems, string_types
 # extensions
 from flaskbb.extensions import (alembic, allows, babel, cache, celery, csrf,
-                                db, db_hub, db_eos, db_onyx, db_dragon,
+                                db, db_hub, db_eos, db_onyx, db_dragon, db_chaotic,
                                 debugtoolbar, limiter, login_manager, mail,
                                 redis_store, themes, whooshee, discordClient, scheduler)
 from flaskbb.plugins import spec
@@ -218,11 +218,13 @@ def configure_extensions(app):
     db_onyx.init_app(app)
     db_eos.init_app(app)
     db_dragon.init_app(app)
+    db_chaotic.init_app(app)
     db.init_app(app)
 
     #APScheduler
-    scheduler.init_app(app)
-    scheduler.start()
+    if scheduler.state == 0 :
+        scheduler.init_app(app)
+        scheduler.start()
 
     scheduler.scheduler.print_jobs()
 
@@ -300,7 +302,7 @@ def configure_extensions(app):
         loop.create_task(discordClient.start(app.config["DISCORD_BOT_TOKEN"]))
         discordClientThread = threading.Thread(target=loop.run_forever)
         discordClientThread.start()
-
+        
         def add_discord_task(async_task):
             async def context_task(app):
                 with app.app_context():

@@ -2,7 +2,7 @@
 import attr
 import datetime
 import pytz
-from flaskbb.extensions import db_onyx, db_eos, db_dragon
+from flaskbb.extensions import db_chaotic, db_onyx, db_eos, db_dragon
 from sqlalchemy import Column, DateTime, Integer, String, Text, Index, text
 from sqlalchemy.dialects.mysql import TINYINT, INTEGER, SMALLINT, VARCHAR
 
@@ -68,7 +68,7 @@ class ErroBan:
         )
 
 
-class ErroBanChaotic(db_onyx.Model, ErroBan):
+class ErroBanChaotic(db_chaotic.Model, ErroBan):
     __bind_key__ = 'chaotic'
     __tablename__ = 'erro_ban'
 
@@ -77,6 +77,9 @@ class ErroBanEos(db_eos.Model, ErroBan):
     __bind_key__ = 'eos'
     __tablename__ = 'erro_ban'
 
+class ErroBanOnyx(db_onyx.Model, ErroBan):
+    __bind_key__ = 'onyx'
+    __tablename__ = 'erro_ban'
 
 class ErroBanDragon(db_dragon.Model):
     __bind_key__ = 'dragon'
@@ -168,7 +171,7 @@ class Connection():
         )
 
 
-class ConnectionChaotic(db_onyx.Model, Connection):
+class ConnectionChaotic(db_chaotic.Model, Connection):
     __bind_key__ = 'chaotic'
     __tablename__ = 'connection'
 
@@ -177,6 +180,9 @@ class ConnectionEos(db_eos.Model, Connection):
     __bind_key__ = 'eos'
     __tablename__ = 'connection'
 
+class ConnectionOnyx(db_onyx.Model, Connection):
+    __bind_key__ = 'onyx'
+    __tablename__ = 'connection'
 
 class ConnectionDragon(db_dragon.Model):
     __bind_key__ = 'dragon'
@@ -219,13 +225,17 @@ class ErroAdmin():
             flags=self.flags
         )
 
-class ErroAdminChaotic(db_onyx.Model, ErroAdmin):
+class ErroAdminChaotic(db_chaotic.Model, ErroAdmin):
     __bind_key__ = 'chaotic'
     __tablename__ = 'erro_admin'
 
 
 class ErroAdminEos(db_eos.Model, ErroAdmin):
     __bind_key__ = 'eos'
+    __tablename__ = 'erro_admin'
+
+class ErroAdminOnyx(db_onyx.Model, ErroAdmin):
+    __bind_key__ = 'onyx'
     __tablename__ = 'erro_admin'
 
 game_models = {
@@ -241,9 +251,21 @@ game_models = {
             "Connection": ConnectionEos,
             "ErroAdmin": ErroAdminEos
         },
+    "malachite":
+        {
+            "ErroBan": ErroBanEos,
+            "Connection": ConnectionEos,
+            "ErroAdmin": ErroAdminEos,
+        },
     "dragon":
         {
             "ErroBan": ErroBanDragon,
             "Connection": ConnectionDragon
-        }
+        },
+    "onyx":
+        {
+            "ErroBan": ErroBanOnyx,
+            "Connection": ConnectionOnyx,
+            "ErroAdmin": ErroAdminOnyx,
+        },
 }

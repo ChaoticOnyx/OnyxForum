@@ -64,11 +64,20 @@
                                 {{ server.players_count }}
                             </span>
                         </div>
+			{%for link in server.links %}
+				{% if link.what == 'play' %}
+					<a target="_blank" class="ServerLink {{ link.what}}" href="{{ link.href }}">
+					<i class="fa fa-play"></i>
+					{{ link.text }}
+					</a>
+					
+				{%endif %}
+			{% endfor %}
                         <details class="ServerDescription">
                             <summary>Описание</summary>
                             <p>{{ server.description }}</p>
                             <div class="ServerLinks">
-                                {% for link in server.links %}
+                                {% for link in server.links if not (link.what == 'play') %}
                                 <a target="_blank" class="ServerLink {{ link.what }}" href="{{ link.href }}">
                                     {% if link.what == 'discord' %}
                                         <i class="fa-brands fa-discord"></i>

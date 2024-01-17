@@ -50,14 +50,16 @@ metadata = MetaData(
 )
 
 metadata_hub = copy.deepcopy(metadata)
-metadata_onyx = copy.deepcopy(metadata)
+metadata_chaotic = copy.deepcopy(metadata)
 metadata_eos = copy.deepcopy(metadata)
 metadata_dragon = copy.deepcopy(metadata)
+metadata_onyx = copy.deepcopy(metadata)
 
 db_hub = SQLAlchemy(metadata=metadata_hub, session_options={"expire_on_commit": False})
-db_onyx = SQLAlchemy(metadata=metadata_onyx)
+db_chaotic = SQLAlchemy(metadata=metadata_chaotic)
 db_eos = SQLAlchemy(metadata=metadata_eos)
 db_dragon = SQLAlchemy(metadata=metadata_dragon)
+db_onyx = SQLAlchemy(metadata=metadata_onyx)
 db = SQLAlchemy(metadata=metadata)
 
 # Whooshee (Full Text Search)

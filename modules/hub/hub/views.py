@@ -68,16 +68,16 @@ def run_console_script_async(script, task_name=None, output_file_path=""):
             if exc.errno != errno.EEXIST:
                 raise
     output_file = open(output_file_path, "a+", buffering=1)
-
     output_file.write("\n-------------------\n")
     output_file.write(datetime_tag() + task_name + " script:\n")
     for script_line in script.split('\n'):
         output_file.write(datetime_tag() + "> " + script_line + "\n")
-
+    
     output_file.write(datetime_tag() + task_name + " started:\n")
     for line in proc.stdout:
         output_file.write(datetime_tag() + line)
     output_file.write(datetime_tag() + task_name + " finished\n")
+    
 
 
 class ServerControl(MethodView):

@@ -147,3 +147,7 @@ modules/hub/hub/configs/*
 /flaskbb.cfg
 flaskbb/static/user_content/
 flaskbb/static/img/server_logos/
+logs/*
+!logs/.gitkeep
+nohup.out
+celerybeat-schedule
