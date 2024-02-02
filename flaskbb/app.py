@@ -281,6 +281,11 @@ def configure_extensions(app):
 
     command_line = ' '.join(sys.argv)
     is_running_server = ('run' in command_line) or ('gunicorn' in command_line)
+    
+    #Celery dummy def
+    def add_discord_task(async_task):
+        return
+    app.add_discord_task = add_discord_task
 
     if not is_running_server:
         return
