@@ -60,6 +60,12 @@ async def register_commands():
             description = "Beginner Issues",
             callback=current_app.add_discord_callback(status_beginners)))
     
+    group.add_command(
+        app_commands.Command(
+            name = "wiki",
+            description = "Wiki PRs",
+            callback=current_app.add_discord_callback(status_wiki)))
+
     discordCommandsTree.add_command(group)
     
     for guild in guilds:

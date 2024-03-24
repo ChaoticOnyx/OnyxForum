@@ -17,6 +17,7 @@ repositories: typing.Dict[str, Repository] = {
             robot = Label(name = ":robot:создано роботом"),
             postponed = Label(name = "🕗 отложено"),
             waiting_author = Label(name = ":white_circle: ожидает автора"),
+            wiki = Label(name = "🌐 вики"),
 
             difficulty_unreal = Label(name = ":goberserk: сложнее тех двух"),
             difficulty_very_hard = Label(name = ":rage1: очень сложно"),
@@ -35,9 +36,9 @@ repositories: typing.Dict[str, Repository] = {
                     developers = 686884175822716953,
                     owners = 697914765304922132,
                     designers = 697914765304922132,
-                    watchers = 860569736638365746,
-                    spriters = 846685890549514280,
-                    beginners = 698083783072546857,
+                    watchers = 414840922652803073,
+                    spriters = 414840922652803073,
+                    beginners = 414840922652803073,
                     webhook = 423205687133470721,
                 )
             )

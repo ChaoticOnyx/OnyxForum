@@ -37,6 +37,7 @@ class Labels:
     robot: Label
     postponed: Label
     waiting_author: Label
+    wiki: Label
 
     difficulty_unreal: Label
     difficulty_very_hard: Label
@@ -58,6 +59,7 @@ class DiscordChannels:
     spriters: int = None
     beginners: int = None
     webhook: int = None
+    wiki: int = None
 
 
 @define

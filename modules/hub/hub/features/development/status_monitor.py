@@ -103,6 +103,18 @@ def create_beginners_status_embed():
     
     return embed
 
+def create_wiki_status_embed():
+    repo = repositories["onyxbay"]
+
+    query_wiki = QueryGenerator(repo).wiki()
+    wiki_issues = current_app.githubApi.search_issues(query_wiki)
+
+    embed = discord.Embed(title="СТАТУС: Задачи требующие изменения вики")
+    embed.color = 0xff8b00
+    embed.description = "**Задачи требующие изменения вики:**\n" \
+        f"**{wiki_issues.totalCount}** [Список задач](https://github.com/issues?q={urllib.parse.quote(query_wiki)})"
+    
+    return embed
 
 @discord_task
 async def send_status(repo: Repository, title: str, description: str, query: str, color: int, channel_key: str):
@@ -171,7 +183,12 @@ def development_status_monitor():
             color=0xff4d00,
             channel_key="designers"
         )
-
+        
+        send_status(
+            repo,
+            create_wiki_status_embed(),
+            channel_keys=["wiki"]
+        )
 
 async def status_owners(interaction: discord.Interaction):
     response = interaction.response
@@ -242,3 +259,12 @@ async def status_designers(interaction):
     embed.description = f"**{issues.totalCount}** критических задачи ожидают проработки\n[Список задач](https://github.com/issues?q={urllib.parse.quote(query)})"
 
     await interaction.edit_original_response(embed=embed)
+
+async def status_wiki(interaction):
+    response = interaction.response
+    asyncio.create_task(response.defer())
+
+    embed = create_wiki_status_embed()
+
+    await interaction.edit_original_response(embed=embed)
+

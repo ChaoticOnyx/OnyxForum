@@ -23,6 +23,9 @@ class QueryGenerator:
 
     def open(self):
         return "is:open"
+    
+    def closed(self):
+        return "is:closed"
 
     def issue(self):
         return "is:issue"
@@ -35,6 +38,13 @@ class QueryGenerator:
     
     def not_assigned(self):
         return "no:assignee"
+
+    def wiki(self):
+        query =   self.in_repository() + \
+            " " + self.closed() + \
+            " " + self.pr() + \
+            " " + _include(self._labels.wiki)
+        return query
 
     def beginners(self):
         query =   self.in_repository() + \
