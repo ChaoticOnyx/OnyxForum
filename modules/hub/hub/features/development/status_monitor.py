@@ -184,7 +184,7 @@ def development_status_monitor():
             channel_key="designers"
         )
         
-        send_status(
+        send_embed(
             repo,
             create_wiki_status_embed(),
             channel_keys=["wiki"]

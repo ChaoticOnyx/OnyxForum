@@ -282,33 +282,18 @@ class GroupForm(FlaskForm):
         description=_("Management access for server's head"),
     )
 
-    dragon_base = BooleanField(
-        _("Dragon base permissions"),
+    malachite_base = BooleanField(
+        _("Malachite base permissions"),
         description=_("Readonly access to server logs"),
     )
 
-    dragon_additional = BooleanField(
-        _("Dragon additional permissions (dangerous)"),
+    malachite_additional = BooleanField(
+        _("Malachite additional permissions (dangerous)"),
         description=_("Access to server controls and configs"),
     )
 
-    dragon_management = BooleanField(
-        _("Dragon management permissions"),
-        description=_("Management access for server's head"),
-    )
-
-    eos_base = BooleanField(
-        _("EOS base permissions"),
-        description=_("Readonly access to server logs"),
-    )
-
-    eos_additional = BooleanField(
-        _("EOS additional permissions (dangerous)"),
-        description=_("Access to server controls and configs"),
-    )
-
-    eos_management = BooleanField(
-        _("EOS management permissions"),
+    malachite_management = BooleanField(
+        _("Malachite management permissions"),
         description=_("Management access for server's head"),
     )
 

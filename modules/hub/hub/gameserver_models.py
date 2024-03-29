@@ -2,7 +2,7 @@
 import attr
 import datetime
 import pytz
-from flaskbb.extensions import db_chaotic, db_onyx, db_eos, db_dragon
+from flaskbb.extensions import db_onyx, db_malachite
 from sqlalchemy import Column, DateTime, Integer, String, Text, Index, text
 from sqlalchemy.dialects.mysql import TINYINT, INTEGER, SMALLINT, VARCHAR
 
@@ -67,85 +67,13 @@ class ErroBan:
             reason=self.reason
         )
 
-
-class ErroBanChaotic(db_chaotic.Model, ErroBan):
-    __bind_key__ = 'chaotic'
-    __tablename__ = 'erro_ban'
-
-
-class ErroBanEos(db_eos.Model, ErroBan):
-    __bind_key__ = 'eos'
+class ErroBanMalachite(db_malachite.Model, ErroBan):
+    __bind_key__ = 'malachite'
     __tablename__ = 'erro_ban'
 
 class ErroBanOnyx(db_onyx.Model, ErroBan):
     __bind_key__ = 'onyx'
     __tablename__ = 'erro_ban'
-
-class ErroBanDragon(db_dragon.Model):
-    __bind_key__ = 'dragon'
-    __tablename__ = 'SS13_ban'
-    __table_args__ = (
-        Index('idx_ban_isbanned_details', 'ckey', 'ip', 'computerid', 'role', 'unbanned_datetime', 'expiration_time'),
-        Index('idx_ban_count', 'bantime', 'a_ckey', 'applies_to_admins', 'unbanned_datetime', 'expiration_time'),
-        Index('idx_ban_isbanned', 'ckey', 'role', 'unbanned_datetime', 'expiration_time')
-    )
-
-    id = Column(INTEGER, primary_key=True)
-    bantime = Column(DateTime, nullable=False)
-    server_name = Column(String(32))
-    server_ip = Column(INTEGER, nullable=False)
-    server_port = Column(SMALLINT, nullable=False)
-    round_id = Column(INTEGER, nullable=False)
-    role = Column(String(32))
-    expiration_time = Column(DateTime)
-    applies_to_admins = Column(TINYINT, nullable=False, server_default=text("'0'"))
-    reason = Column(String(2048), nullable=False)
-    ckey = Column(String(32))
-    ip = Column(INTEGER)
-    computerid = Column(String(32))
-    a_ckey = Column(String(32), nullable=False)
-    a_ip = Column(INTEGER, nullable=False)
-    a_computerid = Column(String(32), nullable=False)
-    who = Column(String(2048), nullable=False)
-    adminwho = Column(String(2048), nullable=False)
-    edits = Column(Text)
-    unbanned_datetime = Column(DateTime)
-    unbanned_ckey = Column(String(32))
-    unbanned_ip = Column(INTEGER)
-    unbanned_computerid = Column(String(32))
-    unbanned_round_id = Column(INTEGER)
-    global_ban = Column(TINYINT, nullable=False, server_default=text("'1'"))
-    hidden = Column(TINYINT, nullable=False, server_default=text("'0'"))
-
-    def get_ban_record(self):
-        bantype = ""
-        if self.role == "Server":
-            if self.expiration_time:
-                bantype = "tempban"
-            else:
-                bantype = "permaban"
-        else:
-            if self.expiration_time:
-                bantype = "job_tempban"
-            else:
-                bantype = "job_permaban"
-
-        return BanRecord(
-            ckey=self.ckey,
-            bantime=self.bantime and self.bantime.astimezone(pytz.UTC),
-            expiration_time=self.expiration_time and self.expiration_time.astimezone(pytz.UTC),
-            a_ckey=self.a_ckey,
-            bantype=bantype,
-            expired=(bantype != "permaban" and
-                     bantype != "job_permaban" and
-                     self.expiration_time.astimezone(pytz.UTC) < datetime.datetime.now(datetime.timezone.utc)),
-            role=self.role,
-            unbanned=bool(self.unbanned_datetime),
-            unbanned_ckey=self.unbanned_ckey,
-            unbanned_datetime=self.unbanned_datetime and self.unbanned_datetime.astimezone(pytz.UTC),
-            reason=self.reason
-        )
-
 
 @attr.s
 class ConnectionRecord:
@@ -171,40 +99,14 @@ class Connection():
         )
 
 
-class ConnectionChaotic(db_chaotic.Model, Connection):
-    __bind_key__ = 'chaotic'
-    __tablename__ = 'connection'
-
-
-class ConnectionEos(db_eos.Model, Connection):
-    __bind_key__ = 'eos'
-    __tablename__ = 'connection'
 
 class ConnectionOnyx(db_onyx.Model, Connection):
     __bind_key__ = 'onyx'
     __tablename__ = 'connection'
 
-class ConnectionDragon(db_dragon.Model):
-    __bind_key__ = 'dragon'
-    __tablename__ = 'SS13_connection_log'
-
-    id = Column(Integer, primary_key=True)
-    datetime = Column(DateTime)
-    server_name = Column(String(32))
-    server_ip = Column(INTEGER, nullable=False)
-    server_port = Column(SMALLINT, nullable=False)
-    round_id = Column(INTEGER, nullable=False)
-    ckey = Column(String(45))
-    ip = Column(INTEGER, nullable=False)
-    computerid = Column(String(45))
-
-    def get_record(self):
-        return ConnectionRecord(
-            datetime=self.datetime.astimezone(pytz.UTC),
-            ckey=self.ckey,
-            ip=self.ip,
-            computerid=self.computerid
-        )
+class ConnectionMalachite(db_malachite.Model, Connection):
+    __bind_key__ = 'malachite'
+    __tablename__ = 'connection'
 
 @attr.s
 class AdminRecord:
@@ -225,42 +127,20 @@ class ErroAdmin():
             flags=self.flags
         )
 
-class ErroAdminChaotic(db_chaotic.Model, ErroAdmin):
-    __bind_key__ = 'chaotic'
-    __tablename__ = 'erro_admin'
-
-
-class ErroAdminEos(db_eos.Model, ErroAdmin):
-    __bind_key__ = 'eos'
-    __tablename__ = 'erro_admin'
-
 class ErroAdminOnyx(db_onyx.Model, ErroAdmin):
     __bind_key__ = 'onyx'
     __tablename__ = 'erro_admin'
 
+class ErroAdminMalachite(db_malachite.Model, ErroAdmin):
+    __bind_key__ = 'malachite'
+    __tablename__ = 'erro_admin'
+
 game_models = {
-    "chaotic":
-        {
-            "ErroBan": ErroBanChaotic,
-            "Connection": ConnectionChaotic,
-            "ErroAdmin": ErroAdminChaotic
-        },
-    "eos":
-        {
-            "ErroBan": ErroBanEos,
-            "Connection": ConnectionEos,
-            "ErroAdmin": ErroAdminEos
-        },
     "malachite":
         {
-            "ErroBan": ErroBanEos,
-            "Connection": ConnectionEos,
-            "ErroAdmin": ErroAdminEos,
-        },
-    "dragon":
-        {
-            "ErroBan": ErroBanDragon,
-            "Connection": ConnectionDragon
+            "ErroBan": ErroBanMalachite,
+            "Connection": ConnectionMalachite,
+            "ErroAdmin": ErroAdminMalachite,
         },
     "onyx":
         {
