@@ -873,7 +873,7 @@ class FlashAndRedirect(object):
 
 
 def get_random_logo():
-    return url_for("static", filename="img/logos/logo{}.png".format(random.randint(1, 84)))
+    return url_for("static", filename="img/logos/logo{}.png".format(random.randint(1, 83)))
 
 
 def discord_task(func):

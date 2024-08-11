@@ -32,7 +32,7 @@ from flask_discord import DiscordOAuth2Session
 from flaskbb._compat import iteritems, string_types
 # extensions
 from flaskbb.extensions import (alembic, allows, babel, cache, celery, csrf,
-                                db, db_hub, db_onyx, db_malachite,
+                                db, db_hub, db_onyx, db_openkeep,
                                 debugtoolbar, limiter, login_manager, mail,
                                 redis_store, themes, whooshee, discordClient, scheduler)
 from flaskbb.plugins import spec
@@ -216,7 +216,7 @@ def configure_extensions(app):
     # Flask-SQLAlchemy
     db_hub.init_app(app)
     db_onyx.init_app(app)
-    db_malachite.init_app(app)
+    db_openkeep.init_app(app)
     db.init_app(app)
 
     #APScheduler
@@ -279,7 +279,7 @@ def configure_extensions(app):
 
     command_line = ' '.join(sys.argv)
     is_running_server = ('run' in command_line) or ('gunicorn' in command_line)
-    
+
     #Celery dummy def
     def add_discord_task(async_task):
         return
@@ -305,13 +305,13 @@ def configure_extensions(app):
         loop.create_task(discordClient.start(app.config["DISCORD_BOT_TOKEN"]))
         discordClientThread = threading.Thread(target=loop.run_forever)
         discordClientThread.start()
-        
+
         def add_discord_task(async_task):
             async def context_task(app):
                 with app.app_context():
                     return await async_task
             return loop.create_task(context_task(app))
-        
+
         def add_discord_callback(async_task):
             async def context_task(*args):
                 with app.app_context():

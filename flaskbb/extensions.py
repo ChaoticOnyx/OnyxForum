@@ -50,11 +50,11 @@ metadata = MetaData(
 )
 
 metadata_hub = copy.deepcopy(metadata)
-metadata_malachite = copy.deepcopy(metadata)
+metadata_openkeep  = copy.deepcopy(metadata)
 metadata_onyx = copy.deepcopy(metadata)
 
 db_hub = SQLAlchemy(metadata=metadata_hub, session_options={"expire_on_commit": False})
-db_malachite = SQLAlchemy(metadata=metadata_malachite)
+db_openkeep = SQLAlchemy(metadata=metadata_openkeep )
 db_onyx = SQLAlchemy(metadata=metadata_onyx)
 db = SQLAlchemy(metadata=metadata)
 

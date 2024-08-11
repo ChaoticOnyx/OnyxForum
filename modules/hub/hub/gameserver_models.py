@@ -2,7 +2,7 @@
 import attr
 import datetime
 import pytz
-from flaskbb.extensions import db_onyx, db_malachite
+from flaskbb.extensions import db_onyx, db_openkeep
 from sqlalchemy import Column, DateTime, Integer, String, Text, Index, text
 from sqlalchemy.dialects.mysql import TINYINT, INTEGER, SMALLINT, VARCHAR
 
@@ -67,13 +67,72 @@ class ErroBan:
             reason=self.reason
         )
 
-class ErroBanMalachite(db_malachite.Model, ErroBan):
-    __bind_key__ = 'malachite'
-    __tablename__ = 'erro_ban'
-
 class ErroBanOnyx(db_onyx.Model, ErroBan):
     __bind_key__ = 'onyx'
     __tablename__ = 'erro_ban'
+
+class ErroBanOpenKeep(db_openkeep.Model):
+    __bind_key__ = 'openkeep'
+    __tablename__ = 'ban'
+
+    __table_args__ = (
+        Index('idx_ban_isbanned_details', 'ckey', 'ip', 'computerid', 'role', 'unbanned_datetime', 'expiration_time'),
+        Index('idx_ban_count', 'bantime', 'a_ckey', 'applies_to_admins', 'unbanned_datetime', 'expiration_time'),
+        Index('idx_ban_isbanned', 'ckey', 'role', 'unbanned_datetime', 'expiration_time')
+    )
+
+    id = Column(INTEGER, primary_key=True)
+    bantime = Column(DateTime, nullable=False)
+    server_ip = Column(INTEGER, nullable=False)
+    server_port = Column(SMALLINT, nullable=False)
+    round_id = Column(INTEGER, nullable=False)
+    role = Column(String(32))
+    expiration_time = Column(DateTime)
+    applies_to_admins = Column(TINYINT, nullable=False, server_default=text("'0'"))
+    reason = Column(String(2048), nullable=False)
+    ckey = Column(String(32))
+    ip = Column(INTEGER)
+    computerid = Column(String(32))
+    a_ckey = Column(String(32), nullable=False)
+    a_ip = Column(INTEGER, nullable=False)
+    a_computerid = Column(String(32), nullable=False)
+    who = Column(String(2048), nullable=False)
+    adminwho = Column(String(2048), nullable=False)
+    edits = Column(Text)
+    unbanned_datetime = Column(DateTime)
+    unbanned_ckey = Column(String(32))
+    unbanned_ip = Column(INTEGER)
+    unbanned_computerid = Column(String(32))
+    unbanned_round_id = Column(INTEGER)
+
+    def get_ban_record(self):
+        bantype = ""
+        if self.role == "Server":
+            if self.expiration_time:
+                bantype = "tempban"
+            else:
+                bantype = "permaban"
+        else:
+            if self.expiration_time:
+                bantype = "job_tempban"
+            else:
+                bantype = "job_permaban"
+
+        return BanRecord(
+            ckey=self.ckey,
+            bantime=self.bantime and self.bantime.astimezone(pytz.UTC),
+            expiration_time=self.expiration_time and self.expiration_time.astimezone(pytz.UTC),
+            a_ckey=self.a_ckey,
+            bantype=bantype,
+            expired=(bantype != "permaban" and
+                     bantype != "job_permaban" and
+                     self.expiration_time.astimezone(pytz.UTC) < datetime.datetime.now(datetime.timezone.utc)),
+            role=self.role,
+            unbanned=bool(self.unbanned_datetime),
+            unbanned_ckey=self.unbanned_ckey,
+            unbanned_datetime=self.unbanned_datetime and self.unbanned_datetime.astimezone(pytz.UTC),
+            reason=self.reason
+        )
 
 @attr.s
 class ConnectionRecord:
@@ -104,9 +163,12 @@ class ConnectionOnyx(db_onyx.Model, Connection):
     __bind_key__ = 'onyx'
     __tablename__ = 'connection'
 
-class ConnectionMalachite(db_malachite.Model, Connection):
-    __bind_key__ = 'malachite'
-    __tablename__ = 'connection'
+class ConnectionOpenKeep(db_openkeep.Model, Connection):
+    __bind_key__ = 'openkeep'
+    __tablename__ = 'connection_log'
+    ckey = Column(VARCHAR(45))
+    ip = Column(INTEGER, nullable=False)
+    computerid = Column(VARCHAR(45))
 
 @attr.s
 class AdminRecord:
@@ -119,7 +181,7 @@ class ErroAdmin():
     ckey = Column(VARCHAR(50), nullable=False)
     rank = Column(VARCHAR(50), nullable=False)
     flags = Column(INTEGER, nullable=False)
-    
+
     def get_record(self):
         return AdminRecord(
             ckey=self.ckey,
@@ -131,16 +193,26 @@ class ErroAdminOnyx(db_onyx.Model, ErroAdmin):
     __bind_key__ = 'onyx'
     __tablename__ = 'erro_admin'
 
-class ErroAdminMalachite(db_malachite.Model, ErroAdmin):
-    __bind_key__ = 'malachite'
-    __tablename__ = 'erro_admin'
+class ErroAdminOpenKeep(db_openkeep.Model):
+    __bind_key__ = 'openkeep'
+    __tablename__ = 'admin'
+    ckey = Column(VARCHAR(50), primary_key=True)
+    rank = Column(VARCHAR(50), nullable=False)
+    flags = 1
+
+    def get_record(self):
+        return AdminRecord(
+            ckey=self.ckey,
+            rank=self.rank,
+            flags=self.flags
+        )
 
 game_models = {
-    "malachite":
+    "openkeep":
         {
-            "ErroBan": ErroBanMalachite,
-            "Connection": ConnectionMalachite,
-            "ErroAdmin": ErroAdminMalachite,
+            "ErroBan": ErroBanOpenKeep,
+            "Connection": ConnectionOpenKeep,
+            "ErroAdmin": ErroAdminOpenKeep,
         },
     "onyx":
         {

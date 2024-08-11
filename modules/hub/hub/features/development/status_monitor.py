@@ -132,8 +132,7 @@ async def send_status(repo: Repository, title: str, description: str, query: str
         channel: discord.TextChannel = await guild.fetch_channel(getattr(guild_descriptor.channels, channel_key))
         await channel.send(embed=embed)
 
-
-@scheduler.task('cron', id='development_status_monitor', hour=12)
+@scheduler.task('cron', id='development_status_monitor', hour=12, minute=1)
 def development_status_monitor():
     with scheduler.app.app_context():
         repo = repositories["onyxbay"]
@@ -166,6 +165,12 @@ def development_status_monitor():
             channel_keys=["developers"]
         )
 
+        send_embed(
+            repo,
+            create_wiki_status_embed(),
+            channel_keys=["wiki"]
+        )
+
         send_status(
             repo,
             title="Issue Watchers, обратите внимание!",
@@ -184,12 +189,6 @@ def development_status_monitor():
             channel_key="designers"
         )
         
-        send_embed(
-            repo,
-            create_wiki_status_embed(),
-            channel_keys=["wiki"]
-        )
-
 async def status_owners(interaction: discord.Interaction):
     response = interaction.response
     asyncio.create_task(response.defer())
@@ -267,4 +266,3 @@ async def status_wiki(interaction):
     embed = create_wiki_status_embed()
 
     await interaction.edit_original_response(embed=embed)
-

@@ -72,12 +72,12 @@ def run_console_script_async(script, task_name=None, output_file_path=""):
     output_file.write(datetime_tag() + task_name + " script:\n")
     for script_line in script.split('\n'):
         output_file.write(datetime_tag() + "> " + script_line + "\n")
-    
+
     output_file.write(datetime_tag() + task_name + " started:\n")
     for line in proc.stdout:
         output_file.write(datetime_tag() + line)
     output_file.write(datetime_tag() + task_name + " finished\n")
-    
+
 
 
 class ServerControl(MethodView):
@@ -313,20 +313,58 @@ class ConfigsView(Hub):
         )
     ]
 
+    # returns list [{"name": name, "url": url)]
+    @staticmethod
+    def get_title_parent_folders(server_id, root_path, current_path):
+        folders = []
+        if(root_path[-1]=="/"):
+            root_path=root_path[:-1]
+        path = current_path
+        while root_path != path:
+            name = os.path.split(path)[1]
+            url = url_for("hub.configs", server=server_id, path=os.path.relpath(path, root_path))
+            folders.insert(0, {"name": name, "url": url})
+            path = os.path.dirname(path)
+
+        name = "config"
+        url = url_for("hub.configs", server=server_id)
+        folders.insert(0, {"name": name, "url": url})
+
+        if len(folders):
+            folders[-1]["url"] = None
+
+        return folders
+
     def get(self):
         server_id = request.args["server"]
         servers = current_app.config["BYOND_SERVERS"]
+        path = None
+        if "path" in request.args:
+                path = request.args["path"]
 
         for server in servers:
             if server.id == server_id:
-                config_folder_entries = [safe_join(server.configs_path, f) for f in os.listdir(server.configs_path)]
-                config_files = [f for f in config_folder_entries if os.path.isfile(f)]
-
-                config_files_names = [os.path.split(f)[1] for f in config_files]
-                config_files_names = [f for f in config_files_names if f not in server.configs_exclude]
-                config_files_names.sort()
-
-                return render_template("hub/server/configs.html", **self.get_args(), configs=config_files_names)
+                #Get those files!
+                current_path = server.configs_path
+                if path:
+                    current_path = os.path.realpath(safe_join(current_path, path))
+                    if not current_path.startswith(server.configs_path):
+                        abort(404)
+                title_parent_folders = self.get_title_parent_folders(server_id, server.configs_path, current_path)
+                configs_folder_entries = [safe_join(current_path, f) for f in os.listdir(current_path)]
+                entries = {}
+                config_files = {}
+                for entry in configs_folder_entries:
+                    entry_pure = os.path.split(entry)[1]
+                    if(entry_pure not in server.configs_exclude):
+                        if os.path.isfile(entry):
+                            entries[entry_pure] = [url_for("hub.config_edit", server=server_id, config_name=os.path.relpath(entry, server.configs_path)), "file"]
+                        else:
+                            lll = os.path.relpath(entry, server.configs_path)
+                            entries[entry_pure] = [url_for("hub.configs", server=server_id, path=os.path.relpath(entry, server.configs_path)), "folder"]
+                return render_template("hub/server/configs.html", **self.get_args(),
+                    entries=sorted(entries.items()),
+                    title_parent_folders=title_parent_folders)
 
         return render_template("hub/server/configs.html", **self.get_args())
 
@@ -449,6 +487,7 @@ class LogsView(Hub):
 
         current_path = server.logs_path
         if path:
+
             current_path = os.path.realpath(safe_join(current_path, path))
             if not current_path.startswith(server.logs_path + os.sep):
                 abort(404)

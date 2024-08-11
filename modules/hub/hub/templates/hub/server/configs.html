@@ -2,10 +2,25 @@
 {% extends theme("hub/server/index.html") %}
 
 {% block hub_content %}
+<ol class="breadcrumb">
+    <li class="breadcrumb-item active" aria-current="page"></li>
+    {%- for folder in title_parent_folders %}
+        {%- if folder.url %}
+            <li class="breadcrumb-item"><a href="{{ folder.url }}">{{ folder.name }}</a></li>
+        {%- else %}
+            <li class="breadcrumb-item active" aria-current="page">{{ folder.name }}</li>
+        {%- endif -%}
+    {%- endfor -%}
+</ol>
 <div class="panel page-panel">
     <div class="panel-body">
-        {% for config in configs %}
-            <a href="{{ url_for('hub.config_edit', server=server.id, config_name=config)}}">{{ config }}</a><br>
+        {% for entry, data in entries %}
+                {% if data[1]=="folder" %}
+                    <i class="fa fa-folder" aria-hidden="true" style="margin-right: 8px;"></i>
+                {% else %}
+                    <i class="fa fa-file-o" aria-hidden="true" style="margin-right: 8px;"></i>
+                {% endif %}
+                <a href="{{ data[0] }}">{{ entry }}</a><br>
         {% endfor %}
     </div>
 </div>
