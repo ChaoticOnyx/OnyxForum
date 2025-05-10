@@ -4,6 +4,8 @@ from dateutil import relativedelta
 from dataclasses import dataclass
 from typing import List
 import string
+import uuid
+from yookassa import Configuration, Payment
 
 from flask import request, url_for, redirect, current_app, abort, flash
 from flask.views import MethodView
@@ -30,26 +32,26 @@ class UserDonationsView(MethodView):
         actions.append(
             NavigationLink(
                 endpoint="donations.info",
-                name=_("✨ Donate"),
+                name=_("✨ Донат"),
             ))
 
         actions.append(
             NavigationLink(
                 endpoint="donations.patron",
-                name=_("🫅 Patron Tier"),
+                name=_("🫅 Уровни Подписок"),
                 active=(request.endpoint == "donations.choose_tier"),
             ))
 
         actions.append(
             NavigationLink(
                 endpoint="donations.points_transactions",
-                name=_("🔆 Opyxes Transactions"),
+                name=_("🔆 Транзакции Ониксов"),
             ))
 
         actions.append(
             NavigationLink(
                 endpoint="donations.money_transactions",
-                name=_("💵 Donations History"),
+                name=_("💵 История Донатов"),
             ))
 
         return actions
@@ -199,7 +201,7 @@ class PatronChooseTierView(UserDonationsView):
             abort(404)
         if player.patron_type_id:
             current_tier = tiers[player.patron_type_id - 1]
-        
+
         available_points = get_player_points_sum(player)
         if player.patron_type_charged_id:
             charged_tier = tiers[player.patron_type_charged_id - 1]
@@ -228,7 +230,7 @@ class PatronChooseTierView(UserDonationsView):
         tier = tiers[patron_type.id - 1]
         charged_tier = player.patron_type_charged_id and tiers[player.patron_type_charged_id - 1]
         charge_amount = _evaluate_charge_amount(tier, charged_tier, player.patron_until_date)
-        
+
         if charge_amount > 0:
             reason = f"Подписка патрона уровня {tier['title']}"
             points_transaction = actions.try_charge_points_transaction_and_notify(player, charge_amount, reason, current_user)
@@ -268,3 +270,40 @@ class PatronRevokeTierView(UserDonationsView):
         update_patron_role(player)
 
         return redirect(url_for("donations.patron"))
+
+
+class CreatePayment(UserDonationsView):
+    decorators = [login_required]
+
+    def get(self, value=100):
+        #Yookassa
+        Configuration.secret_key = "test_qSeVJ5xz6MLLdxlVbEvYmRe5ESgvBjFzckdREhi5b6U"
+        Configuration.account_id = "437574"
+
+        _payment = Payment.create({
+            "amount": {
+                "value": "100",
+                "currency": "RUB"
+            },
+            "confirmation": {
+                "type": "embedded"
+            },
+            "capture": True,
+            "description": "1"
+        }, uuid.uuid4())
+
+        return redirect(url_for("donations.payment"),
+                               payment=_payment)
+
+    def post(self):
+        return
+
+class PaymentView(UserDonationsView):
+    decorators = [login_required]
+
+    def get(self, payment):
+        return render_template("features/donations/payment.html",
+                               payment=payment)
+
+    def post(self):
+        return

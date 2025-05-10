@@ -5,9 +5,9 @@
 
 {% block breadcrumb %}
 <ol class="breadcrumb flaskbb-breadcrumb">
-    <li><a href="{{ url_for('forum.index') }}">{% trans %}Forum{% endtrans %}</a></li>
-    <li><a href="{{ url_for('management.overview') }}">{% trans %}Management{% endtrans %}</a></li>
-    <li class="active">{% trans %}Forums{% endtrans %}</li>
+    <li><a href="{{ url_for('forum.index') }}">{% trans %}Форум{% endtrans %}</a></li>
+    <li><a href="{{ url_for('management.overview') }}">{% trans %}Управление{% endtrans %}</a></li>
+    <li class="active">{% trans %}Форумы{% endtrans %}</li>
 </ol>
 {% endblock %}
 
@@ -17,9 +17,9 @@
 <div class="col-md-3 settings-col">
     <div class="nav-sidebar">
         <ul class="nav">
-        {{ navlink('management.forums', _("Manage Forums")) }}
-        {{ navlink('management.add_forum', _("Add Forum")) }}
-        {{ navlink('management.add_category', _("Add Category")) }}
+        {{ navlink('management.forums', _("Управление Форумами")) }}
+        {{ navlink('management.add_forum', _("Добавить Форум")) }}
+        {{ navlink('management.add_category', _("Добавить Категорию")) }}
         </ul>
     </div>
 </div>
@@ -27,7 +27,7 @@
 <div class="col-md-9 settings-col with-left-border">
     <div class="panel settings-panel">
         <div class="panel-heading settings-head">
-            <span class="fa fa-comments"></span> {% trans %}Manage Forums{% endtrans %}
+            <span class="fa fa-comments"></span> {% trans %}Управление Форумами{% endtrans %}
         </div>
         <div class="panel-body settings-body">
             <div class="settings-content">
@@ -41,15 +41,15 @@
                                 </div>
                                 <div class="pull-right">
                                     <a class="btn btn-xs btn-default" href="{{ url_for('management.add_forum', category_id=category.id) }}">
-                                        <span class="fa fa-plus"></span> {% trans %}Add Forum{% endtrans %}
+                                        <span class="fa fa-plus"></span> {% trans %}Добавить Форум{% endtrans %}
                                     </a>
                                     <a class="btn btn-xs btn-success" href="{{ url_for('management.edit_category', category_id = category.id) }}">
-                                        <span class="fa fa-pencil"></span> {% trans %}Edit Category{% endtrans %}
+                                        <span class="fa fa-pencil"></span> {% trans %}Изменить Категорию{% endtrans %}
                                     </a>
                                     <form class="inline-form" method="post" action="{{ url_for('management.delete_category', category_id=category.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                         <button class="btn btn-xs btn-danger" name="confirmDialog">
-                                            <span class="fa fa-trash"></span> {% trans %}Delete Category{% endtrans %}
+                                            <span class="fa fa-trash"></span> {% trans %}Удалить Категорию{% endtrans %}
                                         </button>
                                     </form>
                                 </div>
@@ -59,8 +59,8 @@
 
                     <div class="panel-body category-body">
                         <div class="category-meta">
-                            <div class="col-md-5 col-sm-5 col-xs-8 forum-name">{% trans %}Forum{% endtrans %}</div>
-                            <div class="col-md-2 col-sm-2 hidden-xs forum-stats">{% trans %}Topics / Posts{% endtrans %}</div>
+                            <div class="col-md-5 col-sm-5 col-xs-8 forum-name">{% trans %}Форум{% endtrans %}</div>
+                            <div class="col-md-2 col-sm-2 hidden-xs forum-stats">{% trans %}Топики / Посты{% endtrans %}</div>
                             <div class="col-md-5 col-sm-5 col-xs-4 forum-last-post"></div>
                         </div>
                         {% for forum in category.forums %}

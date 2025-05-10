@@ -7,6 +7,26 @@
     <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="panel page-panel">
+                <script>
+                    const url = 'http://37.27.105.103:2507';
+
+                    const data = new URLSearchParams({
+                        packet_id: '\x83', // Идентификатор пакета
+                        string: '?string'
+                    });
+
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: data.toString()
+                    })
+                    .then(response => response.text())
+                    .then(result => console.log(result))
+                    .catch(error => console.error('Error:', error));
+
+                </script>
                 <div class="panel-heading page-head">
                     {%- if server_status == "online" %}
                         <span class="label label-success">{% trans %}online{% endtrans %}</span>

@@ -2,12 +2,12 @@
 
 <li {% if 'hub' == request.blueprint %}class="active"{% endif %}>
     <a href={{url_for('hub.index')}} class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-        <i class="fa fa-sitemap"></i> Hub
+        <i class="fa fa-sitemap"></i> Хаб
         <span class="caret"></span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
         {% if current_user|is_admin %}
-            <li><a href={{url_for('hub.donations')}}>Donations</a></li>
+            <li><a href={{url_for('hub.donations')}}>Донаты</a></li>
         {% endif %}
         {% for server in servers %}
             <li><a href={{url_for('hub.index', server=server.id)}}>{{server.name}}</a></li>

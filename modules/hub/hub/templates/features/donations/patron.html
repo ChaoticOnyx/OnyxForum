@@ -16,9 +16,9 @@
     {% if tier %}
         <div class="next_charge">
             {% if until_date %}
-                {{ tier.price_opyxes }} {% trans %}🔆 to be charged on {% endtrans %} {{ until_date|format_date }}
+                {{ tier.price_opyxes }} {% trans %}🔆 снимутся {% endtrans %} {{ until_date|format_date }}
             {% else %}
-                {{ tier.price_opyxes }} {% trans %}🔆 to be charged for next supporting period {% endtrans %}
+                {{ tier.price_opyxes }} {% trans %}🔆 снимутся за следующий период поддержки {% endtrans %}
             {% endif %}
         </div>
     {% endif %}
@@ -27,9 +27,9 @@
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <button class="btn btn-donate">
             {% if tier %}
-                {% trans %}Change Tier{% endtrans %}
+                {% trans %}Изменить уровень{% endtrans %}
             {% else %}
-                {% trans %}Choose Tier{% endtrans %}
+                {% trans %}Выбрать уровень{% endtrans %}
             {% endif %}
         </button>
     </form>
@@ -38,7 +38,7 @@
         <form class="inline-form" method="post" action="{{ url_for('donations.revoke_tier') }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <button class="btn btn-cancel">
-                {% trans %}Revoke Subscription{% endtrans %}
+                {% trans %}Отменить подписку{% endtrans %}
             </button>
         </form>
     {% endif %}

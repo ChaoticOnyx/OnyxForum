@@ -53,3 +53,15 @@ register_view(
     routes=['/qiwi_hook'],
     view_func=QiwiHook.as_view('qiwi_hook')
 )
+
+register_view(
+    donations,
+    routes=['/create_payment'],
+    view_func=CreatePayment.as_view('create_payment')
+)
+
+register_view(
+    donations,
+    routes=['/payment'],
+    view_func=PaymentView.as_view('payment')
+)

@@ -33,31 +33,31 @@ class DonationsView(MethodView):
             actions.append(
                 NavigationLink(
                     endpoint="hub.add_donation",
-                    name=_("Add Donation"),
+                    name=_("Добавить Донат"),
                 ))
 
             actions.append(
                 NavigationLink(
                     endpoint="hub.money_transactions",
-                    name=_("Money Transactions"),
+                    name=_("Денежные Транзакции"),
                 ))
 
             actions.append(
                 NavigationLink(
                     endpoint="hub.points_transactions",
-                    name=_("Opyxes Transactions"),
+                    name=_("Транзакции Опиксов"),
                 ))
 
             actions.append(
                 NavigationLink(
                     endpoint="hub.add_money_transaction",
-                    name=_("Add Money Transaction"),
+                    name=_("Добавить Денежную Транзакцию"),
                 ))
 
             actions.append(
                 NavigationLink(
                     endpoint="hub.add_points_transaction",
-                    name=_("Add Points Transaction"),
+                    name=_("Добавить Транзакцию Опиксов"),
                 ))
 
         return actions
@@ -182,7 +182,7 @@ class MoneyTransactionsView(DonationsView):
             player_str = ""
             if transaction.player:
                 player_str = transaction.player.ckey or f"{transaction.player.discord_user.nickname} ({transaction.player.discord_user_id})"
-            data.append(TransactionData( 
+            data.append(TransactionData(
                 datetime=transaction.datetime,
                 change="{:+2}".format(transaction.change).rstrip('0').rstrip('.') + " ₽",
                 reason=transaction.reason + f"({player_str})"

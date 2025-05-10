@@ -104,7 +104,7 @@
                 {% else %}
                 <div class="row forum-row clearfix">
                     <div class="col-md-12 col-sm-12 col-xs-12">
-                        {% trans %}No Topics.{% endtrans %}
+                        {% trans %}Нет Топиков.{% endtrans %}
                     </div>
                 </div> <!-- end forum-row -->
                 {% endfor %}
@@ -114,7 +114,7 @@
             <div class="col-md-2 col-sm-2 col-xs-2 controls-col">
                 <div class="pull-left">
                     <a class="btn btn-default" href="{{ forum.url }}">
-                        <span class="fa fa-arrow-left"></span> {% trans %}Back{% endtrans %}
+                        <span class="fa fa-arrow-left"></span> {% trans %}Назад{% endtrans %}
                     </a>
                 </div>
             </div>
@@ -125,33 +125,33 @@
 
                         <div class="btn-group" role="group">
                             <button name="lock" class="btn btn-warning">
-                                <span class="fa fa-lock fa-fw"></span> {% trans %}Lock{% endtrans %}
+                                <span class="fa fa-lock fa-fw"></span> {% trans %}Заблокировать{% endtrans %}
                             </button>
                             <button name="unlock" class="btn btn-warning">
-                                <span class="fa fa-unlock fa-fw"></span> {% trans %}Unlock{% endtrans %}
+                                <span class="fa fa-unlock fa-fw"></span> {% trans %}Разблокировать{% endtrans %}
                             </button>
                         </div>
 
                         <div class="btn-group" role="group">
                             <button name="highlight" class="btn btn-success">
-                                <span class="fa fa-star fa-fw"></span> {% trans %}Highlight{% endtrans %}
+                                <span class="fa fa-star fa-fw"></span> {% trans %}Выделить{% endtrans %}
                             </button>
                             <button name="trivialize" class="btn btn-success">
-                                <span class="fa fa-star-o fa-fw"></span> {% trans %}Trivialize{% endtrans %}
+                                <span class="fa fa-star-o fa-fw"></span> {% trans %}Снять выделение{% endtrans %}
                             </button>
                         </div>
 
                         <button name="delete" class="btn btn-danger">
-                            <span class="fa fa-trash-o fa-fw"></span> {% trans %}Delete{% endtrans %}
+                            <span class="fa fa-trash-o fa-fw"></span> {% trans %}Удалить{% endtrans %}
                         </button>
 
                         {% if current_user.permissions.get('makehidden') %}
                         <div class="btn-group" role="group">
                             <button name="hide" class="btn btn-info">
-                                <span class="fa fa-user-secret fa-fw"></span> {% trans %}Hide{% endtrans %}
+                                <span class="fa fa-user-secret fa-fw"></span> {% trans %}Скрыть{% endtrans %}
                             </button>
                             <button name="unhide" class="btn btn-info">
-                                <span class="fa fa-user fa-fw"></span> {% trans %}Unhide{% endtrans %}
+                                <span class="fa fa-user fa-fw"></span> {% trans %}Показать{% endtrans %}
                             </button>
                         </div>
                         {% endif %}
@@ -166,14 +166,14 @@
 
                         <div class="form-inline">
                             <select class="form-control" id="forum" name="forum">
-                                <option selected value="">{% trans %}Move to...{% endtrans %}</option>
+                                <option selected value="">{% trans %}Переместить в...{% endtrans %}</option>
                                 {% for forum in available_forums %}
                                     <option value={{forum.id}}>{{ forum.title }}</option>
                                 {% endfor %}
                             </select>
 
                             <button name="move" class="btn btn-info">
-                                <span class="fa fa-plane"></span> {% trans %}Move{% endtrans %}
+                                <span class="fa fa-plane"></span> {% trans %}Переместить{% endtrans %}
                             </button>
                         </div>
 

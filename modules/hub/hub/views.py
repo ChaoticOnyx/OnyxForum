@@ -182,7 +182,7 @@ class Hub(MethodView):
             actions.append(
                 NavigationLink(
                     endpoint="hub.control",
-                    name=_("Control"),
+                    name=_("Управление"),
                     icon="fa fa-tablet",
                     urlforkwargs={"server": hub_current_server.id},
                 ))
@@ -191,7 +191,7 @@ class Hub(MethodView):
             actions.append(
                 NavigationLink(
                     endpoint="hub.configs",
-                    name=_("Configs"),
+                    name=_("Конфиги"),
                     icon="fa fa-wrench",
                     urlforkwargs={"server": hub_current_server.id},
                 ))
@@ -200,7 +200,7 @@ class Hub(MethodView):
             actions.append(
                 NavigationLink(
                     endpoint="hub.gamelogs",
-                    name=_("Game Logs"),
+                    name=_("Логи"),
                     icon="fa fa-file",
                     urlforkwargs={"server": hub_current_server.id},
                 ))
@@ -208,7 +208,7 @@ class Hub(MethodView):
         actions.append(
             NavigationLink(
                 endpoint="hub.bans",
-                name=_("Bans"),
+                name=_("Баны"),
                 icon="fa fa-wheelchair-alt",
                 urlforkwargs={"server": hub_current_server.id},
             )
@@ -218,7 +218,7 @@ class Hub(MethodView):
             actions.append(
                 NavigationLink(
                     endpoint="hub.connections",
-                    name=_("Connections"),
+                    name=_("Подключения"),
                     icon="fa fa-sign-in",
                     urlforkwargs={"server": hub_current_server.id},
                 )
@@ -228,7 +228,7 @@ class Hub(MethodView):
             actions.append(
                 NavigationLink(
                     endpoint="hub.team",
-                    name=_("Team"),
+                    name=_("Состав"),
                     icon="fa fa-group",
                     urlforkwargs={"server": hub_current_server.id},
                 ))
@@ -236,7 +236,7 @@ class Hub(MethodView):
             actions.append(
                     NavigationLink(
                         endpoint="hub.admins",
-                        name=_("Admins"),
+                        name=_("Админы"),
                         icon="fa fa-group",
                         urlforkwargs={"server": hub_current_server.id},
                     )

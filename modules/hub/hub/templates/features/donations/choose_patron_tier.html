@@ -15,13 +15,13 @@
                     <form class="inline-form" method="post" {% if tier.available %} action="{{ url_for('donations.choose_tier', tier_type=tier.type) }}" {% endif %}>
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                         <button {% if tier.available %} class="btn btn-donate" {% else %} class="btn btn-inactive" {% endif %}>
-                            {% trans %}Choose for {% endtrans %}{{ tier.price_opyxes }}🔆 {% trans %} per month {% endtrans %}
+                            {% trans %} Выбрать за {% endtrans %}{{ tier.price_opyxes }}🔆 {% trans %} в месяц {% endtrans %}
                             {% if tier.charge_amount %}
                                 {% if tier.charge_amount != tier.price_opyxes %}
-                                    ({{ tier.charge_amount }}🔆 {% trans %}current month{% endtrans %})
+                                    ({{ tier.charge_amount }}🔆 {% trans %}в этом месяце{% endtrans %})
                                 {% endif %}
                             {% else %}
-                                ({% trans %}starting next month{% endtrans %})
+                                ({% trans %}начиная со следующего месяца{% endtrans %})
                             {% endif %}
                         </button>
                     </form>
@@ -29,7 +29,7 @@
                     <form class="inline-form" method="post" action="{{ url_for('donations.revoke_tier') }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                         <button class="btn btn-cancel">
-                            {% trans %}Revoke Subscription{% endtrans %}
+                            {% trans %}Отменить подписку{% endtrans %}
                         </button>
                     </form>
                 {% endif %}

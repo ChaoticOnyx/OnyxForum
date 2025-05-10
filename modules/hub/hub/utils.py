@@ -64,28 +64,48 @@ def hub_current_server():
 def byond_export(host, port, string):
     packet_id = b'\x83'
     try:
-        sock = socket.create_connection((host, port))
+        sock = socket.create_connection((host, int(port)), timeout=3)
     except socket.error:
-        return
+        return None
 
-    packet = struct.pack('>xcH5x', packet_id, len(string)+6) + bytes(string, encoding='ascii') + b'\x00'
-    sock.send(packet)
+    try:
+        try:
+            string_bytes = bytes(string, encoding='ascii')
+        except UnicodeEncodeError:
+            return None
 
-    data = sock.recv(5000)
-    sock.close()
-    data = str(data[5:-1], encoding='ascii')
-    return urllib.parse.parse_qs(data, keep_blank_values=True)
+        packet = struct.pack('>xcH5x', packet_id, len(string_bytes) + 6) + string_bytes + b'\x00'
+        sock.send(packet)
+
+        data = sock.recv(5000)
+        if len(data) < 6:
+            return None
+
+        parsed = str(data[5:-1], encoding='ascii', errors='ignore')
+        return urllib.parse.parse_qs(parsed, keep_blank_values=True)
+    except Exception:
+        return None
+    finally:
+        sock.close()
 
 
 @attr.s(auto_attribs=True)
 class ServerStatus:
+    is_online: bool
     players_count: int
 
-def get_server_status(server: ServerDescriptor) -> Optional[ServerStatus]:
-    data = byond_export('localhost', str(server.port), '?status')
-    if not data:
-        return None
-    return ServerStatus(data['players'][0])
+
+def get_server_status(server: ServerDescriptor) -> ServerStatus:
+    data = byond_export('localhost', server.port, '?status')
+    try:
+        if not data or 'players' not in data or not data['players']:
+            return ServerStatus(is_online=False, players_count=0)
+        return ServerStatus(
+            is_online=True,
+            players_count=int(data['players'][0])
+        )
+    except (KeyError, ValueError, IndexError):
+        return ServerStatus(is_online=False, players_count=0)
 
 
 @attr.s(auto_attribs=True)
@@ -109,12 +129,10 @@ def get_servers_for_index():
             name=server.name,
             icon=server.icon,
             description=server.description,
-            links=server.links
+            links=server.links,
+            is_online=status.is_online,
+            players_count=status.players_count
         )
-
-        if status:
-            entry.is_online = True
-            entry.players_count = status.players_count
 
         entries.append(entry)
 

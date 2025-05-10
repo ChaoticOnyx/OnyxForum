@@ -25,7 +25,7 @@ def get_player_points_sum(player: Player) -> int:
 
     cursor: db_hub.Query = db_hub.session.query(0 + func.sum(PointsTransaction.change)) \
         .join(PointsTransaction.player) \
-        .filter(Player.ckey == player.ckey)
+        .filter(Player.discord_user_id == player.discord_user_id)
 
     return math.floor(cursor.first()[0] or 0)
 
