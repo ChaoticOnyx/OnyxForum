@@ -30,6 +30,7 @@ from flask_themes2 import Themes
 from flask_whooshee import Whooshee
 from flask_wtf.csrf import CSRFProtect
 from flask_apscheduler import APScheduler
+from flask_migrate import Migrate
 
 from flaskbb.exceptions import AuthorizationRequired
 
@@ -57,6 +58,7 @@ db_hub = SQLAlchemy(metadata=metadata_hub, session_options={"expire_on_commit": 
 db_openkeep = SQLAlchemy(metadata=metadata_openkeep )
 db_onyx = SQLAlchemy(metadata=metadata_onyx)
 db = SQLAlchemy(metadata=metadata)
+migrate = Migrate(db)
 
 # Whooshee (Full Text Search)
 whooshee = Whooshee()

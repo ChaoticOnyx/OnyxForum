@@ -41,6 +41,8 @@ from flaskbb.utils.requirements import (CanBanUser, CanEditUser, IsAdmin,
                                         IsAtleastSuperModerator)
 from flaskbb.utils.settings import flaskbb_config
 
+from hub.utils import get_servers_config
+    
 impl = HookimplMarker('flaskbb')
 
 logger = logging.getLogger(__name__)
@@ -580,7 +582,19 @@ class AddGroup(MethodView):
     def post(self):
         form = AddGroupForm()
         if form.validate_on_submit():
-            form.save()
+            group = form.save()
+
+            # Считать hub_permissions из POST-данных
+            hub_permissions = {}
+            for server in get_servers_config:
+                for perm_type in ['base', 'additional', 'management']:
+                    key = f"{server.id}_{perm_type}"
+                    # чекбокс в POST присутствует — значит True, иначе False
+                    hub_permissions[key] = key in request.form
+
+            group.hub_permissions = hub_permissions
+            group.save()
+
             flash(_('Group added.'), 'success')
             return redirect(url_for('management.groups'))
 
@@ -605,16 +619,30 @@ class EditGroup(MethodView):
     def get(self, group_id):
         group = Group.query.filter_by(id=group_id).first_or_404()
         form = self.form(group)
+        # Передаем текущие permissions из модели
+        user_permissions = group.hub_permissions or {}
         return render_template(
-            'management/group_form.html', form=form, title=_('Edit Group')
+            'management/group_form.html',
+            form=form,
+            user_permissions=user_permissions,
+            servers=get_servers_config(),
+            title=_('Edit Group')
         )
 
     def post(self, group_id):
         group = Group.query.filter_by(id=group_id).first_or_404()
-        form = EditGroupForm(group)
+        form = self.form(group)
 
         if form.validate_on_submit():
             form.populate_obj(group)
+
+            hub_permissions = {}
+            for server in get_servers_config():
+                for perm_type in ['base', 'additional', 'management']:
+                    key = f"{server.id}_{perm_type}"
+                    hub_permissions[key] = key in request.form
+
+            group.hub_permissions = hub_permissions
             group.save()
 
             if group.guest:
@@ -623,8 +651,13 @@ class EditGroup(MethodView):
             flash(_('Group updated.'), 'success')
             return redirect(url_for('management.groups', group_id=group.id))
 
+        user_permissions = request.form
         return render_template(
-            'management/group_form.html', form=form, title=_('Edit Group')
+            'management/group_form.html',
+            form=form,
+            user_permissions=user_permissions,
+            servers=get_servers_config(),
+            title=_('Edit Group')
         )
 
 

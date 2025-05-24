@@ -1,5 +1,5 @@
 alembic==1.4.2
-amqp==2.6.0
+amqp==5.1.1
 attrs
 Babel==2.8.0
 billiard==3.6.3.0
@@ -36,7 +36,7 @@ idna==2.10
 IPython==8.2.0
 itsdangerous==1.1.0
 Jinja2==2.11.2
-kombu==4.6.11
+kombu==5.5.3
 limits==1.5.1
 Mako==1.1.3
 MarkupSafe==1.1.1
@@ -50,15 +50,15 @@ python-dateutil==2.8.1
 python-editor==1.0.4
 pytz==2020.1
 redis==3.5.3
-requests==2.24.0
+requests==2.32.3
 simplejson==3.17.0
 six==1.15.0
 speaklater==1.3
 SQLAlchemy==1.3.18
 SQLAlchemy-Utils==0.36.8
 Unidecode==1.1.1
-urllib3==1.25.9
-vine==1.3.0
+urllib3==1.26.20
+vine==5.1.0
 Werkzeug==1.0.1
 Whoosh==2.7.4
 WTForms==2.3.3

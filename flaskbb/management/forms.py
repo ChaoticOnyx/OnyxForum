@@ -41,6 +41,7 @@ from flaskbb.utils.fields import BirthdayField
 from flaskbb.utils.helpers import check_image
 from flaskbb.utils.requirements import IsAtleastModerator
 
+from hub.utils import get_servers_config
 
 logger = logging.getLogger(__name__)
 
@@ -267,36 +268,6 @@ class GroupForm(FlaskForm):
         description=_("Check this, if the users shouldn't be affected with karma restrictions")
     )
 
-    onyx_base = BooleanField(
-        _("Onyx base permissions"),
-        description=_("Readonly access to server logs"),
-    )
-
-    onyx_additional = BooleanField(
-        _("Onyx additional permissions (dangerous)"),
-        description=_("Access to server controls and configs"),
-    )
-
-    onyx_management = BooleanField(
-        _("Onyx management permissions"),
-        description=_("Management access for server's head"),
-    )
-
-    malachite_base = BooleanField(
-        _("Malachite base permissions"),
-        description=_("Readonly access to server logs"),
-    )
-
-    malachite_additional = BooleanField(
-        _("Malachite additional permissions (dangerous)"),
-        description=_("Access to server controls and configs"),
-    )
-
-    malachite_management = BooleanField(
-        _("Malachite management permissions"),
-        description=_("Management access for server's head"),
-    )
-
     upload_size_limit = IntegerField(
         _("Uploaded file max size"),
         default=0,
@@ -400,9 +371,18 @@ class GroupForm(FlaskForm):
         data = self.data
         data.pop('submit', None)
         data.pop('csrf_token', None)
+
+        # Собираем пермишены из request.form вручную (пример для Flask view)
+        hub_permissions = {}
+        for server in get_servers_config():  # твой список серверов
+            for perm_type in ['base', 'additional', 'management']:
+                key = f"{server.id}_{perm_type}"
+                hub_permissions[key] = bool(request.form.get(key))
+
+        data['hub_permissions'] = hub_permissions
+
         group = Group(**data)
         return group.save()
-
 
 class EditGroupForm(GroupForm):
     def __init__(self, group, *args, **kwargs):

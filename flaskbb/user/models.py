@@ -53,13 +53,7 @@ class Group(db.Model, CRUDMixin):
     guest = db.Column(db.Boolean, default=False, nullable=False)
     banned = db.Column(db.Boolean, default=False, nullable=False)
 
-    # Hub permissions
-    onyx_base = db.Column(db.Boolean, default=False, nullable=False)
-    onyx_additional = db.Column(db.Boolean, default=False, nullable=False)
-    onyx_management = db.Column(db.Boolean, default=False, nullable=False)
-    malachite_base = db.Column(db.Boolean, default=False, nullable=False)
-    malachite_additional = db.Column(db.Boolean, default=False, nullable=False)
-    malachite_management = db.Column(db.Boolean, default=False, nullable=False)
+    hub_permissions = db.Column(db.JSON, nullable=False, server_default=text("'{}'"))
 
     # Moderator permissions (only available when the user a moderator)
     mod_edituser = db.Column(db.Boolean, default=False, nullable=False)

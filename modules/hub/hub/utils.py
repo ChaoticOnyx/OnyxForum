@@ -55,7 +55,7 @@ def hub_current_server():
 
     server_id = request.args["server"]
 
-    servers = current_app.config["BYOND_SERVERS"]
+    servers = get_servers_config()
     for server in servers:
         if server.id == server_id:
             return server
@@ -119,7 +119,7 @@ class IndexServerEntry:
 
 
 def get_servers_for_index():
-    servers: List[ServerDescriptor] = current_app.config["BYOND_SERVERS"]
+    servers: List[ServerDescriptor] = get_servers_config()
 
     entries = []
     for server in servers:
@@ -137,3 +137,6 @@ def get_servers_for_index():
         entries.append(entry)
 
     return entries
+
+def get_servers_config():
+    return ServerDescriptor.query.all()

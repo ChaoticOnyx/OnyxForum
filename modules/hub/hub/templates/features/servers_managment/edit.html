@@ -1,0 +1,213 @@
+{% extends theme("layout.html") %}
+{% block content %}
+<form method="post" action="{{ url_for('servers_managment.manage_server', server_id=server.id if server else None) }}">
+  {{ form.hidden_tag() }}
+
+  <div class="panel panel-info">
+    <div class="panel-heading">
+      <i class="fa fa-server"></i> Основная информация
+    </div>
+    <div class="panel-body">
+      <p class="text-muted">Ключевые параметры, определяющие сервер в системе.</p>
+
+      <div class="form-group">
+        <label for="id">ID</label>
+        {% if server %}
+          <p class="help-block">ID нельзя изменить после создания.</p>
+          <input type="hidden" name="id" value="{{ server.id }}">
+          <input type="text" class="form-control" id="id" value="{{ server.id }}" disabled>
+        {% else %}
+          <p class="help-block"><code>Всегда должно быть равно названию БД сервера!</code></p>
+          <p class="help-block">Уникальный идентификатор. Назначается один раз. </p>
+          <input type="text" class="form-control" name="id" id="id" required>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="name">Название</label>
+        <input type="text" class="form-control" name="name" id="name" value="{{ server.name or '' }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="icon">Путь до иконки</label>
+        <p class="help-block">Ссылка на локальный файл изображение (например, /static/img/server_log/animus.png).</p>
+        <input type="text" class="form-control" name="icon" id="icon" value="{{ server.icon or '' }}">
+      </div>
+
+      <div class="form-group">
+        <label for="description">Описание</label>
+        <textarea class="form-control" name="description" id="description">{{ server.description or '' }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="port">Порт</label>
+        <input type="number" class="form-control" name="port" id="port" value="{{ server.port or '' }}" required>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-warning">
+    <div class="panel-heading">
+      <i class="fa fa-code-fork"></i> Пути и сборка
+    </div>
+    <div class="panel-body">
+      <p class="text-muted">Параметры, необходимые для сборки и обновления сервера.</p>
+
+      <div class="form-group">
+        <label for="service_name">Systemd-сервис</label>
+        <p class="help-block">Название systemd-сервиса, например: <code>onyxserver.service</code>.</p>
+        <input type="text" class="form-control" name="service_name" id="service_name" value="{{ server.service_name or '' }}">
+      </div>
+
+      <div class="form-group">
+        <label for="path">Путь до репозитория</label>
+        <input type="text" class="form-control" name="path" id="path" value="{{ server.path or '' }}">
+      </div>
+
+      <div class="form-group">
+        <label for="branch_name">Название ветки</label>
+        <p class="help-block">Ветка Git, которая используется при сборке.</p>
+        <input type="text" class="form-control" name="branch_name" id="branch_name" value="{{ server.branch_name or '' }}">
+      </div>
+
+      <div class="form-group">
+        <label for="dream_maker_binary">DreamMaker</label>
+        <p class="help-block">Путь до компилятора BYOND (DreamMaker).</p>
+        <input type="text" class="form-control" name="dream_maker_binary" id="dream_maker_binary" value="{{ server.dream_maker_binary or '' }}">
+      </div>
+
+      <div class="form-group">
+        <label for="dme_name">DME файл</label>
+        <input type="text" class="form-control" name="dme_name" id="dme_name" value="{{ server.dme_name or '' }}">
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-success">
+    <div class="panel-heading">
+      <i class="fa fa-cogs"></i> Конфиги и логи
+    </div>
+    <div class="panel-body">
+      <p class="text-muted">Пути к конфигурациям и логам сервера.</p>
+
+      <div class="form-group">
+        <label for="configs_path">Путь к конфигам</label>
+        <input type="text" class="form-control" name="configs_path" id="configs_path" value="{{ server.configs_path or '' }}">
+      </div>
+
+      <div class="form-group">
+        <label for="configs_exclude">Исключения (через запятую)</label>
+        <p class="help-block">Имена файлов/директорий, которые не нужно загружать.</p>
+        <input type="text" class="form-control" name="configs_exclude" id="configs_exclude" value="{{ server.configs_exclude|join(', ') if server else '' }}">
+      </div>
+
+      <div class="form-group">
+        <label for="logs_path">Путь к логам</label>
+        <input type="text" class="form-control" name="logs_path" id="logs_path" value="{{ server.logs_path or '' }}">
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <i class="fa fa-discord"></i> Discord
+    </div>
+    <div class="panel-body">
+      <p class="text-muted">Настройки Discord-доступа и привязки ролей.</p>
+
+      <div class="form-group">
+        <label for="discord_full_access_titles">Полный доступ (через запятую)</label>
+        <input type="text" class="form-control" name="discord_full_access_titles" id="discord_full_access_titles" value="{{ server.discord_full_access_titles|join(', ') if server else '' }}">
+      </div>
+
+      <div class="form-group">
+        <label for="discord_base_access_titles">Базовый доступ (через запятую)</label>
+        <input type="text" class="form-control" name="discord_base_access_titles" id="discord_base_access_titles" value="{{ server.discord_base_access_titles|join(', ') if server else '' }}">
+      </div>
+
+      <div class="form-group">
+        <label for="discord_role_to_group">Discord роли в группы (JSON)</label>
+        <p class="help-block">Формат: <code>{ "RoleName": GroupId }</code></p>
+        <textarea class="form-control" name="discord_role_to_group" id="discord_role_to_group">{{ server.discord_role_to_group|tojson if server else '{}' }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="discord_role_to_group">Канал/форум для принятия заявок вайтлиста</label>
+        <p class="help-block">Формат: <code>000000000</code></p>
+        <input type="number" class="form-control" name="whitelist_channel" id="whitelist_channel" value="{{ server.whitelist_channel }}"></input>
+      </div>
+      <div class="form-group">
+        <label for="discord_role_to_group">Роль для членов вайтлиста</label>
+        <p class="help-block">Формат: <code>000000000</code></p>
+        <input type="number" class="form-control" name="whitelist_role" id="whitelist_role" value="{{ server.whitelist_role }}"></input>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <i class="fa fa-link"></i> Ссылки
+    </div>
+    <div class="panel-body">
+      <p class="text-muted">Произвольные ссылки, отображаемые на странице сервера.</p>
+
+      <div id="links">
+        {% for link in server.links if server %}
+          {% if not loop.first %}<hr>{% endif %}
+          <div class="row mb-2">
+            <div class="col-sm-4"><input type="text" name="link_what" class="form-control" placeholder="Тип" value="{{ link.what }}"></div>
+            <div class="col-sm-4"><input type="text" name="link_text" class="form-control" placeholder="Текст" value="{{ link.text }}"></div>
+            <div class="col-sm-3"><input type="text" name="link_href" class="form-control" placeholder="URL" value="{{ link.href }}"></div>
+            <div class="col-sm-1 text-right"><button type="button" class="btn btn-danger" onclick="removeLink(this)"><i class="fa fa-trash"></i></button></div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <button type="button" class="btn btn-default mt-2" onclick="addLink()"><i class="fa fa-plus"></i> Добавить ссылку</button>
+    </div>
+  </div>
+
+  <div class="text-center">
+    <button type="submit" class="btn btn-success btn-lg"><i class="fa fa-save"></i> Сохранить</button>
+  </div>
+</form>
+
+<script>
+  function addLink() {
+    const container = document.getElementById("links");
+
+    if (container.children.length > 0) {
+      const hr = document.createElement("hr");
+      container.appendChild(hr);
+    }
+
+    const div = document.createElement("div");
+    div.className = "row mb-2";
+    div.innerHTML = `
+      <div class="col-sm-4"><input type="text" name="link_what" class="form-control" placeholder="Тип"></div>
+      <div class="col-sm-4"><input type="text" name="link_text" class="form-control" placeholder="Текст"></div>
+      <div class="col-sm-3"><input type="text" name="link_href" class="form-control" placeholder="URL"></div>
+      <div class="col-sm-1 text-right">
+        <button type="button" class="btn btn-danger" onclick="removeLink(this)">
+          <i class="fa fa-trash"></i>
+        </button>
+      </div>
+    `;
+    container.appendChild(div);
+  }
+
+  function removeLink(button) {
+    const row = button.closest('.row');
+    const hr = row.previousElementSibling;
+    const container = document.getElementById("links");
+
+    // Удаляем hr, если он непосредственно перед блоком
+    if (hr && hr.tagName === "HR") {
+      container.removeChild(hr);
+    }
+
+    container.removeChild(row);
+  }
+</script>
+
+{% endblock %}

@@ -141,7 +141,6 @@ node_modules
 .DS_Store
 .pytest_cache
 test-results.xml
-/modules/hub/hub/servers_config.py
 modules/hub/hub/configs/*
 !modules/hub/hub/configs/example/
 /flaskbb.cfg
@@ -151,3 +150,4 @@ logs/*
 !logs/.gitkeep
 nohup.out
 celerybeat-schedule
+migrations/alembic.ini

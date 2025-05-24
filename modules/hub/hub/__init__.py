@@ -17,6 +17,8 @@ from hub.features.community_rating.render import render_community_rating
 from hub.github import create_github_api
 from .features.donations.utils import render_donations_label
 from .features.donations.blueprint import donations
+from .features.servers_managment.blueprint import servers_managment
+from .features.whitelist.blueprint import whitelist
 from .features.donations.qiwi_hook import register_webhooks_service
 from .utils import get_byond_ckey, configs_path
 
@@ -53,6 +55,8 @@ def flaskbb_load_blueprints(app):
     app.register_blueprint(hub, url_prefix="/hub")
     app.register_blueprint(donations, url_prefix="/donations")
     app.register_blueprint(development, url_prefix="/development")
+    app.register_blueprint(servers_managment, url_prefix="/servers_managment")
+    app.register_blueprint(whitelist, url_prefix="/whitelist")
 
     app.before_first_request(lambda: register_webhooks_service(app))
 

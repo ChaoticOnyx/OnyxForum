@@ -24,7 +24,7 @@ from flaskbb.forum.models import Post
 from hub.forms import ConfigEditForm, BanSearchForm, ConnectionSearchForm
 from hub.permissions import CanAccessServerHub, CanAccessServerHubAdditional, CanAccessServerHubManagement
 from hub.models import DiscordUser, DiscordUserRole, DiscordRole, HubLog
-from hub.utils import hub_current_server
+from hub.utils import hub_current_server, get_servers_config
 from hub.gameserver_models import game_models, ErroBan
 
 from flaskbb.utils.helpers import (
@@ -232,6 +232,16 @@ class Hub(MethodView):
                     icon="fa fa-group",
                     urlforkwargs={"server": hub_current_server.id},
                 ))
+
+        if Permission(CanAccessServerHubManagement()) and hub_current_server.whitelist_channel != '':
+            actions.append(
+                NavigationLink(
+                    endpoint="whitelist.server_whitelist",
+                    name=_("Вайтлист"),
+                    icon="fa fa-address-book",
+                    urlforkwargs={"server": hub_current_server.id},
+                ))
+
         if "ErroAdmin" in game_models[hub_current_server.id].keys() :
             actions.append(
                     NavigationLink(
@@ -337,7 +347,7 @@ class ConfigsView(Hub):
 
     def get(self):
         server_id = request.args["server"]
-        servers = current_app.config["BYOND_SERVERS"]
+        servers = get_servers_config()
         path = None
         if "path" in request.args:
                 path = request.args["path"]
@@ -384,7 +394,7 @@ class ConfigEditView(Hub):
         server_id = request.args["server"]
         config_name = request.args["config_name"]
 
-        servers = current_app.config["BYOND_SERVERS"]
+        servers = get_servers_config()
         server = None
 
         for srv in servers:
@@ -408,7 +418,7 @@ class ConfigEditView(Hub):
         server_id = request.args["server"]
         config_name = request.args["config_name"]
 
-        servers = current_app.config["BYOND_SERVERS"]
+        servers = get_servers_config()
         server = None
 
         for srv in servers:
@@ -473,7 +483,7 @@ class LogsView(Hub):
         path = None
         if "path" in request.args:
             path = request.args["path"]
-        servers = current_app.config["BYOND_SERVERS"]
+        servers = get_servers_config()
 
         server = None
 
@@ -528,7 +538,7 @@ class LogDownload(Hub):
     def get(self):
         server_id = request.args["server"]
         path = request.args["path"]
-        servers = current_app.config["BYOND_SERVERS"]
+        servers = get_servers_config()
 
         assert path
         assert server_id

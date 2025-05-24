@@ -31,10 +31,7 @@ from flask_discord import DiscordOAuth2Session
 
 from flaskbb._compat import iteritems, string_types
 # extensions
-from flaskbb.extensions import (alembic, allows, babel, cache, celery, csrf,
-                                db, db_hub, db_onyx, db_openkeep,
-                                debugtoolbar, limiter, login_manager, mail,
-                                redis_store, themes, whooshee, discordClient, scheduler)
+from flaskbb.extensions import *
 from flaskbb.plugins import spec
 from flaskbb.plugins.manager import FlaskBBPluginManager
 from flaskbb.plugins.models import PluginRegistry
@@ -62,10 +59,8 @@ from flaskbb.utils.search import (ForumWhoosheer, PostWhoosheer,
 from flaskbb.utils.settings import flaskbb_config
 from flaskbb.utils.translations import FlaskBBDomain
 
-try:
-    from hub.servers_config import servers_config
-except ImportError:
-    servers_config = []
+from hub.utils import get_servers_config
+from hub.gameserver_models import init_game_models
 
 from . import markup  # noqa
 from .auth import views as auth_views  # noqa
@@ -181,7 +176,6 @@ def configure_app(app, config):
 
     app.pluggy = FlaskBBPluginManager("flaskbb")
 
-    app.config["BYOND_SERVERS"] = servers_config
     app.config["SCHEDULER_API_ENABLED"] = True
 
 
@@ -218,6 +212,7 @@ def configure_extensions(app):
     db_onyx.init_app(app)
     db_openkeep.init_app(app)
     db.init_app(app)
+    migrate.init_app(app)
 
     #APScheduler
     if scheduler.state == 0 :
@@ -249,7 +244,14 @@ def configure_extensions(app):
 
     # Flask-Whooshee
     whooshee.init_app(app)
-    whooshee.reindex()
+    
+    command_line = ' '.join(sys.argv)
+    is_migration = ('db' in command_line and ('migrate' in command_line or 'upgrade' in command_line))
+    if not is_migration:
+        # только при запуске сервера вызываем reindex
+        whooshee.reindex()
+        init_game_models()
+
     # not needed for unittests - and it will speed up testing A LOT
     if True:#not app.testing:
         whooshee.register_whoosheer(PostWhoosheer)
@@ -392,7 +394,7 @@ def configure_context_processors(app):
 
     @app.context_processor
     def inject_servers():
-        return dict(servers=app.config["BYOND_SERVERS"])
+        return dict(servers=get_servers_config())
 
 
 def configure_before_handlers(app):

@@ -9,6 +9,9 @@
         {% if current_user|is_admin %}
             <li><a href={{url_for('hub.donations')}}>Донаты</a></li>
         {% endif %}
+        {% if current_user|is_admin %}
+            <li><a href={{url_for('servers_managment.list_servers')}}>Управление серверами</a></li>
+        {% endif %}
         {% for server in servers %}
             <li><a href={{url_for('hub.index', server=server.id)}}>{{server.name}}</a></li>
         {% endfor %}

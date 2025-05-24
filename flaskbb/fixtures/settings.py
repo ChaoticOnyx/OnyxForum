@@ -34,7 +34,7 @@ fixture = (
                 (
                     "project_title",
                     {
-                        "value": "FlaskBB",
+                        "value": "AnimusForum",
                         "value_type": SettingValueType.string,
                         "name": "Project title",
                         "description": "The title of the project.",
@@ -43,7 +43,7 @@ fixture = (
                 (
                     "project_subtitle",
                     {
-                        "value": "A lightweight forum software in Flask",
+                        "value": "Форум сообщества SS13.RU",
                         "value_type": SettingValueType.string,
                         "name": "Project subtitle",
                         "description": "A short description of the project.",

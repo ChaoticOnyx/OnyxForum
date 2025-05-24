@@ -55,18 +55,33 @@
                         {{ render_boolean_field(form.viewhidden) }}
                         {{ render_boolean_field(form.ignorekarma) }}
 
-                        <div class="panel settings-panel">
-                            <div class="panel-heading settings-head">
-                                Servers hub permissions
+                        <div class="panel-group" id="serversAccordion" role="tablist" aria-multiselectable="true">
+                          {% for server in servers %}
+                            <div class="panel panel-default">
+                              <div class="panel-heading" role="tab" id="heading-{{ server.id }}">
+                                <h4 class="panel-title">
+                                  <a role="button" data-toggle="collapse" data-parent="#serversAccordion" href="#collapse-{{ server.id }}" aria-expanded="{{ 'true' if loop.first else 'false' }}" aria-controls="collapse-{{ server.id }}">
+                                    {{ server.name }}
+                                  </a>
+                                </h4>
+                              </div>
+                              <div id="collapse-{{ server.id }}" class="panel-collapse collapse{% if loop.first %} in{% endif %}" role="tabpanel" aria-labelledby="heading-{{ server.id }}">
+                                <div class="panel-body">
+                                  {% for perm_type in ['base', 'additional', 'management'] %}
+                                    {% set input_id = server.id ~ '_' ~ perm_type %}
+                                    <div class="checkbox">
+                                      <label for="{{ input_id }}">
+                                        <input type="checkbox" name="{{ input_id }}" id="{{ input_id }}"
+                                          {% if user_permissions and user_permissions.get(input_id) %}checked{% endif %}>
+                                        {{ perm_type.capitalize() }}
+                                      </label>
+                                    </div>
+                                  {% endfor %}
+                                </div>
+                              </div>
                             </div>
-                            <div class="panel-body settings-body">
-                                {{ render_boolean_field(form.onyx_base) }}
-                                {{ render_boolean_field(form.onyx_additional) }}
-                                {{ render_boolean_field(form.onyx_management) }}
-                                {{ render_boolean_field(form.malachite_base) }}
-                                {{ render_boolean_field(form.malachite_additional) }}
-                                {{ render_boolean_field(form.malachite_management) }}
-                            </div>
+                          {% endfor %}
+                          <input type="hidden" name="server_permissions_json" id="server_permissions_json" />
                         </div>
                         {{ render_field(form.upload_size_limit) }}
                         {{ render_field(form.uploads_total_size_limit) }}
