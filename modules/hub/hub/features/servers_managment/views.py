@@ -60,6 +60,9 @@ class ServerManagementView(MethodView):
 
         server = ServerDescriptor.query.get(server_id) if server_id else ServerDescriptor()
 
+        server.hub_visible = 'hub_visible' in form_data
+        server.ss14 = 'ss14' in form_data
+
         server.id = form_data.get("id") if not server_id else server.id
         server.name = form_data.get("name")
         server.icon = form_data.get("icon")

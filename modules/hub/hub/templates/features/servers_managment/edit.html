@@ -11,6 +11,16 @@
       <p class="text-muted">Ключевые параметры, определяющие сервер в системе.</p>
 
       <div class="form-group">
+          <label for="hub_visible">Видимость в хабе(не на главной)</label>
+          <input type="checkbox" class="form-control" name="hub_visible" id="hub_visible" {% if server.hub_visible %}checked{% endif %}>
+      </div>
+
+      <div class="form-group">
+          <label for="ss14">SS14 сервер</label>
+          <input type="checkbox" class="form-control" name="ss14" id="ss14" {% if server.ss14 %}checked{% endif %}>
+      </div>
+
+      <div class="form-group">
         <label for="id">ID</label>
         {% if server %}
           <p class="help-block">ID нельзя изменить после создания.</p>

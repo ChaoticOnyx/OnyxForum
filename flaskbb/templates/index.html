@@ -86,6 +86,49 @@
 					</a>
 					
 				{%endif %}
+                {% if link.what == 'ss14_play' %}
+                    <a href="{{ link.href }}" class="ServerLink play" target="_blank" 
+                        onclick="copyLink(event, this)" style="cursor: pointer; user-select: text;">
+                        <i class="fa fa-clipboard"></i>
+                        {{ link.text }}
+                    </a>
+                    <div id="copy-popup" style="
+                        position: fixed; 
+                        top: 20px; 
+                        left: 50%; 
+                        transform: translateX(-50%);
+                        background: #222; 
+                        color: #fff; 
+                        padding: 6px 14px; 
+                        border-radius: 4px; 
+                        font-size: 14px; 
+                        display: none;
+                        z-index: 10000;
+                        box-shadow: 0 0 8px rgba(0,0,0,0.6);
+                        ">
+                        Ссылка скопирована
+                    </div>
+
+                    <script>
+                      function copyLink(event, el) {
+                        event.preventDefault();
+
+                        const textToCopy = el.href;
+
+                        navigator.clipboard.writeText(textToCopy).then(() => {
+                          const popup = document.getElementById('copy-popup');
+                          popup.style.display = 'block';
+
+                          clearTimeout(popup._timeout);
+                          popup._timeout = setTimeout(() => {
+                            popup.style.display = 'none';
+                          }, 1500);
+                        }).catch(() => {
+                          alert('Не удалось скопировать ссылку');
+                        });
+                      }
+                    </script>
+				{%endif %}
 			{% endfor %}
                         <details class="ServerDescription">
                             <summary>Описание</summary>

@@ -2,6 +2,7 @@ import attr
 import os
 import socket
 import struct
+import requests
 from typing import List, Optional
 import urllib
 
@@ -96,16 +97,28 @@ class ServerStatus:
 
 
 def get_server_status(server: ServerDescriptor) -> ServerStatus:
-    data = byond_export('localhost', server.port, '?status')
-    try:
-        if not data or 'players' not in data or not data['players']:
+    if server.ss14:
+        # ss14 сервер — делаем HTTP запрос по фиксированному порту 
+        try:
+            resp = requests.get(f'http://localhost:{server.port}/status', timeout=2)
+            if resp.status_code != 200:
+                return ServerStatus(is_online=False, players_count=0)
+            data = resp.json()
+            players = data.get('players', 0)
+            return ServerStatus(is_online=True, players_count=int(players))
+        except (requests.RequestException, ValueError, KeyError):
             return ServerStatus(is_online=False, players_count=0)
-        return ServerStatus(
-            is_online=True,
-            players_count=int(data['players'][0])
-        )
-    except (KeyError, ValueError, IndexError):
-        return ServerStatus(is_online=False, players_count=0)
+    else:
+        data = byond_export('localhost', server.port, '?status')
+        try:
+            if not data or 'players' not in data or not data['players']:
+                return ServerStatus(is_online=False, players_count=0)
+            return ServerStatus(
+                is_online=True,
+                players_count=int(data['players'][0])
+            )
+        except (KeyError, ValueError, IndexError):
+            return ServerStatus(is_online=False, players_count=0)
 
 
 @attr.s(auto_attribs=True)
