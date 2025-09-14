@@ -1,0 +1,312 @@
+{% extends theme("layout.html") %}
+{% block content %}
+<h2>Заявки на Job Whitelist: {{ server.name }}</h2>
+
+<style>
+/* ===== Карточки одинаковой высоты (flex-грид) ===== */
+#pendingContainer{
+  display:flex;
+  flex-wrap:wrap;
+  margin-left:-15px;
+  margin-right:-15px;
+}
+#pendingContainer .col-card{
+  padding:0 15px 30px;
+  box-sizing:border-box;
+  display:flex;            /* чтобы .panel растягивалась по высоте */
+}
+@media (min-width: 992px){  /* ~col-md-4 */
+  #pendingContainer .col-card{ width:33.3333%; }
+}
+@media (min-width: 768px) and (max-width: 991px){ /* ~col-sm-6 */
+  #pendingContainer .col-card{ width:50%; }
+}
+@media (max-width: 767px){
+  #pendingContainer .col-card{ width:100%; }
+}
+#pendingContainer .panel{
+  display:flex;
+  flex-direction:column;
+  width:100%;
+}
+#pendingContainer .panel-body{ flex:1 1 auto; }
+
+/* ===== Обёртка бейджей с переносами ===== */
+.badges-wrap{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+}
+.badges-wrap .badge{
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.badge.bg-danger{
+  background-color: #dc3545 !important;
+}
+
+/* ===== Инлайн-вывод с усечением до ~75 символов ===== */
+.kv-line{ display:flex; gap:6px; align-items:baseline; }
+.kv-key { color:#6c757d; font-size:12px; flex:0 0 auto; }
+.kv-val { flex:1 1 auto; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+</style>
+
+<!-- Спиннер загрузки -->
+<div id="loadingSpinner" class="text-center my-4">
+  <div class="spinner-border text-primary" role="status">
+    <span class="sr-only">Загрузка...</span>
+  </div>
+  <p>Загрузка заявок...</p>
+</div>
+
+<!-- Принятые заявки -->
+<div class="panel panel-default" style="display:none" id="contentBlock">
+  <div class="panel-heading">
+    <a data-toggle="collapse" href="#acceptedList">
+      <i class="fa fa-check-square-o"></i> Принятые заявки (Jobs)
+    </a>
+  </div>
+  <div class="panel-body collapse" id="acceptedList">
+    <input type="text" class="form-control mb-2" id="searchAccepted" placeholder="Поиск по ckey..." oninput="filterAccepted()">
+    <ul class="list-group" id="acceptedItems">
+      {% for app in accepted %}
+        <li class="list-group-item" data-ckey="{{ app.ckey }}" style="padding: 6px 12px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; white-space:nowrap; gap:8px;">
+            <div style="overflow:hidden; text-overflow:ellipsis; max-width:70%;">
+              <strong style="color:#222;"><a href="https://discord.com/channels/{{guild_id}}/{{app.message_id}}">{{ app.ckey }}</a></strong>
+              <small class="text-muted" style="margin-left:8px;">
+                {{ app.created_at.strftime('%Y-%m-%d %H:%M') }}
+              </small>
+              {% if app.jobs %}
+                <div class="mt-1 badges-wrap">
+                  {% for j in app.jobs %}
+                    <span class="badge bg-primary" title="{{ j }}">{{ j }}</span>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            <button class="btn btn-xs btn-danger" onclick="removeFromJobWhitelist('{{ app.id }}', '{{ server.id }}')">
+              <i class="fa fa-trash"></i>Удалить
+            </button>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<!-- Сетка заявок -->
+<div id="pendingContainer">
+  {% for app in pending.items %}
+    <div class="col-card">
+      {% if app.jobs_valid is not none and not app.jobs_valid %}
+        <div class="panel panel-warning" style="min-height:240px;">
+      {% else %}
+        <div class="panel panel-info" style="min-height:240px;">
+      {% endif %}
+        
+        <div class="panel-heading" title="Источник: {{ app.source_type }} #{{ app.source_id }}">
+          <strong><a href="https://discord.com/channels/{{guild_id}}/{{app.message_id}}">{{ app.ckey }}</a></strong>
+          {% if app.jobs_valid is not none and not app.jobs_valid %}
+            <span class="label label-warning" style="margin-left:6px;">Необходимы исправления</span>
+          {% endif %}
+        </div>
+        <div class="panel-body">
+
+          <!-- Краткое сообщение -->
+          {% if app.message_text %}
+            <p>{{ app.message_text[:140] }}{% if app.message_text|length > 140 %}...{% endif %}</p>
+          {% else %}
+            <p class="text-muted">Нет сопроводительного текста</p>
+          {% endif %}          
+        </div>
+        <div class="panel-footer text-right">
+          <!-- Инлайн-строки с ограничением в 75 символов -->
+          <div class="kv-line">
+          <span class="kv-key">Jobs:</span>
+          <span class="kv-val">
+            {% if app.jobs %}
+              <span class="badges-wrap">
+                {% set ns = namespace(total=0, hidden=0) %}
+                {% for j in app.jobs %}
+                  {% set l = j|length %}
+                  {% if ns.total + l <= 75 %}
+                    <span class="badge bg-primary" title="{{ j }}">{{ j }}</span>
+                    {% set ns.total = ns.total + l %}
+                  {% else %}
+                    {% set ns.hidden = ns.hidden + 1 %}
+                  {% endif %}
+                {% endfor %}
+                {% if ns.hidden > 0 %}
+                  <span class="badge" title="Ещё {{ ns.hidden }}">+{{ ns.hidden }}</span>
+                {% endif %}
+              </span>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </span>
+        </div>
+
+        {# ===== Unknown: отдельные бейджи, общий лимит 75 символов ===== #}
+        {% if app.jobs_unknown %}
+        <div class="kv-line mt-2">
+          <span class="kv-key">Unknown:</span>
+          <span class="kv-val">
+            <span class="badges-wrap">
+              {% set ns = namespace(total=0, hidden=0) %}
+              {% for u in app.jobs_unknown %}
+                {% set l = u|length %}
+                {% if ns.total + l <= 75 %}
+                  <span class="badge bg-danger" title="{{ u }}">{{ u }}</span>
+                  {% set ns.total = ns.total + l %}
+                {% else %}
+                  {% set ns.hidden = ns.hidden + 1 %}
+                {% endif %}
+              {% endfor %}
+              {% if ns.hidden > 0 %}
+                <span class="badge" title="Ещё {{ ns.hidden }}">+{{ ns.hidden }}</span>
+              {% endif %}
+            </span>
+          </span>
+        </div>
+        {% endif %}
+
+        {# ===== Reason: усечение до 75 символов ===== #}
+        {% if app.jobs_valid_reason %}
+        <div class="kv-line mt-2">
+          <span class="kv-key">Reason:</span>
+          <span class="kv-val" title="{{ app.jobs_valid_reason }}">
+            {{ app.jobs_valid_reason|truncate(75, True, '…') }}
+          </span>
+        </div>
+        {% endif %}
+        </div>
+
+        <div class="panel-footer text-right">
+          <div class="btn-group btn-group-justified" role="group">
+            <div class="btn-group" role="group">
+              <button
+                class="btn btn-success btn-xs"
+                onclick="respondJob('{{ app.id }}', true, '{{ server.id }}')"
+                {% if not app.jobs_valid %}disabled title="Нельзя принять: заявка не прошла валидацию джоб"{% endif %}
+              >
+                <i class="fa fa-check"></i> Принять
+              </button>
+            </div>
+            <div class="btn-group" role="group">
+              <button class="btn btn-danger btn-xs" onclick="respondJob('{{ app.id }}', false, '{{ server.id }}')">
+                <i class="fa fa-times"></i> Отклонить
+              </button>
+            </div>
+          </div>
+          <button class="btn btn-info btn-xs btn-block mt-2" data-toggle="modal" data-target="#detailsModal{{ app.id }}">
+            <i class="fa fa-eye"></i> Подробнее
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Модалка (полный вывод с бейджами) -->
+    <div class="modal fade" id="detailsModal{{ app.id }}">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <strong>{{ app.ckey }}</strong>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="text-muted small">Источник: {{ app.source_type }} #{{ app.source_id }}</div>
+            <hr>
+            <h5>Заявка</h5>
+            <pre style="white-space:pre-wrap;">{{ app.message_text }}</pre>
+
+            <h5 class="mt-2">Jobs</h5>
+            {% if app.jobs %}
+              <div class="badges-wrap">
+                {% for j in app.jobs %}
+                  <span class="badge bg-primary" title="{{ j }}">{{ j }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+
+            {% if app.jobs_unknown %}
+              <hr>
+              <h5>Unknown</h5>
+              <div class="badges-wrap">
+                {% for u in app.jobs_unknown %}
+                  <span class="badge bg-danger" title="{{ u }}">{{ u }}</span>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            {% if app.jobs_valid_reason %}
+              <hr>
+              <h5>Причина</h5>
+              <div>{{ app.jobs_valid_reason }}</div>
+            {% endif %}
+
+            {% if app.comments %}
+              <hr>
+              <h5>Комментарии</h5>
+              {% for c in app.comments %}
+                <p><strong>{{ c.author }}:</strong> {{ c.content }}</p>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<!-- Пагинация -->
+{% if pending.pages > 1 %}
+<nav class="text-center">
+  <ul class="pagination">
+    {% for page in range(1, pending.pages + 1) %}
+      <li class="{% if page == pending.page %}active{% endif %}">
+        <a href="?page={{ page }}">{{ page }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+</nav>
+{% endif %}
+
+<script>
+function filterAccepted() {
+  var query = document.getElementById("searchAccepted").value.toLowerCase();
+  var items = document.querySelectorAll("#acceptedItems li");
+  items.forEach(function(item) {
+    item.style.display = item.dataset.ckey.toLowerCase().includes(query) ? "" : "none";
+  });
+}
+
+function respondJob(id, accept, server_id) {
+  fetch(`/whitelist/jobs/respond`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id: id, server_id: server_id, action: accept ? "accept" : "reject" })
+  }).then(() => location.reload());
+}
+
+function removeFromJobWhitelist(id, server_id) {
+  if (!confirm("Удалить из Job Whitelist?")) return;
+  fetch(`/whitelist/jobs/remove`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ application_id: id, server_id: server_id })
+  }).then(() => location.reload());
+}
+
+// Ждём полной загрузки страницы и скрываем спиннер
+window.addEventListener("load", function() {
+  document.getElementById("loadingSpinner").style.display = "none";
+  document.getElementById("contentBlock").style.display = "block";
+});
+</script>
+{% endblock %}

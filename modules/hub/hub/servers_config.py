@@ -22,9 +22,11 @@ class ServerDescriptor(db.Model):
     configs_exclude = db.Column(db.JSON, default=list)
     logs_path = db.Column(db.String(255), nullable=False)
     whitelist_channel = db.Column(db.String(255), nullable=False)
+    job_whitelist_channel = db.Column(db.String(255), nullable=False)
     whitelist_role = db.Column(db.String(255), nullable=False)
     hub_visible = db.Column(db.Boolean, nullable=False, default=True)
     ss14 = db.Column(db.Boolean, nullable=False, default=False)
+    tg_base = db.Column(db.Boolean, nullable=False, default=False)
 
     discord_full_access_titles = db.Column(db.JSON, default=list)
     discord_base_access_titles = db.Column(db.JSON, default=list)

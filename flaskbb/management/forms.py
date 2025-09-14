@@ -40,6 +40,7 @@ from flaskbb.user.models import Group, User
 from flaskbb.utils.fields import BirthdayField
 from flaskbb.utils.helpers import check_image
 from flaskbb.utils.requirements import IsAtleastModerator
+from flask import request
 
 from hub.utils import get_servers_config
 

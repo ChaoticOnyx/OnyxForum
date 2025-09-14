@@ -124,6 +124,13 @@ class ErroWhitelist:
     added_at = Column(DateTime, default=datetime.datetime.utcnow)
     text = Column(Text, nullable=False)
 
+class ErroJobWhitelist:
+    id = Column(Integer, primary_key=True)
+    ckey = Column(String(50), nullable=False, unique=True)
+    job = Column(String(50), nullable=False, unique=True)
+    added_at = Column(DateTime, default=datetime.datetime.utcnow)
+    text = Column(Text, nullable=False)
+
 metadata_by_bind = {}
 def get_metadata_for(bind_key: str):
     if bind_key not in metadata_by_bind:
@@ -157,20 +164,22 @@ def load_dynamic_game_models():
         connection_tablename = "connection"
         admin_tablename = "erro_admin"
         whitelist_tablename = "erro_whitelist"
+        job_whitelist_tablename = "erro_job_whitelist"
 
         erro_ban_args = {}
-        if sid == "openkeep":
-            erro_ban_args["__table_args__"] = (
-                Index('idx_ban_isbanned_details', 'ckey', 'ip', 'computerid', 'role', 'unbanned_datetime', 'expiration_time'),
-                Index('idx_ban_count', 'bantime', 'a_ckey', 'applies_to_admins', 'unbanned_datetime', 'expiration_time'),
-                Index('idx_ban_isbanned', 'ckey', 'role', 'unbanned_datetime', 'expiration_time')
-            )
+        #if server.tg_base:
+        #    erro_ban_args["__table_args__"] = (
+        #        Index('idx_ban_isbanned_details', 'ckey', 'ip', 'computerid', 'role', 'unbanned_datetime', 'expiration_time'),
+        #        Index('idx_ban_count', 'bantime', 'a_ckey', 'applies_to_admins', 'unbanned_datetime', 'expiration_time'),
+        #        Index('idx_ban_isbanned', 'ckey', 'role', 'unbanned_datetime', 'expiration_time')
+        #    )
 
         models[sid] = {
             "ErroBan": create_game_model(ErroBan, erro_ban_tablename, sid, erro_ban_args),
             "Connection": create_game_model(Connection, connection_tablename, sid),
             "ErroAdmin": create_game_model(ErroAdmin, admin_tablename, sid),
-            "ErroWhitelist": create_game_model(ErroWhitelist, whitelist_tablename, sid)
+            "ErroWhitelist": create_game_model(ErroWhitelist, whitelist_tablename, sid),
+            "ErroJobWhitelist": create_game_model(ErroJobWhitelist, job_whitelist_tablename, sid)
         }
 
     logger.info(f"Loaded dynamic game models for: {list(models.keys())}")

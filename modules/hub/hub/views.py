@@ -242,6 +242,14 @@ class Hub(MethodView):
                     urlforkwargs={"server": hub_current_server.id},
                 ))
 
+        if Permission(CanAccessServerHubManagement()) and hub_current_server.job_whitelist_channel != '':
+            actions.append(
+                NavigationLink(
+                    endpoint="whitelist.server_job_whitelist",
+                    name=_("Job Вайтлист"),
+                    icon="fa fa-user-secret",
+                    urlforkwargs={"server": hub_current_server.id},
+                ))
         if "ErroAdmin" in game_models[hub_current_server.id].keys() :
             actions.append(
                     NavigationLink(

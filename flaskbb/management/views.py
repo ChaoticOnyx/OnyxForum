@@ -585,15 +585,15 @@ class AddGroup(MethodView):
             group = form.save()
 
             # Считать hub_permissions из POST-данных
-            hub_permissions = {}
-            for server in get_servers_config:
-                for perm_type in ['base', 'additional', 'management']:
-                    key = f"{server.id}_{perm_type}"
-                    # чекбокс в POST присутствует — значит True, иначе False
-                    hub_permissions[key] = key in request.form
+            #hub_permissions = {}
+            #for server in get_servers_config():
+            #    for perm_type in ['base', 'additional', 'management']:
+            #        key = f"{server.id}_{perm_type}"
+            #        # чекбокс в POST присутствует — значит True, иначе False
+            #        hub_permissions[key] = key in request.form
 
-            group.hub_permissions = hub_permissions
-            group.save()
+            #group.hub_permissions = hub_permissions
+            #group.save()
 
             flash(_('Group added.'), 'success')
             return redirect(url_for('management.groups'))

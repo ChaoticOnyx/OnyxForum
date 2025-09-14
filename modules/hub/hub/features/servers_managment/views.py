@@ -62,6 +62,7 @@ class ServerManagementView(MethodView):
 
         server.hub_visible = 'hub_visible' in form_data
         server.ss14 = 'ss14' in form_data
+        server.tg_base = 'tg_base' in form_data
 
         server.id = form_data.get("id") if not server_id else server.id
         server.name = form_data.get("name")
@@ -82,6 +83,7 @@ class ServerManagementView(MethodView):
         server.discord_role_to_group = json.loads(form_data.get("discord_role_to_group", "{}"))
         server.whitelist_channel = form_data.get("whitelist_channel")
         server.whitelist_role = form_data.get("whitelist_role")
+        server.job_whitelist_channel = form_data.get("job_whitelist_channel")
 
         # Обработка ссылок
         server.links.clear()

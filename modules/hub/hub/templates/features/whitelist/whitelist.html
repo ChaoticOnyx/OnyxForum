@@ -24,7 +24,7 @@
         <li class="list-group-item" data-ckey="{{ app.ckey }}" style="padding: 6px 12px;">
           <div style="display: flex; align-items: center; justify-content: space-between; white-space: nowrap;">
             <div style="overflow: hidden; text-overflow: ellipsis; max-width: 80%;">
-              <strong style="color: #222;">{{ app.ckey }}</strong>
+              <strong style="color: #222;"><a href="https://discord.com/channels/{{guild_id}}/{{app.message_id}}">{{ app.ckey }}</a></strong>
               <small class="text-muted" style="margin-left: 8px;">
                 {{ app.created_at.strftime('%Y-%m-%d %H:%M') }}
               </small>
@@ -47,7 +47,7 @@
     <div class="col-sm-6 col-md-4">
       <div class="panel panel-info" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between; min-height: 220px;">
         <div class="panel-heading">
-          <strong>{{ app.ckey }}</strong>
+          <strong><a href="https://discord.com/channels/{{guild_id}}/{{app.message_id}}">{{ app.ckey }}</a></strong>
         </div>
         <div class="panel-body" style="flex-grow: 1;">
           <p>{{ app.message_text[:100] }}{% if app.message_text|length > 100 %}...{% endif %}</p>

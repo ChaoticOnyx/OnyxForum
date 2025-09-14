@@ -20,3 +20,20 @@ register_view(
     routes=["/remove"],
     view_func=WhitelistRemoveView.as_view("whitelist_remove")
 )
+
+register_view(
+    whitelist,
+    routes=["/<server>/jobs"],
+    view_func=JobWhitelistView.as_view("server_job_whitelist")
+)
+
+register_view(
+    whitelist,
+    routes=["/jobs/respond"],
+    view_func=JobWhitelistRespondView.as_view("job_whitelist_respond")
+)
+register_view(
+    whitelist,
+    routes=["/jobs/remove"],
+    view_func=JobWhitelistDeleteView.as_view("job_whitelist_remove")
+)

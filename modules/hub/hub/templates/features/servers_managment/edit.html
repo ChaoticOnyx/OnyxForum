@@ -21,6 +21,11 @@
       </div>
 
       <div class="form-group">
+          <label for="tg_base">TG DB</label>
+          <input type="checkbox" class="form-control" name="tg_base" id="tg_base" {% if server.tg_base %}checked{% endif %}>
+      </div>
+
+      <div class="form-group">
         <label for="id">ID</label>
         {% if server %}
           <p class="help-block">ID нельзя изменить после создания.</p>
@@ -150,6 +155,11 @@
         <label for="discord_role_to_group">Роль для членов вайтлиста</label>
         <p class="help-block">Формат: <code>000000000</code></p>
         <input type="number" class="form-control" name="whitelist_role" id="whitelist_role" value="{{ server.whitelist_role }}"></input>
+      </div>
+      <div class="form-group">
+        <label for="discord_role_to_group">Канал/форум для принятия заявок вайтлиста на джобы</label>
+        <p class="help-block">Формат: <code>000000000</code></p>
+        <input type="number" class="form-control" name="job_whitelist_channel" id="job_whitelist_channel" value="{{ server.job_whitelist_channel }}"></input>
       </div>
     </div>
   </div>
