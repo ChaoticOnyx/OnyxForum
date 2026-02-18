@@ -5,6 +5,7 @@ from flaskbb.utils.helpers import FlashAndRedirect
 from flaskbb.utils.helpers import render_template
 from flask_login import current_user
 from flaskbb.extensions import allows, db
+from sqlalchemy import and_, or_, func, not_
 
 import asyncio
 import datetime
@@ -38,17 +39,29 @@ class WhitelistView(MethodView):
         except Exception as e:
             current_app.logger.warning(f"Не удалось запустить фоновую задачу Discord: {e}")
 
+        jobs_is_empty = or_(
+            WhitelistApplication.jobs.is_(None),
+            func.lower(func.trim(WhitelistApplication.jobs)) == 'null',
+            func.length(func.trim(WhitelistApplication.jobs)) == 0,
+            WhitelistApplication.jobs.op('REGEXP')(r'^\s*\[\s*\]\s*$')
+        )
+        jobs_is_empty = or_(
+            WhitelistApplication.jobs.is_(None),
+            func.lower(func.trim(WhitelistApplication.jobs)) == 'null',
+            func.length(func.trim(WhitelistApplication.jobs)) == 0,
+            WhitelistApplication.jobs.op('REGEXP')(r'^\s*\[\s*\]\s*$')
+        )
 
-        accepted = WhitelistApplication.query.filter_by(
-            server_id=server.id,
-            status='accepted',
-            jobs=None
+        accepted = WhitelistApplication.query.filter(
+            WhitelistApplication.server_id == server.id,
+            WhitelistApplication.status == 'accepted',
+            jobs_is_empty
         ).order_by(WhitelistApplication.ckey.asc()).all()
 
-        pending_query = WhitelistApplication.query.filter_by(
-            server_id=server.id,
-            status='pending',
-            jobs=None
+        pending_query = WhitelistApplication.query.filter(
+            WhitelistApplication.server_id == server.id,
+            WhitelistApplication.status == 'pending',
+            jobs_is_empty
         ).order_by(WhitelistApplication.created_at.desc())
 
         pending = pending_query.paginate(page=page, per_page=9, error_out=False)
@@ -175,19 +188,40 @@ class JobWhitelistView(MethodView):
         except Exception as e:
             current_app.logger.warning(f"Не удалось запустить фоновую задачу Discord: {e}")
 
+        
+        jobs_is_not_empty = and_(
+            WhitelistApplication.jobs.isnot(None),
+            func.json_valid(WhitelistApplication.jobs) == 1,
+            func.json_type(WhitelistApplication.jobs) == 'ARRAY',
+            func.json_length(WhitelistApplication.jobs) > 0
+        )
+        
         accepted = (WhitelistApplication.query
-                    .filter(WhitelistApplication.jobs!=None)
-                    .filter_by(server_id=server.id, status='accepted')
-                    .order_by(WhitelistApplication.created_at.desc())
-                    .all())
+            .filter(
+                and_(
+                    WhitelistApplication.server_id == server.id,
+                    WhitelistApplication.status == 'accepted',
+                    jobs_is_not_empty
+                )
+            )
+            .order_by(WhitelistApplication.created_at.desc())
+            .all()
+        )
 
         # Ожидающие — с пагинацией (как в обычном WL)
         page = request.args.get('page', 1, type=int)
+
         pending = (WhitelistApplication.query
-                   .filter(WhitelistApplication.jobs!=None)
-                   .filter_by(server_id=server.id, status='pending')
-                   .order_by(WhitelistApplication.created_at.desc())
-                   .paginate(page=page, per_page=12, error_out=False))
+            .filter(
+                and_(
+                    WhitelistApplication.server_id == server.id,
+                    WhitelistApplication.status == 'pending',
+                    jobs_is_not_empty
+                )
+            )
+            .order_by(WhitelistApplication.created_at.desc())
+            .paginate(page=page, per_page=12, error_out=False)
+        )
 
         return render_template(
             "features/whitelist/job_list.html",

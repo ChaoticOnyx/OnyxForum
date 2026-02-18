@@ -137,57 +137,57 @@ def development_status_monitor():
     with scheduler.app.app_context():
         repo = repositories["onyxbay"]
         
-        send_embed(
-            repo,
-            create_owners_status_embed(),
-            channel_keys=["owners"])
-        
-        send_embed(
-            repo,
-            create_developers_status_embed(),
-            channel_keys=["developers"])
+        #send_embed(
+        #    repo,
+        #    create_owners_status_embed(),
+        #    channel_keys=["owners"])
+        #
+        #send_embed(
+        #    repo,
+        #    create_developers_status_embed(),
+        #    channel_keys=["developers"])
 
-        send_embed(
-            repo,
-            create_spriters_status_embed(),
-            channel_keys=["spriters"]
-        )
+        #send_embed(
+        #    repo,
+        #    create_spriters_status_embed(),
+        #    channel_keys=["spriters"]
+        #)
 
-        send_embed(
-            repo,
-            create_beginners_status_embed(),
-            channel_keys=["beginners"]
-        )
+        #send_embed(
+        #    repo,
+        #    create_beginners_status_embed(),
+        #    channel_keys=["beginners"]
+        #)
 
-        send_embed(
-            repo,
-            create_bounty_embed(),
-            channel_keys=["developers"]
-        )
+        #send_embed(
+        #    repo,
+        #    create_bounty_embed(),
+        #    channel_keys=["developers"]
+        #)
 
-        send_embed(
-            repo,
-            create_wiki_status_embed(),
-            channel_keys=["wiki"]
-        )
+        #send_embed(
+        #    repo,
+        #    create_wiki_status_embed(),
+        #    channel_keys=["wiki"]
+        #)
 
-        send_status(
-            repo,
-            title="Issue Watchers, обратите внимание!",
-            description="задач ждут проверки",
-            query=QueryGenerator(repo).stage_verification(),
-            color=0xff8b00,
-            channel_key="watchers"
-        )
+        #send_status(
+        #    repo,
+        #    title="Issue Watchers, обратите внимание!",
+        #    description="задач ждут проверки",
+        #    query=QueryGenerator(repo).stage_verification(),
+        #    color=0xff8b00,
+        #    channel_key="watchers"
+        #)
 
-        send_status(
-            repo,
-            title="Game Designers, обратите внимание!",
-            description="приоритетных задач ждут вашей реакции",
-            query=QueryGenerator(repo).stage_design(),
-            color=0xff4d00,
-            channel_key="designers"
-        )
+        #send_status(
+        #    repo,
+        #    title="Game Designers, обратите внимание!",
+        #    description="приоритетных задач ждут вашей реакции",
+        #    query=QueryGenerator(repo).stage_design(),
+        #    color=0xff4d00,
+        #    channel_key="designers"
+        #)
         
 async def status_owners(interaction: discord.Interaction):
     response = interaction.response
