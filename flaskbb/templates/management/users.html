@@ -47,9 +47,10 @@
                 <form class="search-form" role="form" method="post">
                     {{ search_form.hidden_tag() }}
                     <div class="input-group">
+                        <span class="input-group-btn">{{ search_form.search_type(class="form-control") }}</span>
                         {{ group_field(search_form.search_query, css_class="form-control") }}
                         <span class="input-group-btn">
-                            <button class="btn btn-default" type="button"><span class="fa fa-search"></span></button>
+                            <button class="btn btn-default" type="submit"><span class="fa fa-search"></span></button>
                         </span>
                     </div>
                 </form>

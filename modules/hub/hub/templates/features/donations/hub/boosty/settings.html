@@ -1,0 +1,47 @@
+{% extends theme("features/donations/hub/boosty/base.html") %}
+{% from theme('macros.html') import horizontal_field %}
+
+{% block boosty_content %}
+<form method="post" class="form-horizontal">
+    {{ form.hidden_tag() }}
+    <h3>General</h3>
+    {{ horizontal_field(form.integration_enabled) }}
+    {{ horizontal_field(form.polling_interval) }}
+    {{ horizontal_field(form.automatic_opyx_enabled) }}
+    {{ horizontal_field(form.opyx_rate) }}
+    {{ horizontal_field(form.rounding) }}
+    {{ horizontal_field(form.minimum_donation) }}
+    {{ horizontal_field(form.maximum_opyx_enabled) }}
+    {{ horizontal_field(form.maximum_opyx) }}
+    {{ horizontal_field(form.bonus_enabled) }}
+    {{ horizontal_field(form.bonus_rules) }}
+    <p class="help-block">Пример: <code>[{"minimum":"1000","percent":"5"},{"minimum":"5000","percent":"10"}]</code></p>
+
+    <h3 class="boosty-section">Linking</h3>
+    {{ horizontal_field(form.automatic_linking_enabled) }}
+    {{ horizontal_field(form.link_token_ttl_minutes) }}
+
+    <h3 class="boosty-section">Discord</h3>
+    {{ horizontal_field(form.discord_sync_enabled) }}
+    {{ horizontal_field(form.discord_guild_id) }}
+    <datalist id="boosty-guild-list">{% for guild_id, guild_name in guilds %}<option value="{{ guild_id }}">{{ guild_name }}</option>{% endfor %}</datalist>
+    {{ horizontal_field(form.donator_role_id) }}
+    <datalist id="boosty-donator-role-list">{% for role in roles %}<option value="{{ role.id }}">{{ role.title }}</option>{% endfor %}</datalist>
+    {{ horizontal_field(form.donator_role_mode) }}
+
+    <h3 class="boosty-section">Notifications</h3>
+    {{ horizontal_field(form.outgoing_webhooks_enabled) }}
+
+    <h3 class="boosty-section">Messages</h3>
+    <p class="help-block">Placeholders: <code>{user}</code>, <code>{token}</code>, <code>{amount}</code>, <code>{opix}</code>, <code>{boostyName}</code>, <code>{expiresAt}</code>, <code>{linkUrl}</code>.</p>
+    {{ horizontal_field(form.message_token) }}
+    {{ horizontal_field(form.message_link_success) }}
+    {{ horizontal_field(form.message_link_error) }}
+    {{ horizontal_field(form.message_expired_token) }}
+    {{ horizontal_field(form.message_opyx_credited) }}
+    {{ horizontal_field(form.message_processing_error) }}
+    {{ horizontal_field(form.message_link_required) }}
+    <div class="form-group"><div class="col-sm-offset-4 col-sm-8"><button class="btn btn-primary" type="submit">Save settings</button></div></div>
+</form>
+<script>document.getElementById('discord_guild_id').setAttribute('list', 'boosty-guild-list');document.getElementById('donator_role_id').setAttribute('list', 'boosty-donator-role-list');</script>
+{% endblock %}

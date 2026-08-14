@@ -129,6 +129,7 @@ class IndexServerEntry:
     links: List[ServerAdditionalLink]
     is_online: bool = False
     players_count: int = 0
+    hub_visible: bool = True
 
 
 def get_servers_for_index():
@@ -144,7 +145,8 @@ def get_servers_for_index():
             description=server.description,
             links=server.links,
             is_online=status.is_online,
-            players_count=status.players_count
+            players_count=status.players_count,
+            hub_visible=server.hub_visible
         )
 
         entries.append(entry)

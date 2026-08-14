@@ -54,6 +54,12 @@ class UserDonationsView(MethodView):
                 name=_("💵 История Донатов"),
             ))
 
+        actions.append(
+            NavigationLink(
+                endpoint="donations.boosty_link",
+                name=_("🔗 Привязать Boosty"),
+            ))
+
         return actions
 
     def get_args(self):

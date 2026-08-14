@@ -20,13 +20,16 @@ from .features.donations.blueprint import donations
 from .features.servers_managment.blueprint import servers_managment
 from .features.whitelist.blueprint import whitelist
 from .features.donations.qiwi_hook import register_webhooks_service
+from .features.donations.boosty import register_boosty_jobs
+from .features.donations.boosty.settings import PLUGIN_SETTINGS
+from .features.donations.boosty import models as boosty_models  # noqa: F401
 from .utils import get_byond_ckey, configs_path
 
 from hub.features.development import commands, github_hook
 from hub.features.development.blueprint import development
 
 __version__ = "1.0.0"
-SETTINGS = None
+SETTINGS = PLUGIN_SETTINGS
 
 
 hookimpl = HookimplMarker("flaskbb")
@@ -36,6 +39,7 @@ hookimpl = HookimplMarker("flaskbb")
 def flaskbb_extensions(app):
     app.config.from_pyfile(configs_path + "/hub.cfg")
     app.config.from_pyfile(configs_path + "/patron_tiers.cfg")
+    app.config.from_pyfile(configs_path + "/boosty.cfg", silent=True)
     app.githubApi = create_github_api()
     commands.register_commands()
 
@@ -58,7 +62,7 @@ def flaskbb_load_blueprints(app):
     app.register_blueprint(servers_managment, url_prefix="/servers_managment")
     app.register_blueprint(whitelist, url_prefix="/whitelist")
 
-    app.before_first_request(lambda: register_webhooks_service(app))
+    #app.before_first_request(lambda: register_webhooks_service(app))
 
 
 @hookimpl
@@ -102,4 +106,4 @@ def flaskbb_tpl_user_nav_loggedin_before():
 def flaskbb_additional_setup(app, pluggy):
     with app.app_context():
         github_hook.register_github_webhooks()
-        pass
+        register_boosty_jobs(app)

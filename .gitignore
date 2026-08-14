@@ -143,6 +143,7 @@ node_modules
 test-results.xml
 modules/hub/hub/configs/*
 !modules/hub/hub/configs/example/
+modules/hub/hub/boosty_auth.json*
 /flaskbb.cfg
 flaskbb/static/user_content/
 flaskbb/static/img/server_logos/

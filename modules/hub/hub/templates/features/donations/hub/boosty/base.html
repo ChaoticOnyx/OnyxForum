@@ -1,0 +1,21 @@
+{% extends theme("features/donations/hub/index.html") %}
+
+{% block hub_content %}
+<style>
+    .boosty-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-bottom:18px; }
+    .boosty-card { background:#21242c; border:1px solid #343946; border-radius:4px; padding:14px; min-height:88px; }
+    .boosty-card small { color:#9da5b4; display:block; text-transform:uppercase; }
+    .boosty-card strong { display:block; font-size:22px; margin-top:6px; overflow-wrap:anywhere; }
+    .boosty-health-Healthy { color:#5cb85c; } .boosty-health-Warning { color:#f0ad4e; } .boosty-health-Error { color:#d9534f; }
+    .boosty-toolbar { display:flex; flex-wrap:wrap; gap:8px; align-items:flex-end; margin-bottom:15px; }
+    .boosty-toolbar .form-group { margin-bottom:0; }
+    .boosty-table-wrap { overflow-x:auto; }
+    .boosty-muted { color:#9da5b4; }
+    .boosty-error { color:#d9534f; white-space:pre-wrap; overflow-wrap:anywhere; }
+    .boosty-chart { width:100%; height:180px; background:#181a20; border:1px solid #343946; }
+    .boosty-section { border-top:1px solid #343946; padding-top:14px; margin-top:18px; }
+    .boosty-raw { max-height:420px; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; background:#15171b; padding:12px; }
+    @media (max-width:767px) { .boosty-card strong { font-size:18px; } .boosty-toolbar > * { width:100%; } }
+</style>
+{% block boosty_content %}{% endblock %}
+{% endblock %}

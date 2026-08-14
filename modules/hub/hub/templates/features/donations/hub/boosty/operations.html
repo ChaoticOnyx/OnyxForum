@@ -1,0 +1,37 @@
+{% extends theme("features/donations/hub/boosty/base.html") %}
+{% from theme('macros.html') import render_pagination %}
+
+{% block boosty_content %}
+{% macro sort_link(field, title) -%}
+{% set next_direction = 'desc' if request.args.get('sort') == field and request.args.get('direction', 'desc') == 'asc' else 'asc' %}
+<a href="{{ url_for('hub.boosty_operations', q=request.args.get('q',''), date_from=request.args.get('date_from',''), date_to=request.args.get('date_to',''), status=request.args.get('status',''), type=request.args.get('type',''), sort=field, direction=next_direction) }}">{{ title }}{% if request.args.get('sort') == field %} {{ '▲' if request.args.get('direction') == 'asc' else '▼' }}{% endif %}</a>
+{%- endmacro %}
+<form method="get" class="boosty-toolbar">
+    <div class="form-group"><label>Поиск</label><input class="form-control" name="q" value="{{ request.args.get('q','') }}" placeholder="ID, Boosty user"></div>
+    <div class="form-group"><label>С</label><input class="form-control" type="date" name="date_from" value="{{ request.args.get('date_from','') }}"></div>
+    <div class="form-group"><label>По</label><input class="form-control" type="date" name="date_to" value="{{ request.args.get('date_to','') }}"></div>
+    <div class="form-group"><label>Status</label><select class="form-control" name="status"><option value="">Все</option>{% for status in statuses %}<option{% if request.args.get('status') == status %} selected{% endif %}>{{ status }}</option>{% endfor %}</select></div>
+    <div class="form-group"><label>Type</label><select class="form-control" name="type"><option value="">Все</option>{% for operation_type in operation_types %}<option value="{{ operation_type }}"{% if request.args.get('type') == operation_type %} selected{% endif %}>{{ operation_type }}</option>{% endfor %}</select></div>
+    <button class="btn btn-default" type="submit">Фильтр</button>
+</form>
+<div class="boosty-table-wrap">
+<table class="table table-striped table-condensed">
+    <thead><tr><th>{{ sort_link('source_created_at', 'Дата') }}</th><th>Boosty user</th><th>Тип</th><th>{{ sort_link('amount', 'Сумма') }}</th><th>Описание</th><th>{{ sort_link('status', 'Status') }}</th><th>Forum user</th><th>Opyx</th><th>Курс</th><th>{{ sort_link('processed_at', 'Обработано') }}</th><th>{{ sort_link('external_id', 'Operation ID') }}</th></tr></thead>
+    <tbody>
+    {% for operation in operations %}
+    <tr>
+        <td>{{ operation.source_created_at|format_datetime }}</td>
+        <td>{{ operation.account.name or operation.account.external_id }}</td>
+        <td>{{ operation.operation_type }}</td><td>{{ operation.amount }} {{ operation.currency }}</td>
+        <td>{{ operation.description }}</td><td><span class="label label-{{ 'success' if operation.status == 'Processed' else 'danger' if operation.status == 'Error' else 'warning' }}">{{ operation.status }}</span></td>
+        <td>{% if users.get(operation.forum_user_id) %}<a href="{{ users[operation.forum_user_id].url }}">{{ users[operation.forum_user_id].display_name }}</a>{% else %}—{% endif %}</td>
+        <td>{{ operation.opyx_amount if operation.opyx_amount is not none else '—' }}</td><td>{{ operation.final_rate if operation.final_rate is not none else '—' }}</td>
+        <td>{{ operation.processed_at|format_datetime if operation.processed_at else '—' }}</td>
+        <td><a href="{{ url_for('hub.boosty_operation', operation_id=operation.id) }}">{{ operation.external_id }}</a></td>
+    </tr>
+    {% else %}<tr><td colspan="11" class="text-center boosty-muted">Операции не найдены</td></tr>{% endfor %}
+    </tbody>
+</table>
+</div>
+{{ render_pagination(pagination, pagination_url, with_args=pagination_with_args) }}
+{% endblock %}

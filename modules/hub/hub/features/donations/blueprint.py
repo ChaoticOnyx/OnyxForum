@@ -2,6 +2,7 @@ from flask import Blueprint
 from flaskbb.utils.helpers import register_view
 from .views import *
 from .qiwi_hook import QiwiHook
+from .boosty.views import BoostyLinkProfileView
 
 
 donations = Blueprint("donations", __name__, template_folder="templates")
@@ -64,4 +65,10 @@ register_view(
     donations,
     routes=['/payment'],
     view_func=PaymentView.as_view('payment')
+)
+
+register_view(
+    donations,
+    routes=['/boosty/link'],
+    view_func=BoostyLinkProfileView.as_view('boosty_link')
 )

@@ -64,6 +64,7 @@
             </div>
             <div id="Servers">
                 {% for server in servers %}
+		    {% if server.hub_visible %}
                     <div class="Server Block">
                         <div class="ServerTitle">
                             <span class="Title">
@@ -128,7 +129,7 @@
                         });
                       }
                     </script>
-				{%endif %}
+				{% endif %}
 			{% endfor %}
                         <details class="ServerDescription">
                             <summary>Описание</summary>
@@ -151,6 +152,7 @@
                             </div>
                         </details>
                     </div>
+		    {% endif %}
                 {% endfor %}
             </div>
         </div>

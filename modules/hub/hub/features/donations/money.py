@@ -92,7 +92,13 @@ def add_money_transaction(change: float, reason: str, player: Optional[Player]):
     return money_transaction
 
 
-def add_points_transaction(player: Player, change: float, reason: str):
+def add_points_transaction(
+    player: Player,
+    change: float,
+    reason: str,
+    commit: bool = True,
+    transaction_type: str = "other",
+):
     assert player
     assert change
     assert reason
@@ -103,11 +109,17 @@ def add_points_transaction(player: Player, change: float, reason: str):
     points_transaction.change = change
     points_transaction.comment = reason
     points_transaction.type = \
-        db_hub.session.query(PointsTransactionType).filter(PointsTransactionType.type == "other").one_or_none()
+        db_hub.session.query(PointsTransactionType).filter(PointsTransactionType.type == transaction_type).one_or_none()
+    if points_transaction.type is None:
+        points_transaction.type = PointsTransactionType(type=transaction_type)
+        db_hub.session.add(points_transaction.type)
 
     db_hub.session.add(points_transaction)
-    db_hub.session.commit()
+    if not commit:
+        db_hub.session.flush()
+        return points_transaction
 
+    db_hub.session.commit()
     db_hub.session.refresh(points_transaction)
     db_hub.session.expunge_all()
 

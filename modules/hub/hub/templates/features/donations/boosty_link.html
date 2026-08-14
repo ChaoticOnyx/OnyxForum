@@ -1,0 +1,31 @@
+{% extends theme("features/donations/index.html") %}
+{% from theme('macros.html') import horizontal_field %}
+
+{% block donations_content %}
+<div class="panel page-panel"><div class="panel-heading page-head">Boosty ↔ Forum</div><div class="panel-body">
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Привязать Boosty-аккаунт</h4>
+            <p>Введите одноразовый код из личного сообщения Boosty. После привязки ожидающие операции будут обработаны автоматически.</p>
+            <form method="post" class="form-horizontal">
+                {{ form.hidden_tag() }}
+                <input type="hidden" name="action" value="link">
+                {{ horizontal_field(form.token) }}
+                <div class="form-group"><div class="col-sm-offset-4 col-sm-8"><button class="btn btn-primary" type="submit">Привязать Boosty-аккаунт</button></div></div>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <h4>Запросить новый код</h4>
+            <p>Если предыдущий код истёк, укажите email вашего Boosty-аккаунта. Новый код придёт в личные сообщения Boosty.</p>
+            <form method="post" class="form-horizontal">
+                {{ request_form.hidden_tag() }}
+                <input type="hidden" name="action" value="request_token">
+                {{ horizontal_field(request_form.email) }}
+                <div class="form-group"><div class="col-sm-offset-4 col-sm-8"><button class="btn btn-default" type="submit">Запросить новый токен</button></div></div>
+            </form>
+            <p class="help-block">Страница привязки: <a href="{{ link_url }}">{{ link_url }}</a></p>
+        </div>
+    </div>
+    <h4>Связанные аккаунты</h4><ul>{% for link in links %}<li>{{ link.account.name or link.account.external_id }} — {{ link.linked_at|format_datetime }}</li>{% else %}<li>Связанных Boosty аккаунтов нет</li>{% endfor %}</ul>
+</div></div>
+{% endblock %}

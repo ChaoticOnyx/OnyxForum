@@ -1,0 +1,29 @@
+{% extends theme("features/donations/hub/boosty/base.html") %}
+{% from theme('macros.html') import render_pagination, horizontal_field %}
+
+{% block boosty_content %}
+<div class="row">
+    <div class="col-md-5">
+        <h4>Ручная Boosty → Forum привязка</h4>
+        <form method="post" action="{{ url_for('hub.boosty_link_manual') }}" class="form-horizontal">
+            {{ form.hidden_tag() }}{{ horizontal_field(form.boosty_account_id) }}{{ horizontal_field(form.forum_user_id) }}
+            <button class="btn btn-primary" name="confirmDialog">Связать</button>
+        </form>
+        <p class="help-block">Перепривязка не затрагивает и не повторяет уже обработанные операции.</p>
+    </div>
+    <div class="col-md-7"><div class="boosty-grid">
+        <div class="boosty-card"><small>Все аккаунты</small><strong>{{ pagination.total }}</strong></div>
+        <div class="boosty-card"><small>Фильтр</small><strong><a href="{{ url_for('hub.boosty_links', pending=1) }}">Аккаунты без связи</a> · <a href="{{ url_for('hub.boosty_operations', status='PendingLink') }}">PendingLink операции</a></strong></div>
+    </div></div>
+</div>
+<div class="boosty-table-wrap boosty-section"><table class="table table-striped table-condensed">
+<thead><tr><th>ID</th><th>Boosty account</th><th>Email</th><th>Tier / status</th><th>Forum user</th><th>Last seen</th><th></th></tr></thead><tbody>
+{% for account in accounts %}<tr>
+    <td>{{ account.id }} / {{ account.external_id }}</td><td>{{ account.name or '—' }}</td><td>{{ account.email or '—' }}</td>
+    <td>{{ account.tier_name or '—' }} / {{ account.subscription_status or '—' }}</td>
+    <td>{% if account.link and users.get(account.link.forum_user_id) %}<a href="{{ users[account.link.forum_user_id].url }}">{{ users[account.link.forum_user_id].display_name }}</a>{% elif account.link %}Missing #{{ account.link.forum_user_id }}{% else %}<span class="label label-warning">Pending</span>{% endif %}</td>
+    <td>{{ account.last_seen_at|format_datetime }}</td><td>{% if account.link %}<form method="post" action="{{ url_for('hub.boosty_unlink', account_id=account.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-xs btn-danger" name="confirmDialog">Unlink</button></form>{% endif %}</td>
+</tr>{% else %}<tr><td colspan="7">Boosty accounts отсутствуют</td></tr>{% endfor %}
+</tbody></table></div>
+{{ render_pagination(pagination, pagination_url, with_args=pagination_with_args) }}
+{% endblock %}

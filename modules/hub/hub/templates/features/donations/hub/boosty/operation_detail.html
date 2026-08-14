@@ -1,0 +1,59 @@
+{% extends theme("features/donations/hub/boosty/base.html") %}
+{% from theme('macros.html') import horizontal_field %}
+
+{% block boosty_content %}
+<div class="boosty-toolbar">
+    <a class="btn btn-default" href="{{ url_for('hub.boosty_operations') }}">← История</a>
+    <form method="post" action="{{ url_for('hub.boosty_operation_retry', operation_id=operation.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-primary"{% if operation.status in ('Processed', 'Ignored') %} disabled title="Операция завершена"{% endif %}>Retry processing</button></form>
+    <a class="btn btn-info" href="{{ url_for('hub.boosty_operation_preview', operation_id=operation.id) }}" target="_blank">Recalculate preview</a>
+</div>
+<div class="boosty-grid">
+    <div class="boosty-card"><small>External operation ID</small><strong>{{ operation.external_id }}</strong></div>
+    <div class="boosty-card"><small>Status</small><strong>{{ operation.status }}</strong></div>
+    <div class="boosty-card"><small>Boosty account</small><strong>{{ operation.account.name or operation.account.external_id }}</strong></div>
+    <div class="boosty-card"><small>Forum user</small><strong>{% if forum_user %}<a href="{{ forum_user.url }}">{{ forum_user.display_name }}</a>{% else %}—{% endif %}</strong></div>
+    <div class="boosty-card"><small>Сумма</small><strong>{{ operation.amount }} {{ operation.currency }}</strong></div>
+    <div class="boosty-card"><small>Base / bonus / final rate</small><strong>{{ operation.base_rate or '—' }} / {{ operation.bonus_percent or 0 }}% / {{ operation.final_rate or '—' }}</strong></div>
+    <div class="boosty-card"><small>Начислено Opyx</small><strong>{{ operation.opyx_amount if operation.opyx_amount is not none else '—' }}</strong></div>
+    <div class="boosty-card"><small>Points transaction</small><strong>{{ operation.points_transaction_id or '—' }}</strong></div>
+    <div class="boosty-card"><small>Received / processed</small><strong style="font-size:14px">{{ operation.received_at|format_datetime }} / {{ operation.processed_at|format_datetime if operation.processed_at else '—' }}</strong></div>
+    <div class="boosty-card"><small>Processing attempts</small><strong>{{ operation.processing_attempts }}</strong></div>
+</div>
+{% if operation.last_error %}<div class="alert alert-danger"><strong>Ошибка:</strong> {{ operation.last_error }}</div>{% endif %}
+{% if operation.ignored_reason %}<div class="alert alert-warning"><strong>Ignored:</strong> {{ operation.ignored_reason }}</div>{% endif %}
+
+<div class="row boosty-section">
+    <div class="col-md-6">
+        <h4>Mark as ignored</h4>
+        <form method="post" action="{{ url_for('hub.boosty_operation_ignore', operation_id=operation.id) }}">
+            {{ ignore_form.hidden_tag() }}
+            {{ horizontal_field(ignore_form.reason) }}
+            <button class="btn btn-warning" name="confirmDialog"{% if operation.status == 'Processed' %} disabled{% endif %}>Mark as ignored</button>
+        </form>
+    </div>
+    <div class="col-md-6">
+        <h4>Manual correction</h4>
+        <p class="boosty-muted">Создаёт отдельную PointsTransaction; исходная операция не меняется.</p>
+        <form method="post" action="{{ url_for('hub.boosty_operation_correction', operation_id=operation.id) }}">
+            {{ correction_form.hidden_tag() }}
+            {{ horizontal_field(correction_form.amount) }}{{ horizontal_field(correction_form.reason) }}
+            <button class="btn btn-danger" name="confirmDialog"{% if not operation.player_id %} disabled title="Сначала свяжите операцию с пользователем"{% endif %}>Create correction</button>
+        </form>
+    </div>
+</div>
+
+<div class="boosty-section"><h4>Processing history</h4>
+<div class="boosty-table-wrap"><table class="table table-condensed"><thead><tr><th>CreatedAt</th><th>Event</th><th>Message</th><th>Details</th></tr></thead><tbody>
+{% for item in operation.history %}<tr><td>{{ item.created_at|format_datetime }}</td><td>{{ item.event }}</td><td>{{ item.message or '' }}</td><td><code>{{ item.details|tojson if item.details else '' }}</code></td></tr>{% else %}<tr><td colspan="4">Нет записей</td></tr>{% endfor %}
+</tbody></table></div></div>
+
+<div class="boosty-section"><h4>Discord actions</h4>
+<div class="boosty-table-wrap"><table class="table table-condensed"><thead><tr><th>Action</th><th>Role</th><th>Status</th><th>Attempts</th><th>Error</th></tr></thead><tbody>{% for item in discord_actions %}<tr><td>{{ item.action }}</td><td>{{ item.role_id or '—' }}</td><td>{{ item.status }}</td><td>{{ item.attempts }}</td><td class="boosty-error">{{ item.last_error or '' }}</td></tr>{% else %}<tr><td colspan="5">Нет действий</td></tr>{% endfor %}</tbody></table></div></div>
+
+<div class="boosty-section"><h4>Webhook deliveries</h4>
+<div class="boosty-table-wrap"><table class="table table-condensed"><thead><tr><th>Event</th><th>Endpoint</th><th>Status</th><th>Attempts</th><th>HTTP</th><th>Error</th></tr></thead><tbody>{% for item in deliveries %}<tr><td>{{ item.event_name }}</td><td>{{ item.endpoint.name }}</td><td>{{ item.status }}</td><td>{{ item.attempts }}</td><td>{{ item.http_status or '—' }}</td><td class="boosty-error">{{ item.last_error or '' }}</td></tr>{% else %}<tr><td colspan="6">Нет доставок</td></tr>{% endfor %}</tbody></table></div></div>
+
+<div class="boosty-section"><h4>Corrections</h4><ul>{% for item in corrections %}<li>{{ item.created_at|format_datetime }} — {{ item.amount }} Opyx — {{ item.reason }} (Points #{{ item.points_transaction_id }})</li>{% else %}<li>Нет корректировок</li>{% endfor %}</ul></div>
+
+{% if operation.raw_payload %}<div class="boosty-section"><h4>Raw Boosty payload</h4><pre class="boosty-raw">{{ operation.raw_payload|tojson(indent=2) }}</pre></div>{% endif %}
+{% endblock %}

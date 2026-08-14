@@ -1,0 +1,92 @@
+{% extends theme("features/donations/hub/boosty/base.html") %}
+
+{% block boosty_content %}
+<div class="boosty-toolbar">
+    <form method="get" class="form-inline">
+        <div class="form-group">
+            <label for="period">Период</label>
+            <select id="period" name="period" class="form-control">
+                {% for value, title in [('day','День'),('week','Неделя'),('month','Месяц'),('3months','3 месяца'),('year','Год')] %}
+                <option value="{{ value }}"{% if dashboard.period == value %} selected{% endif %}>{{ title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group"><label for="date_from">С</label><input id="date_from" class="form-control" type="date" name="date_from" value="{{ request.args.get('date_from', '') }}"></div>
+        <div class="form-group"><label for="date_to">По</label><input id="date_to" class="form-control" type="date" name="date_to" value="{{ request.args.get('date_to', '') }}"></div>
+        <button class="btn btn-default" type="submit">Применить</button>
+    </form>
+    <form method="post" action="{{ url_for('hub.boosty_sync') }}" onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').innerText='Синхронизация…';">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-primary" type="submit"><span class="fa fa-refresh"></span> Синхронизировать сейчас</button>
+    </form>
+</div>
+
+<div class="boosty-grid">
+    <div class="boosty-card"><small>Integration Health</small><strong class="boosty-health-{{ dashboard.health }}">{{ dashboard.health }}</strong></div>
+    <div class="boosty-card"><small>Доход сегодня</small><strong>{{ dashboard.todayRevenue }} ₽</strong></div>
+    <div class="boosty-card"><small>Доход за неделю</small><strong>{{ dashboard.weekRevenue }} ₽</strong></div>
+    <div class="boosty-card"><small>Доход за месяц</small><strong>{{ dashboard.monthRevenue }} ₽</strong></div>
+    <div class="boosty-card"><small>Доход за период</small><strong>{{ dashboard.current.revenue }} ₽</strong></div>
+    <div class="boosty-card"><small>К предыдущему периоду</small><strong>{% if dashboard.changePercent is not none %}{{ dashboard.changePercent }}%{% else %}—{% endif %}</strong></div>
+    <div class="boosty-card"><small>Донатов / донатеров</small><strong>{{ dashboard.current.donations }} / {{ dashboard.current.donators }}</strong></div>
+    <div class="boosty-card"><small>Средний / крупнейший</small><strong>{{ dashboard.current.average|round(2) }} / {{ dashboard.current.maximum }} ₽</strong></div>
+    <div class="boosty-card"><small>Начислено Opyx</small><strong>{{ dashboard.current.opyx }}</strong></div>
+    <div class="boosty-card"><small>Связано / не связано</small><strong>{{ dashboard.linkedAccounts }} / {{ dashboard.unlinkedAccounts }}</strong></div>
+    <div class="boosty-card"><small>Pending</small><strong>{{ dashboard.pendingOperations }} / {{ dashboard.pendingAmount }} ₽</strong></div>
+    <div class="boosty-card"><small>Failed / Discord / Webhook</small><strong>{{ dashboard.failedOperations }} / {{ dashboard.discordFailures }} / {{ dashboard.webhookFailures }}</strong></div>
+    <div class="boosty-card"><small>Платных подписчиков</small><strong>{{ dashboard.paidSubscribers }}</strong></div>
+    <div class="boosty-card"><small>Новые / завершённые подписки</small><strong>{{ dashboard.newPaidSubscribers }} / {{ dashboard.endedSubscriptions }}</strong></div>
+    <div class="boosty-card"><small>Изменения tier</small><strong>{{ dashboard.tierChanges }}</strong></div>
+</div>
+<div class="row">
+    <div class="col-md-12"><h4>Динамика платных подписчиков</h4><canvas id="boosty-subscribers-chart" class="boosty-chart"></canvas></div>
+</div>
+
+<div class="row">
+    <div class="col-md-4"><h4>Доход</h4><canvas id="boosty-revenue-chart" class="boosty-chart"></canvas></div>
+    <div class="col-md-4"><h4>Количество донатов</h4><canvas id="boosty-donations-chart" class="boosty-chart"></canvas></div>
+    <div class="col-md-4"><h4>Динамика донатеров</h4><canvas id="boosty-donators-chart" class="boosty-chart"></canvas></div>
+</div>
+
+<div class="boosty-section">
+    <h4>Состояние синхронизации</h4>
+    <dl class="dl-horizontal">
+        <dt>Последняя успешная</dt><dd>{{ dashboard.state.last_successful_sync_at|format_datetime if dashboard.state and dashboard.state.last_successful_sync_at else '—' }}</dd>
+        <dt>Следующая</dt><dd>{{ dashboard.state.next_sync_at|format_datetime if dashboard.state and dashboard.state.next_sync_at else '—' }}</dd>
+        <dt>Последняя операция</dt><dd>{% if dashboard.lastOperation %}<a href="{{ url_for('hub.boosty_operation', operation_id=dashboard.lastOperation.id) }}">{{ dashboard.lastOperation.external_id }}</a>{% else %}—{% endif %}</dd>
+        <dt>Последняя ошибка</dt><dd class="boosty-error">{{ dashboard.state.last_error if dashboard.state and dashboard.state.last_error else '—' }}</dd>
+    </dl>
+</div>
+
+<script>
+(function () {
+    var points = {{ dashboard.chart|tojson }};
+    var subscriptionPoints = {{ dashboard.subscriptionChart|tojson }};
+    function draw(id, key, color) {
+        var canvas = document.getElementById(id), ratio = window.devicePixelRatio || 1;
+        var width = canvas.clientWidth || 320, height = canvas.clientHeight || 180;
+        canvas.width = width * ratio; canvas.height = height * ratio;
+        var ctx = canvas.getContext('2d'); ctx.scale(ratio, ratio); ctx.clearRect(0, 0, width, height);
+        ctx.strokeStyle = '#343946'; ctx.beginPath(); ctx.moveTo(32, 10); ctx.lineTo(32, height - 24); ctx.lineTo(width - 8, height - 24); ctx.stroke();
+        if (!points.length) { ctx.fillStyle='#9da5b4'; ctx.fillText('Нет данных', 45, 50); return; }
+        var values = points.map(function (p) { return Number(p[key]) || 0; });
+        var maximum = Math.max.apply(Math, values.concat([1]));
+        ctx.strokeStyle=color; ctx.lineWidth=2; ctx.beginPath();
+        values.forEach(function (value, index) {
+            var x = 32 + index * ((width - 48) / Math.max(values.length - 1, 1));
+            var y = 10 + (height - 42) * (1 - value / maximum);
+            if (index === 0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        });
+        ctx.stroke(); ctx.fillStyle='#9da5b4'; ctx.fillText(String(maximum), 2, 18); ctx.fillText('0', 15, height - 21);
+    }
+    function drawSubscribers() {
+        var original = points;
+        points = subscriptionPoints;
+        draw('boosty-subscribers-chart', 'subscribers', '#d06bff');
+        points = original;
+    }
+    function drawAll() { draw('boosty-revenue-chart','revenue','#5bc0de'); draw('boosty-donations-chart','donations','#5cb85c'); draw('boosty-donators-chart','donators','#f0ad4e'); drawSubscribers(); }
+    drawAll(); window.addEventListener('resize', drawAll);
+})();
+</script>
+{% endblock %}

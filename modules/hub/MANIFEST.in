@@ -1,0 +1,6 @@
+recursive-include hub/templates *.html
+recursive-include hub/migrations *.py
+recursive-include hub/configs/example *.cfg
+recursive-include hub/translations *.mo *.po
+global-exclude __pycache__
+global-exclude *.py[co]

@@ -1,0 +1,8 @@
+{% extends theme("features/donations/hub/boosty/base.html") %}
+
+{% block boosty_content %}
+<div class="boosty-toolbar"><form method="post" action="{{ url_for('hub.boosty_reconcile') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-primary"><span class="fa fa-check"></span> Run reconciliation</button></form></div>
+<div class="boosty-table-wrap"><table class="table table-striped table-condensed"><thead><tr><th>Severity</th><th>Issue</th><th>Operation</th><th>Status</th><th>Detected</th><th>Last seen</th><th>Message</th></tr></thead><tbody>
+{% for issue in issues %}<tr><td><span class="label label-{{ 'danger' if issue.severity == 'Critical' else 'warning' if issue.severity == 'Warning' else 'info' }}">{{ issue.severity }}</span></td><td>{{ issue.issue_type }}</td><td>{% if issue.operation %}<a href="{{ url_for('hub.boosty_operation', operation_id=issue.operation.id) }}">{{ issue.operation.external_id }}</a>{% else %}—{% endif %}</td><td>{{ issue.status }}</td><td>{{ issue.detected_at|format_datetime }}</td><td>{{ issue.last_seen_at|format_datetime }}</td><td>{{ issue.message }}</td></tr>
+{% else %}<tr><td colspan="7">Проблемы не обнаружены. Запустите reconciliation для актуальной проверки.</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

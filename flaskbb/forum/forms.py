@@ -9,16 +9,17 @@
     :license: BSD, see LICENSE for more details.
 """
 import logging
+from sqlalchemy import or_
 
 from flask import current_app
 from flask_babelplus import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import (BooleanField, SelectMultipleField, StringField,
+from wtforms import (BooleanField, SelectField, SelectMultipleField, StringField,
                      SubmitField, TextAreaField)
 from wtforms.validators import DataRequired, Length, Optional
 
 from flaskbb.forum.models import Forum, Post, Report, Topic
-from flaskbb.user.models import User
+from flaskbb.user.models import Group, User
 from flaskbb.utils.helpers import time_utcnow
 
 logger = logging.getLogger(__name__)
@@ -167,6 +168,16 @@ class ReportForm(FlaskForm):
 
 
 class UserSearchForm(FlaskForm):
+    search_type = SelectField(
+        _("Search by"),
+        choices=[
+            ("text", _("Username / display name")),
+            ("primary_group", _("Primary group")),
+            ("secondary_group", _("Secondary group")),
+            ("discord", _("Discord ID / name")),
+        ],
+        default="text",
+    )
     search_query = StringField(
         _("Search"), validators=[DataRequired(), Length(min=3, max=50)]
     )
@@ -175,6 +186,26 @@ class UserSearchForm(FlaskForm):
 
     def get_results(self):
         query = self.search_query.data
+        pattern = "%{}%".format(query)
+        if self.search_type.data == "primary_group":
+            return User.query.join(User.primary_group).filter(Group.name.like(pattern))
+        if self.search_type.data == "secondary_group":
+            return User.query.filter(User.secondary_groups.any(Group.name.like(pattern)))
+        if self.search_type.data == "discord":
+            discord_ids = []
+            try:
+                from flaskbb.extensions import db_hub
+                from hub.models import DiscordUser
+                discord_ids = [
+                    item[0] for item in
+                    db_hub.session.query(DiscordUser.id)
+                    .filter(or_(DiscordUser.id.like(pattern), DiscordUser.nickname.like(pattern)))
+                    .limit(500)
+                    .all()
+                ]
+            except Exception:
+                logger.exception("Discord display-name lookup failed")
+            return User.query.filter(or_(User.discord.like(pattern), User.discord.in_(discord_ids)))
         return User.query.whooshee_search(query)
 
 

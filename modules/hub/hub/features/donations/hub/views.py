@@ -3,7 +3,7 @@ import logging
 from dataclasses import dataclass
 from typing import List
 
-from flask import request, flash
+from flask import request, flash, redirect, url_for
 from flask.views import MethodView
 from flask_allows import Permission
 from flask_babelplus import gettext as _
@@ -68,7 +68,7 @@ class DonationsView(MethodView):
         }
 
     def get(self):
-        return render_template("features/donations/hub/index.html", **self.get_args())
+        return redirect(url_for("hub.boosty_dashboard"))
 
 
 class AddDonationView(DonationsView):

@@ -3,6 +3,16 @@ from flaskbb.utils.helpers import register_view
 
 from .views import *
 from .features.donations.hub.views import *
+from .features.donations.boosty.views import (
+    BoostyDashboardApiView, BoostyDashboardView, BoostyDiscordView,
+    BoostyIssuesView, BoostyLinksView, BoostyOperationDetailView,
+    BoostyOperationsApiView, BoostyOperationsView, BoostySettingsView,
+    BoostyStatisticsView, BoostyWebhooksView, admin_required,
+    correct_operation, delete_role_mapping, delete_webhook, ignore_operation,
+    link_account_manually, operation_preview, retry_discord,
+    retry_operation, retry_webhook, run_reconciliation, save_role_mapping,
+    save_webhook, sync_now, test_webhook, unlink_account_admin,
+)
 from .features.karma.views import *
 
 hub = Blueprint("hub", __name__, template_folder="templates")
@@ -144,3 +154,33 @@ register_view(
     routes=["/donations/add_points_transaction"],
     view_func=AddPointsTransactionView.as_view("add_points_transaction"),
 )
+
+register_view(hub, routes=["/donations/boosty"], view_func=BoostyDashboardView.as_view("boosty_dashboard"))
+register_view(hub, routes=["/donations/boosty/statistics"], view_func=BoostyStatisticsView.as_view("boosty_statistics"))
+register_view(hub, routes=["/donations/boosty/operations"], view_func=BoostyOperationsView.as_view("boosty_operations"))
+register_view(hub, routes=["/donations/boosty/operations/<int:operation_id>"], view_func=BoostyOperationDetailView.as_view("boosty_operation"))
+register_view(hub, routes=["/donations/boosty/settings"], view_func=BoostySettingsView.as_view("boosty_settings"))
+register_view(hub, routes=["/donations/boosty/links"], view_func=BoostyLinksView.as_view("boosty_links"))
+register_view(hub, routes=["/donations/boosty/discord"], view_func=BoostyDiscordView.as_view("boosty_discord"))
+register_view(hub, routes=["/donations/boosty/webhooks"], view_func=BoostyWebhooksView.as_view("boosty_webhooks"))
+register_view(hub, routes=["/donations/boosty/issues"], view_func=BoostyIssuesView.as_view("boosty_issues"))
+register_view(hub, routes=["/donations/boosty/api/dashboard"], view_func=BoostyDashboardApiView.as_view("boosty_api_dashboard"))
+register_view(hub, routes=["/donations/boosty/api/operations"], view_func=BoostyOperationsApiView.as_view("boosty_api_operations"))
+
+register_view(hub, routes=["/donations/boosty/sync"], view_func=admin_required(sync_now), endpoint="boosty_sync", methods=["POST"])
+register_view(hub, routes=["/donations/boosty/operations/<int:operation_id>/retry"], view_func=admin_required(retry_operation), endpoint="boosty_operation_retry", methods=["POST"])
+register_view(hub, routes=["/donations/boosty/operations/<int:operation_id>/ignore"], view_func=admin_required(ignore_operation), endpoint="boosty_operation_ignore", methods=["POST"])
+register_view(hub, routes=["/donations/boosty/operations/<int:operation_id>/preview"], view_func=admin_required(operation_preview), endpoint="boosty_operation_preview", methods=["GET"])
+register_view(hub, routes=["/donations/boosty/operations/<int:operation_id>/correction"], view_func=admin_required(correct_operation), endpoint="boosty_operation_correction", methods=["POST"])
+register_view(hub, routes=["/donations/boosty/links/manual"], view_func=admin_required(link_account_manually), endpoint="boosty_link_manual", methods=["POST"])
+register_view(hub, routes=["/donations/boosty/links/<int:account_id>/unlink"], view_func=admin_required(unlink_account_admin), endpoint="boosty_unlink", methods=["POST"])
+register_view(hub, routes=["/donations/boosty/discord/mappings"], view_func=admin_required(save_role_mapping), endpoint="boosty_discord_mapping_add", methods=["POST"])
+register_view(hub, routes=["/donations/boosty/discord/mappings/<int:mapping_id>"], view_func=admin_required(save_role_mapping), endpoint="boosty_discord_mapping_edit", methods=["POST"])
+register_view(hub, routes=["/donations/boosty/discord/mappings/<int:mapping_id>/delete"], view_func=admin_required(delete_role_mapping), endpoint="boosty_discord_mapping_delete", methods=["POST"])
+register_view(hub, routes=["/donations/boosty/discord/actions/<int:action_id>/retry"], view_func=admin_required(retry_discord), endpoint="boosty_discord_retry", methods=["POST"])
+register_view(hub, routes=["/donations/boosty/webhooks"], view_func=admin_required(save_webhook), endpoint="boosty_webhook_add", methods=["POST"])
+register_view(hub, routes=["/donations/boosty/webhooks/<int:endpoint_id>"], view_func=admin_required(save_webhook), endpoint="boosty_webhook_edit", methods=["POST"])
+register_view(hub, routes=["/donations/boosty/webhooks/<int:endpoint_id>/delete"], view_func=admin_required(delete_webhook), endpoint="boosty_webhook_delete", methods=["POST"])
+register_view(hub, routes=["/donations/boosty/webhooks/<int:endpoint_id>/test"], view_func=admin_required(test_webhook), endpoint="boosty_webhook_test", methods=["POST"])
+register_view(hub, routes=["/donations/boosty/webhook-deliveries/<int:delivery_id>/retry"], view_func=admin_required(retry_webhook), endpoint="boosty_webhook_retry", methods=["POST"])
+register_view(hub, routes=["/donations/boosty/reconcile"], view_func=admin_required(run_reconciliation), endpoint="boosty_reconcile", methods=["POST"])
