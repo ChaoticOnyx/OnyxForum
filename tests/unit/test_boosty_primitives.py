@@ -24,6 +24,7 @@ signing = load_module("boosty_signing_primitives", "signing.py")
 api = load_module("boosty_api_primitives", "api.py")
 webhook_payload = load_module("boosty_webhook_payload_primitives", "webhook_payload.py")
 formatting = load_module("boosty_formatting_primitives", "formatting.py")
+constants = load_module("boosty_constants_primitives", "constants.py")
 
 
 def settings(**overrides):
@@ -211,9 +212,30 @@ class BoostySafetyBoundaryTest(unittest.TestCase):
             self.assertIn(key, source)
 
     def test_gift_purchase_is_not_a_points_event(self):
-        source = (BOOSTY / "constants.py").read_text(encoding="utf-8")
-        self.assertIn('POINTS_EVENT_TYPES = frozenset(("donation_author", "subscribe", "recurrent"))', source)
-        self.assertNotIn('POINTS_EVENT_TYPES = frozenset(("buy_gift"', source)
+        self.assertNotIn("buy_gift", constants.POINTS_EVENT_TYPES)
+
+    def test_subscription_upgrade_is_a_points_and_subscription_event(self):
+        self.assertEqual(
+            constants.EVENT_OPERATION_TYPES["up_subscription"],
+            constants.OPERATION_SUBSCRIPTION_UPGRADE,
+        )
+        self.assertIn("up_subscription", constants.POINTS_EVENT_TYPES)
+        self.assertIn("up_subscription", constants.SUBSCRIPTION_EVENT_TYPES)
+        self.assertIn(
+            constants.OPERATION_SUBSCRIPTION_UPGRADE,
+            constants.POINTS_OPERATION_TYPES,
+        )
+
+    def test_unsupported_subscription_upgrades_are_requeued_once(self):
+        service = (BOOSTY / "service.py").read_text(encoding="utf-8")
+        sync = (BOOSTY / "sync.py").read_text(encoding="utf-8")
+        self.assertIn("def requeue_ignored_subscription_upgrades():", service)
+        self.assertIn('BoostyOperation.ignored_reason', service)
+        self.assertIn(
+            '== "Unsupported Boosty event type: up_subscription"', service,
+        )
+        self.assertIn("BoostyOperation.status: OPERATION_NEW", service)
+        self.assertIn("requeue_ignored_subscription_upgrades()", sync)
 
     def test_expired_link_token_requires_an_explicit_reissue(self):
         service = (BOOSTY / "service.py").read_text(encoding="utf-8")

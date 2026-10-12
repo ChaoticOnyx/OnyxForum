@@ -32,6 +32,7 @@ from .constants import (
     OPERATION_PROCESSED,
     OPERATION_PROCESSING,
     OPERATION_SUBSCRIPTION_ENDED,
+    OPERATION_SUBSCRIPTION_UPGRADE,
     OPERATION_UNKNOWN,
     POINTS_EVENT_TYPES,
     ZERO,
@@ -222,16 +223,30 @@ def _ignored_event_reason(operation_type, event_type):
 
 
 def _apply_subscription_event(account, payload, event_type):
-    if event_type not in ("subscribe", "recurrent", "unsubscribe"):
+    if event_type not in (
+        "subscribe",
+        "recurrent",
+        "up_subscription",
+        "unsubscribe",
+    ):
         return
     now = time_utcnow()
-    previous_tier_id = account.tier_id
+    previous_tier_id = (
+        str(payload.get("oldLevelId"))
+        if payload.get("oldLevelId") is not None
+        else account.tier_id
+    )
     tier_id = str(payload.get("levelId")) if payload.get("levelId") is not None else None
-    if event_type in ("subscribe", "recurrent"):
+    if event_type in ("subscribe", "recurrent", "up_subscription"):
         account.is_paid_subscriber = True
         account.subscription_status = "active"
         account.tier_id = tier_id or account.tier_id
-        event_name = "Started" if event_type == "subscribe" else "Renewed"
+        if event_type == "subscribe":
+            event_name = "Started"
+        elif event_type == "up_subscription":
+            event_name = "Changed"
+        else:
+            event_name = "Renewed"
     else:
         account.is_paid_subscriber = False
         account.subscription_status = "inactive"
@@ -250,6 +265,13 @@ def _apply_subscription_event(account, payload, event_type):
     if event_type == "subscribe":
         queue_event("boosty.subscription.started", {
             "boostyAccountId": account.external_id,
+            "tierId": account.tier_id,
+            "status": account.subscription_status,
+        })
+    elif event_type == "up_subscription":
+        queue_event("boosty.subscription.changed", {
+            "boostyAccountId": account.external_id,
+            "previousTierId": previous_tier_id,
             "tierId": account.tier_id,
             "status": account.subscription_status,
         })
@@ -302,6 +324,29 @@ def ingest_event(payload):
         if existing:
             return existing, False
         raise
+
+
+def requeue_ignored_subscription_upgrades():
+    """Requeue upgrades that were ignored before support was added."""
+    return (
+        BoostyOperation.query
+        .filter(
+            BoostyOperation.status == OPERATION_IGNORED,
+            BoostyOperation.description == "Boosty event (up_subscription)",
+            BoostyOperation.ignored_reason
+            == "Unsupported Boosty event type: up_subscription",
+            BoostyOperation.points_transaction_id.is_(None),
+        )
+        .update({
+            BoostyOperation.operation_type: OPERATION_SUBSCRIPTION_UPGRADE,
+            BoostyOperation.status: OPERATION_NEW,
+            BoostyOperation.processed_at: None,
+            BoostyOperation.processing_started_at: None,
+            BoostyOperation.processing_attempts: 0,
+            BoostyOperation.last_error: None,
+            BoostyOperation.ignored_reason: None,
+        }, synchronize_session=False)
+    )
 
 
 def ensure_link_token(account, settings=None, allow_reissue=False):

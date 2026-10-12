@@ -20,6 +20,7 @@ OPERATION_STATUSES = (
 OPERATION_DONATION = "Donation"
 OPERATION_SUBSCRIPTION = "Subscription"
 OPERATION_SUBSCRIPTION_RENEWAL = "SubscriptionRenewal"
+OPERATION_SUBSCRIPTION_UPGRADE = "SubscriptionUpgrade"
 OPERATION_GIFT_PURCHASE = "GiftPurchase"
 OPERATION_SUBSCRIPTION_ENDED = "SubscriptionEnded"
 OPERATION_PAYOUT = "Payout"
@@ -30,20 +31,32 @@ POINTS_OPERATION_TYPES = (
     OPERATION_DONATION,
     OPERATION_SUBSCRIPTION,
     OPERATION_SUBSCRIPTION_RENEWAL,
+    OPERATION_SUBSCRIPTION_UPGRADE,
 )
 
 EVENT_OPERATION_TYPES = {
     "donation_author": OPERATION_DONATION,
     "subscribe": OPERATION_SUBSCRIPTION,
     "recurrent": OPERATION_SUBSCRIPTION_RENEWAL,
+    "up_subscription": OPERATION_SUBSCRIPTION_UPGRADE,
     "buy_gift": OPERATION_GIFT_PURCHASE,
     "unsubscribe": OPERATION_SUBSCRIPTION_ENDED,
     "payout": OPERATION_PAYOUT,
     "payout_error": OPERATION_PAYOUT_ERROR,
 }
 
-POINTS_EVENT_TYPES = frozenset(("donation_author", "subscribe", "recurrent"))
-SUBSCRIPTION_EVENT_TYPES = frozenset(("subscribe", "recurrent", "unsubscribe"))
+POINTS_EVENT_TYPES = frozenset((
+    "donation_author",
+    "subscribe",
+    "recurrent",
+    "up_subscription",
+))
+SUBSCRIPTION_EVENT_TYPES = frozenset((
+    "subscribe",
+    "recurrent",
+    "up_subscription",
+    "unsubscribe",
+))
 
 WEBHOOK_PENDING = "Pending"
 WEBHOOK_DELIVERED = "Delivered"

@@ -10,7 +10,11 @@ from flaskbb.utils.helpers import time_utcnow
 from .api import BoostyApiClient, event_external_id, next_page_offset
 from .constants import OPERATION_ERROR, OPERATION_NEW, OPERATION_PENDING_LINK, SUBSCRIPTION_EVENT_TYPES
 from .models import BoostyAccount, BoostyLinkToken, BoostyOperation, BoostySubscriptionEvent, BoostySyncState
-from .service import ingest_event, process_operation
+from .service import (
+    ingest_event,
+    process_operation,
+    requeue_ignored_subscription_upgrades,
+)
 from .settings import get_settings
 from .webhooks import queue_event
 
@@ -130,6 +134,14 @@ def synchronize(force=False):
     state.next_sync_at = now + datetime.timedelta(seconds=interval)
     db_hub.session.commit()
 
+    requeued = requeue_ignored_subscription_upgrades()
+    if requeued:
+        logger.info(
+            "Requeued %s previously ignored Boosty subscription upgrades",
+            requeued,
+        )
+    db_hub.session.commit()
+
     received_ids = []
     received_count = 0
     processed = 0
@@ -239,7 +251,12 @@ def synchronize(force=False):
         state.last_error_at = None
         state.consecutive_failures = 0
         db_hub.session.commit()
-        return {"skipped": False, "received": received_count, "processed": processed}
+        return {
+            "skipped": False,
+            "received": received_count,
+            "processed": processed,
+            "requeued": requeued,
+        }
     except Exception as exc:
         db_hub.session.rollback()
         state = get_sync_state(for_update=True)
