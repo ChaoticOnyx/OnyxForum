@@ -18,6 +18,7 @@ class ServerDescriptor(db.Model):
     branch_name = db.Column(db.String(255), nullable=False)
     dream_maker_binary = db.Column(db.String(255), nullable=False)
     dme_name = db.Column(db.String(255), nullable=False)
+    update_script_path = db.Column(db.String(255), nullable=True)
     configs_path = db.Column(db.String(255), nullable=False)
     configs_exclude = db.Column(db.JSON, default=list)
     logs_path = db.Column(db.String(255), nullable=False)

@@ -74,6 +74,7 @@ class ServerManagementView(MethodView):
         server.branch_name = form_data.get("branch_name")
         server.dream_maker_binary = form_data.get("dream_maker_binary")
         server.dme_name = form_data.get("dme_name")
+        server.update_script_path = form_data.get("update_script_path") or None
         server.configs_path = form_data.get("configs_path")
         server.configs_exclude = [x.strip() for x in form_data.get("configs_exclude", "").split(",") if x.strip()]
         server.logs_path = form_data.get("logs_path")

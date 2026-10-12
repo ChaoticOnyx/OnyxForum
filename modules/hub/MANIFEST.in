@@ -1,4 +1,5 @@
 recursive-include hub/templates *.html
+recursive-include hub/static *.js
 recursive-include hub/migrations *.py
 recursive-include hub/configs/example *.cfg
 recursive-include hub/translations *.mo *.po

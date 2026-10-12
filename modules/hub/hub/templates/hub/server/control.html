@@ -49,15 +49,24 @@
                     {% endfor %}
                 {% endif %}
                 {% if view == "UpdateLogs" or view == "ServerLogs" %}
-                    <div style="height: 300px; overflow: auto; display: flex; flex-direction: column-reverse;">
-                        {% for log in logs %}
-                            {{ log }}<br>
-                        {% endfor %}
+                    <div class="text-muted">
+                        <i class="fa fa-circle text-success" aria-hidden="true"></i>
+                        Live view
                     </div>
+                    <pre id="server-live-log"
+                         data-source="{{ url_for('hub.control_logs', server=server.id, view=view) }}"
+                         style="height: 300px; overflow: auto; white-space: pre-wrap;">{{ logs|join('\n') }}</pre>
                 {% endif %}
             </div>
         </div>
     </div>
 </div>
 {% include theme('confirm_dialog.html') %}
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    {% if view == "UpdateLogs" or view == "ServerLogs" %}
+        <script src="{{ url_for('hub.static', filename='js/control_logs.js') }}"></script>
+    {% endif %}
 {% endblock %}

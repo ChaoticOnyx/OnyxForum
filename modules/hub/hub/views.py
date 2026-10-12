@@ -8,7 +8,8 @@ import subprocess
 from subprocess import DEVNULL, PIPE, STDOUT
 from typing import List
 
-from flask import redirect, request, url_for, current_app, abort, flash, send_file, safe_join
+from flask import abort, current_app, flash, jsonify, redirect, request
+from flask import safe_join, send_file, url_for
 from flask_babelplus import gettext as _
 from flask_allows import Permission
 from flask_login import current_user
@@ -26,6 +27,13 @@ from hub.permissions import CanAccessServerHub, CanAccessServerHubAdditional, Ca
 from hub.models import DiscordUser, DiscordUserRole, DiscordRole, HubLog
 from hub.utils import hub_current_server, get_servers_config
 from hub.gameserver_models import game_models, ErroBan
+from hub.features.servers_managment.tasks import update_server_async
+from hub.services.control_logs import (
+    append_update_log,
+    get_update_log_path,
+    read_server_output,
+    read_update_log,
+)
 
 from flaskbb.utils.helpers import (
     render_template,
@@ -135,10 +143,6 @@ class RestartServer(ServerControl):
         return redirect(url_for("hub.control", server=hub_current_server.id, view="HubLogs"))
 
 
-def get_update_log_path(server_id):
-    return "logs/" + server_id + "/update.log"
-
-
 class UpdateServer(ServerControl):
     _action = "updated"
 
@@ -146,21 +150,33 @@ class UpdateServer(ServerControl):
         if not hub_current_server:
             abort(404)
 
-        update_script = \
-            '''
-                cd {path}
-                git fetch origin {branch}
-                git checkout -f FETCH_HEAD
-                {dreammaker} -clean {dme}
-            '''.format(
-                path=hub_current_server.path,
-                branch=hub_current_server.branch_name,
-                dreammaker=hub_current_server.dream_maker_binary,
-                dme=hub_current_server.dme_name
+        output_file = get_update_log_path(
+            current_app.config["LOG_PATH"],
+            hub_current_server.id,
+        )
+        append_update_log(
+            output_file,
+            "\n-------------------\n"
+            + datetime_tag()
+            + "Update requested from Hub",
+        )
+        try:
+            update_task = update_server_async.delay(
+                hub_current_server.id,
+                output_file,
             )
-
-        output_file = get_update_log_path(hub_current_server.id)
-        result = run_console_script_async.delay(update_script, "Update", output_file)
+        except Exception as exception:
+            append_update_log(
+                output_file,
+                datetime_tag()
+                + "Failed to queue update: {}".format(exception),
+            )
+            raise
+        append_update_log(
+            output_file,
+            datetime_tag()
+            + "Update queued: task {}".format(update_task.id),
+        )
         self._report(current_user)
         return redirect(url_for("hub.control", server=hub_current_server.id, view="UpdateLogs"))
 
@@ -273,19 +289,6 @@ class Hub(MethodView):
         return render_template("hub/server/index.html", **self.get_args())
 
 
-def get_server_log_file_path(server):
-    log_file_path = "logs/" + server.id + "/server.log"
-
-    script = '''
-            rm {log_file}
-            journalctl --unit={unit} -n 500 --no-pager >> {log_file}
-        '''.format(
-            unit=server.service_name,
-            log_file=log_file_path)
-    subprocess.run(script, shell=True)
-    return log_file_path
-
-
 class ControlView(Hub):
     decorators = [
         allows.requires(
@@ -310,13 +313,35 @@ class ControlView(Hub):
                 .limit(100) \
                 .all()
         elif view == "UpdateLogs":
-            update_log_path = get_update_log_path(hub_current_server.id)
-            logs = open(update_log_path, 'r').read().split("\n")[-500:]
+            logs = read_update_log(
+                current_app.config["LOG_PATH"],
+                hub_current_server.id,
+            )
         elif view == "ServerLogs":
-            server_log_path = get_server_log_file_path(hub_current_server)
-            logs = open(server_log_path, 'r').read().split("\n")[-500:]
+            logs = read_server_output(hub_current_server.service_name)
 
         return render_template("hub/server/control.html", **self.get_args(), view=view, logs=logs)
+
+
+class ControlLogsView(ServerControl):
+    def get(self):
+        if not hub_current_server:
+            abort(404)
+
+        view = request.args.get("view")
+        if view == "UpdateLogs":
+            logs = read_update_log(
+                current_app.config["LOG_PATH"],
+                hub_current_server.id,
+            )
+        elif view == "ServerLogs":
+            logs = read_server_output(hub_current_server.service_name)
+        else:
+            abort(400)
+
+        response = jsonify({"lines": logs})
+        response.headers["Cache-Control"] = "no-store"
+        return response
 
 
 class ConfigsView(Hub):

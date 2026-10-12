@@ -95,6 +95,17 @@
         <label for="dme_name">DME файл</label>
         <input type="text" class="form-control" name="dme_name" id="dme_name" value="{{ server.dme_name or '' }}">
       </div>
+
+      <div class="form-group">
+        <label for="update_script_path">Скрипт сборки/обновления</label>
+        <p class="help-block">
+          Необязательный путь к <code>update.sh</code> или <code>tools/build/build.sh</code>.
+          Скрипт внутри репозитория запускается в изолированной сборке;
+          внешний скрипт сам управляет обновлением.
+          Оставьте поле пустым для старой сборки через DreamMaker.
+        </p>
+        <input type="text" class="form-control" name="update_script_path" id="update_script_path" value="{{ server.update_script_path or '' }}">
+      </div>
     </div>
   </div>
 

@@ -15,7 +15,12 @@ from .features.donations.boosty.views import (
 )
 from .features.karma.views import *
 
-hub = Blueprint("hub", __name__, template_folder="templates")
+hub = Blueprint(
+    "hub",
+    __name__,
+    template_folder="templates",
+    static_folder="static",
+)
 
 register_view(
     hub,
@@ -27,6 +32,12 @@ register_view(
     hub,
     routes=["/control"],
     view_func=ControlView.as_view("control")
+)
+
+register_view(
+    hub,
+    routes=["/control/logs"],
+    view_func=ControlLogsView.as_view("control_logs")
 )
 
 register_view(

@@ -10,6 +10,7 @@ from flask import current_app, url_for
 
 from flask_login import current_user
 
+from .features.servers_managment import tasks as _server_tasks  # noqa: F401
 from .blueprint import hub
 from .permissions import can_access_hub
 from hub.features.karma.render import render_karma, render_post_rating
